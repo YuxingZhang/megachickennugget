@@ -8,6 +8,10 @@ from sklearn.preprocessing import normalize
 # Output:
 # 	Variational parameters {u, u_prime, rho, alpha, eta, z}	
 # Variables:
+#	K:			Number of topics
+#	V:			Size of vocabulary
+#	D:			Number of documents
+#	N:			A list where N[i] = Number of words in document i
 # 	word_dim:	Dimension of word embedding
 # 	doc_dim:	Dimension of document embedding
 
@@ -17,7 +21,7 @@ V = 10000 #
 word_dim = 100
 D = 20 #
 
-def initialize_variables(D, K, N, V, doc_dim, word_dim):
+def init_vars(D, K, N, V, doc_dim, word_dim):
 	# initialize Z s.t. Z_dn is a vector of size K as parameters for a categorical distribution
         # Z is the variational distribution of q(z_dn), q(z_dn = k) = Z(d, n, k)
 	Z = list()
@@ -58,6 +62,12 @@ def initialize_variables(D, K, N, V, doc_dim, word_dim):
 		# mu_tmp = np.random.rand(1, doc_dim)
 		# Sigma_tmp = np.diag(np.random.rand(1, doc_dim))
 		# U.append(dict(mu = mu_tmp, Sigma = Sigma_tmp))
+	XiK = [np.random.random((1, V))	for i in range(K)]
+	AlphaK = np.random.random((1, K))
+	XiD = 1 #TODO
+	AlphaD = 1 #TODO
+
+	return Z, Eta, A, Rho, U_prime, U, XiK, AlphaK, XiD, AlphaD
 
 def load_documents(word_embd_file, corpus_file):
 	word_embd = list()
@@ -94,7 +104,7 @@ def gen_normalparams(dim):
 
 def run():
 	B = load_documents(file_path)
-	initialize_variables()
+	(Z, Eta, A, Rho, U_prime, U, XiK, AlphaK, XiD, AlphaD) = init_vars(D, K, N, V, doc_dim, word_dim)
     # Yuxing Zhang TODO
     while true: # while not converge
         # TODO sample a batch of document B
