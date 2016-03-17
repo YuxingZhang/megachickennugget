@@ -5,8 +5,19 @@ import numpy as np
 # 	Documents {B_1,...,B_D}
 # Output:
 # 	Variational parameters {u, u_prime, rho, alpha, eta, z}	
+# Variables:
+# 	word_dim:	Dimension of word embedding
+# 	doc_dim:	Dimension of document embedding
+
+def initialize_variables():
+
+
+def load_documents(filein):
+	return B
 
 def run():
+	B = load_documents(filepath)
+	initialize_variables()
     # Yuxing Zhang TODO
     while true: # while not converge
         # TODO sample a batch of document B
