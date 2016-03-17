@@ -59,9 +59,33 @@ def initialize_variables(D, K, N, V, doc_dim, word_dim):
 		# Sigma_tmp = np.diag(np.random.rand(1, doc_dim))
 		# U.append(dict(mu = mu_tmp, Sigma = Sigma_tmp))
 
-def load_documents(filein):
-	# TODO:
-	return B
+def load_documents(word_embd_file, corpus_file):
+	word_embd = list()
+	dictionary = dict()
+	filein = open(word_embd_file, 'r')
+	filein.readline()
+	index = 0
+	for line in filein:
+		vals = line.split()
+		# build the dictionary
+		dictionary[vals[0]] = index
+		# store the word-embedding results
+		word_embd.append(vals[1: ])
+		index += 1
+	filein.close()
+
+	# read in the corpus file
+	W = list()
+	N = list()
+	filein = open(corpus_file, 'r')
+	for doc in filein:
+		words = doc.split()
+		W.append(words)
+		N.append(len(words))
+
+	filein.close()
+
+	return dictionary, word_embd, W
 
 def gen_normalparams(dim):
 	mu_tmp = np.random.rand(1, dim)
