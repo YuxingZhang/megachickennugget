@@ -1,5 +1,6 @@
 import sys
 import numpy as np
+import update
 
 # Input: 
 # 	Documents {B_1,...,B_D}
@@ -10,7 +11,10 @@ import numpy as np
 # 	doc_dim:	Dimension of document embedding
 
 def initialize_variables():
-
+	# initialize z
+	for d in D:
+		for n in N(d):
+			
 
 def load_documents(filein):
 	return B
