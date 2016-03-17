@@ -1,5 +1,10 @@
 import sys
 import numpy as np
 
-if __name__ == "__main__":
+def run():
+    # Yuxing Zhang TODO
 
+    # Tianshu Ren starts here TODO
+
+if __name__ == "__main__":
+    run()
