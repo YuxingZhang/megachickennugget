@@ -11,7 +11,6 @@ from sklearn.preprocessing import normalize
 # 	word_dim:	Dimension of word embedding
 # 	doc_dim:	Dimension of document embedding
 
-<<<<<<< HEAD
 K = 10 # number of topics
 doc_dim = 100 # embedding space dimension of document
 V = 10000 # 
@@ -70,7 +69,7 @@ def gen_normalparams(dim):
 	return dict(mu = mu_tmp, Sigma = Sigma_tmp)
 
 def run():
-	B = load_documents(filepath)
+	B = load_documents(file_path)
 	initialize_variables()
     # Yuxing Zhang TODO
     while true: # while not converge
