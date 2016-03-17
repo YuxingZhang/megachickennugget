@@ -17,6 +17,14 @@ def run():
 
 
     # Tianshu Ren starts here TODO
+    	for k in K:
+    		# TODO update zeta_k_tild by Eq.8
+    		# TODO update u_k_tild by Eq.10
+    		# TODO update u_prime_k_tild by Eq.9
+    		if certain_interval():
+    			# TODO update xi_k by Eq. 5
+    			# TODO update alpha_k by Eq. 6
+    			
 
 
 if __name__ == "__main__":
