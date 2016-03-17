@@ -11,8 +11,15 @@ from sklearn.preprocessing import normalize
 # 	word_dim:	Dimension of word embedding
 # 	doc_dim:	Dimension of document embedding
 
+K = 10 # number of topics
+doc_dim = 100 # embedding space dimension of document
+V = 10000 # 
+word_dim = 100
+D = 20 #
+
 def initialize_variables():
 	# initialize Z s.t. Z_dn is a vector of size K as parameters for a categorical distribution
+        # Z is the variational distribution of q(z_dn), q(z_dn = k) = Z(d, n, k)
 	Z = list()
 	for d in range(D):
 		Z.append([normalize(np.random.uniform(0, 1, (1, K)), 'l1') for i in range(N[d])])
@@ -78,7 +85,7 @@ def run():
 
 
     # Tianshu Ren starts here TODO
-    	for k in K:
+        for k in K:
     		# TODO update zeta_k_tild by Eq.8
     		# TODO update u_k_tild by Eq.10
     		# TODO update u_prime_k_tild by Eq.9
