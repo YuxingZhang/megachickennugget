@@ -14,6 +14,10 @@ def run():
         for d in B:
             for w_dn in d:
                 # TODO update q(z_dn) by Eq.7 
+            # TODO update ~mu_d by Eq 上次最后推出来的
+            # TODO update ~a_d by Eq 上次最后推出来的
+            if certain_interval:
+                # TODO update auxiliary variables ksi_d and alpha_d by Eq 2 and Eq 3
 
 
     # Tianshu Ren starts here TODO
