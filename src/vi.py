@@ -11,7 +11,7 @@ from sklearn.preprocessing import normalize
 # 	word_dim:	Dimension of word embedding
 # 	doc_dim:	Dimension of document embedding
 
-def initialize_variables():
+def initialize_variables(D, K, N, V, doc_dim, word_dim):
 	# initialize Z s.t. Z_dn is a vector of size K as parameters for a categorical distribution
 	Z = list()
 	for d in range(D):
