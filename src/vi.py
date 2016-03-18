@@ -8,6 +8,7 @@ from sklearn.preprocessing import normalize
 # Output:
 # 	Variational parameters {u, u_prime, rho, alpha, eta, z}	
 # Variables:
+#       TODO add specification of the variables
 #	K:			Number of topics
 #	V:			Size of vocabulary
 #	D:			Number of documents
