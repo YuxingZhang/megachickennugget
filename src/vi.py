@@ -129,11 +129,7 @@ def run():
             for w_dn in d:
                 # TODO update q(z_dn) by Eq.7 
             # update Eta_d
-<<<<<<< HEAD
-            Eta[d] = update.update_eta(Eta[d], Xi_DK[d], Alpha_D[d], gamma, U, A[d])
-=======
             Eta[d] = update.update_eta(Eta[d], Xi_DK[d], Alpha_D[d], gamma, U, A[d], q_Z[d])
->>>>>>> a553da0b8f8eda9c585ff7edae1616b2beff2325
             # update A_d
             A[d] = update.update_a(A[d], c, gamma, U, Eta[d])
             if certain_interval:
