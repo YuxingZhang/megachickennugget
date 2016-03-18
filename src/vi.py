@@ -99,17 +99,17 @@ def load_documents(word_emb_file, corpus_file):
 
 
 def run():
-<<<<<<< HEAD
-	word_emb_file = '???'
-	corpus_file = '???'
-	l = 1
-	c = 1
-	kappa = 1
-	beta = 1
-	gamma = 1
-	load_documents(word_emb_file, corpus_file)
-	(Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D) = init_vars(D, K, V, N, doc_dim, word_dim)
-    # precompute sigma for U_prime according to Eq 9
+    word_emb_file = '???'
+    corpus_file = '???'
+    l = 1
+    c = 1
+    kappa = 1
+    beta = 1
+    gamma = 1
+    load_documents(word_emb_file, corpus_file)
+    (Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D) = init_vars(D, K, V, N, doc_dim, word_dim)
+
+    # TODO precompute Sigma^{(u')*} by Eq. 9
     compute_u_prime_sigma(U_prime, beta, l, word_emb)
     # Yuxing Zhang TODO
     while true: # while not converge
@@ -121,7 +121,12 @@ def run():
             # update Eta_d
             update.update_eta(d, Eta, Xi_DK, Alpha_D, gamma, U, A, q_Z)
             # update A_d
+<<<<<<< HEAD
             update.update_a(d, A, c, gamma, U, Eta)
+=======
+            A[d] = update.update_a(A[d], c, gamma, U, Eta[d])
+            # TODO update Sigma^{(a)*} by Eq.??
+>>>>>>> fac17a30b7cc730de42ae829cb8142f22cadf7b9
             if certain_interval:
                 # TODO update auxiliary variables ksi_d and alpha_d by Eq 2 and Eq 3
 
@@ -131,8 +136,13 @@ def run():
             # update rho
             update_rho(k, Rho, q_Z, beta, word_emb, U_prime, Alpha_K, Xi_KW)
             # TODO update u_k_tild by Eq.10
+<<<<<<< HEAD
             # update U_prime
             update_u_prime(k, U_prime, beta, word_emb, Rho)
+=======
+            # TODO update u_prime_k_tild by Eq.9
+            # TODO update Sigma^{(u)*} by Eq. 10
+>>>>>>> fac17a30b7cc730de42ae829cb8142f22cadf7b9
             if certain_interval():
                 # TODO update xi_k by Eq. 5
                 # TODO update alpha_k by Eq. 6
