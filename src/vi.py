@@ -8,21 +8,22 @@ from sklearn.preprocessing import normalize
 # Output:
 # 	Variational parameters {u, u_prime, rho, alpha, eta, z}	
 # Variables:
-#	W:			Words in the corpus
-#	K:			Number of topics
-#	V:			Size of vocabulary
-#	D:			Number of documents
-#	N:			A list where N[i] = Number of words in document i
-# 	word_dim:	Dimension of word embedding
-# 	doc_dim:	Dimension of document embedding
+#	W:			Words in each documents, W[d][n] is the n-th word in the d-th doc
+#	K:			Total number of topics
+#	V:			Size of the vocabulary
+#	D:			Total number of documents
+#	N:			A list where N[d] = Number of words in document d
+# 	word_dim:	        Dimension of word embedding space
+# 	doc_dim:	        Dimension of document embedding space
 
 K = 10 # number of topics
-doc_dim = 100 # embedding space dimension of document
 V = 10000 # 
-word_dim = 100
 D = 20 #
+word_dim = 100
+doc_dim = 100 # embedding space dimension of document
+word2idx = dict() # mapping from a word to it's index in the vocabulary
 
-def init_vars(docs, K, doc_len, V, doc_dim, word_dim):
+def init_vars(docs, doc_len, doc_dim, word_dim):
     # initialize Z s.t. Z_dn is a vector of size K as parameters for a categorical distribution
     # Z is the variational distribution of q(z_dn), q(z_dn = k) = Z(d, n, k)
     Z = list()
@@ -67,14 +68,13 @@ def init_vars(docs, K, doc_len, V, doc_dim, word_dim):
 
 def load_documents(word_emb_file, corpus_file):
     word_emb = list()
-    dictionary = dict()
     filein = open(word_emb_file, 'r')
     filein.readline()
     index = 0
     for line in filein:
         vals = line.strip().split()
-        # build the dictionary
-        dictionary[vals[0]] = index
+        # build the word2idx dictionary
+        word2idx[vals[0]] = index
         # store the word-embedding results
         word_emb.append(vals[1: ])
         index += 1
@@ -90,10 +90,10 @@ def load_documents(word_emb_file, corpus_file):
         N.append(len(words))
     filein.close()
 
-    # updating the vocabulary size
-    V = len(dictionary)
+    # setting the vocabulary size
+    V = len(word2idx)
 
-    return dictionary, word_emb, W, V, N
+    return word_emb, W, N
 
 def gen_normalparams(dim):
     mu_tmp = np.random.rand(1, dim)
@@ -102,7 +102,7 @@ def gen_normalparams(dim):
 
 def run():
     (dictionary, word_emb, docs, V, doc_len) = load_documents(file_path)
-    (Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D) = init_vars(docs, K, doc_len, V, doc_dim, word_dim)
+    (Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D) = init_vars(docs, doc_len)
     # Yuxing Zhang TODO
     while true: # while not converge
         # TODO sample a batch of document B
