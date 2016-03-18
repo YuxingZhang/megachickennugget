@@ -28,29 +28,29 @@ doc_dim = 100 # embedding space dimension of document
 word2idx = dict() # mapping from a word to it's index in the vocabulary
 word_emb = list()
 
-def init_vars():
+def init_vars(D, K, V, N, doc_dim, word_dim):
     # initialize Z s.t. Z_dn is a vector of size K as parameters for a categorical distribution
     # Z is the variational distribution of q(z_dn), q(z_dn = k) = Z(d, n, k)
     Z = list()
     for d in range(D):
         Z.append([normalize(np.random.uniform(0, 1, (1, K)), 'l1') for i in range(N[d])])
 
-    # initialize Eta s.t. Eta_d contains two fields "mu" (1 * K) and "Sigma" (K*K) that specifies a multivariate Gaussian
+    # initialize Eta with parameters Sigma (D * K) and mu (D * K) that defines a multivariate Gaussian distribution
     Eta = dict(Sigma = [np.random.rand(1, K) for d in range(D)], mu = [np.random.rand(1, K) for d in range(D)])
 
-    # initialize A s.t. A_d contains two fields "mu" (1 * doc_dim) and "Sigma" (doc_dim * doc_dim) that specifies a multivariate Gaussian
+    # initialize A with parameters Sigma (doc_dim * doc_dim) and mu (D * doc_dim) such that
+    # A_d ~ Normal(mu[d], Sigma)
     A = dict(Sigma = np.diag(np.random.rand(1, doc_dim)), mu = [np.random.rand(1, doc_dim) for d in range(D)])
 
-
-    # initialize Rho s.t. Rho_k contains two fields "mu" (1 * V) and "Sigma" (V * V) that specifies a multivariate Gaussian
-    # Rho = dict(Sigma = np.diag(np.random.rand(1, V)), mu = [np.random.rand(1, V) for k in range(K)])
+    # initialize Rho with parameters Sigma (K * V) and mu (K * V) that defines a multivariate Gaussian distribution
     Rho = dict(Sigma = [np.random.rand(1, V) for k in range(K)], mu = [np.random.rand(1, V) for k in range(K)])
 
-    # initialize U_prime s.t. U_prime_k contains two fields "mu" (1 * word_dim) and
-    # "Sigma" (word_dim * word_dim) that specifies a multivariate Gaussian
+    # initialize U_prime with parameters Sigma (word_dim * word_dim) and mu (K * word_dim) such that
+    # U_prime_k ~ Normal(mu[k], Sigma)
     U_prime = dict(Sigma = np.diag(np.random.rand(1, word_dim)), mu = [np.random.rand(1, word_dim) for k in range(K)])
 
-    # initialize U s.t. U_k contains two fields "mu" (1 * doc_dim) and "Sigma" (doc_dim, doc_dim)
+    # initialize U with parameters Sigma (doc_dim * doc_dim) and mu (K * doc_dim) such that
+    # U_k follows ~ Normal(mu[k], Sigma)
     U = dict(Sigma = np.diag(np.random.rand(1, doc_dim)), mu = [np.random.rand(1, doc_dim) for k in range(K)])
 
     # Xi_KW and Alpha_K are the auxiliary variable related to the lower bound used for q(z_dn)
@@ -97,15 +97,15 @@ def load_documents(word_emb_file, corpus_file):
 
 
 def run():
-	word_emb_file = '???'
-	corpus_file = '???'
-	l = 1
-	c = 1
-	kappa = 1
-	beta = 1
-	gamma = 1
-	load_documents(word_emb_file, corpus_file)
-    (Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D) = init_vars()
+    word_emb_file = '???'
+    corpus_file = '???'
+    l = 1
+    c = 1
+    kappa = 1
+    beta = 1
+    gamma = 1
+    load_documents(word_emb_file, corpus_file)
+    (Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D) = init_vars(D, K, V, N, doc_dim, word_dim)
     # Yuxing Zhang TODO
     while true: # while not converge
         # TODO sample a batch of document B
@@ -131,7 +131,7 @@ def run():
                 # TODO update alpha_k by Eq. 6
 
         if converge:
-        	break
+            break
 
 if __name__ == "__main__":
     run()
