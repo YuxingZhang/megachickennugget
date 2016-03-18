@@ -7,21 +7,22 @@ def lmd(xi):
     # Helper function on Page 5 under Eq. 1
     return 1 / (2 * xi) * (1 / (1 + np.exp(- xi)) - 0.5)
 
-def update_z(Z, d, n, K, V, mu_d, Rho, word_idx, xi, alpha):
+def update_z(Z, d, n, K, V, mu_d, Rho, W, word2idx, xi, alpha):
     # update the vector q(z_dn) of length K from Eq. 7
     # q(z_dn) is a multinomial distribution with q(z_dn=k) = Z_dn(k)
     for z in range(K):
         E1 = mu_d(z)
 
-        expected_sum = 0
+        tmp = 0
         for w in V:
-            expected_sum += lmd(xi[z][w]) * (Rho['Sigma'][z][w] ** 2 + Rho['mu'][z][w] ** 2) \
-                    - (1/2 - 2 * alpha[z] * lmd(xi[z][w])) * Rho['mu'][z][w] \
+            tmp +=  - lmd(xi[z][w]) * (Rho['Sigma'][z][w] ** 2 + Rho['mu'][z][w] ** 2) \
+                    - (0.5 - 2 * alpha[z] * lmd(xi[z][w])) * Rho['mu'][z][w] \
                     + xi[z][w] / 2 \
                     - lmd(xi[z][w]) * (alpha[z] ** 2 - xi[z][w] ** 2) \
                     - np.log(1 + np.exp(xi[z][w]))
 
-        E2 = Rho['mu'][z][word_idx] + alpha[z](V / 2 - 1) - expected_sum
+        w_dn = W[d][n]
+        E2 = Rho['mu'][z][word2idx[w_dn]] + alpha[z] * (V / 2 - 1) + tmp
         Z[d][n][z] = np.exp(E1 + E2)
     Z[d][n] = normalize(Z[d][n])
 
