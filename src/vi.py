@@ -91,14 +91,8 @@ def load_documents(word_emb_file, corpus_file, V, idx2word):
     # setting the vocabulary size
     V = len(word2idx)
 
-
-# def gen_normalparams(dim):
-#     mu_tmp = np.random.rand(1, dim)
-#     Sigma_tmp = np.diag(np.random.rand(1, dim))
-#     return dict(mu = mu_tmp, Sigma = Sigma_tmp)
-
-
 def run():
+    # initialize all variables
     word_emb_file = '???'
     corpus_file = '???'
     l = 1
@@ -110,29 +104,30 @@ def run():
     (Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D) = init_vars(D, K, V, N, doc_dim, word_dim)
 
     # TODO precompute Sigma^{(u')*} by Eq. 9
-    compute_u_prime_sigma(U_prime, beta, l, word_emb)
-    # Yuxing Zhang TODO
+    compute_u_prime_sigma(U_prime, beta, l, word_emb, V)
+
     while true: # while not converge
         # TODO sample a batch of document B
         # TODO 
         for d in B:
-            for w_dn in d:
-                # TODO update q(z_dn) by Eq.7 
+            for n in N[d]:
+                update.update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V)
             # update Eta
-            update.update_eta(d, Eta, Xi_DK, Alpha_D, gamma, U, A, q_Z)
+            update.update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K)
             # update A
-            update.update_a(d, A, c, gamma, U, Eta)
+            update.update_a(d, A, U, Eta, c, gamma, K)
             if certain_interval:
                 # TODO update auxiliary variables ksi_d and alpha_d by Eq 2 and Eq 3
 
 
         # Tianshu Ren starts here TODO
         for k in K:
-            # update rho
-            update.update_rho(k, Rho, q_Z, beta, word_emb, U_prime, Alpha_K, Xi_KW)
-            # TODO update u_k_tild by Eq.10
+            # update Rho
+            update.update_rho(k, Rho, Z, U_prime, Alpha_K, Xi_KW, beta, word_emb, D, N, V)
+            # update U
+            update.update_u(k, U, A, Eta, kappa, gamma, D)
             # update U_prime
-            update.update_u_prime(k, U_prime, beta, word_emb, Rho)
+            update.update_u_prime(k, U_prime, Rho, beta, word_emb, V)
             if certain_interval():
                 # TODO update xi_k by Eq. 5
                 # TODO update alpha_k by Eq. 6
