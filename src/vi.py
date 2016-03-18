@@ -36,6 +36,7 @@ def init_vars(D, K, V, N, doc_dim, word_dim):
         Z.append([normalize(np.random.uniform(0, 1, (1, K)), 'l1') for i in range(N[d])])
 
     # initialize Eta with parameters Sigma (D * K) and mu (D * K) that defines a multivariate Gaussian distribution
+    # Eta_{dk} ~ Normal(mu[d][k], Sigma[d][k])
     Eta = dict(Sigma = [np.random.rand(1, K) for d in range(D)], mu = [np.random.rand(1, K) for d in range(D)])
 
     # initialize A with parameters Sigma (doc_dim * doc_dim) and mu (D * doc_dim) such that
@@ -43,6 +44,7 @@ def init_vars(D, K, V, N, doc_dim, word_dim):
     A = dict(Sigma = np.diag(np.random.rand(1, doc_dim)), mu = [np.random.rand(1, doc_dim) for d in range(D)])
 
     # initialize Rho with parameters Sigma (K * V) and mu (K * V) that defines a multivariate Gaussian distribution
+    # Rho_{kw} ~ Normal(mu[k][w], Sigma[k][w])
     Rho = dict(Sigma = [np.random.rand(1, V) for k in range(K)], mu = [np.random.rand(1, V) for k in range(K)])
 
     # initialize U_prime with parameters Sigma (word_dim * word_dim) and mu (K * word_dim) such that
