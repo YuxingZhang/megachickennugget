@@ -76,7 +76,7 @@ def update_u_prime(k, U_prime, beta, word_emb, Rho):
     tmp = 0
     for w in range(V):
         tmp += word_emb[w] * Rho['mu'][k][w]
-    U_prime['mu'] = beta * U_prime['Sigma'] * tmp
+    U_prime['mu'] = beta * np.dot(U_prime['Sigma'], tmp)
 
     return U_prime
 
