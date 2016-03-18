@@ -90,7 +90,7 @@ def update_u(k, U, kappa, A, Eta, gamma):
     else:
         tmp2 = 0
         for d in range(D):
-            mp2 += Eta['mu'][d][k] * A['mu'][d]
+            tmp2 += Eta['mu'][d][k] * A['mu'][d]
         U['mu'][k] = gamma * np.dot(U['Sigma'], tmp2)
 
 
