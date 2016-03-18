@@ -20,13 +20,13 @@ def update_z(Z, d, n, K, V, mu_d, Rho, word_idx, xi, alpha):
 		Z[d][n][z] = np.exp(E1 + E2)
 	Z[d][n] = normalize(Z[d][n])
 
-def update_eta(d, Eta, Xi_DK, Alpha_D, gamma, U, A, q_Z):
+def update_eta(d, Eta, Xi_DK, Alpha_D, gamma, U, A, Z):
 	for k in range(K):
 		Eta['Sigma'][d][k] = 1 / (gamma - 2 * mylambda(Xi_DK[d][k]))
 		tmp = 0
 		for n in range(N[d]):
-			tmp += q_Z[d][n][k] #??? how to reference ???
-		Eta['mu'][d][k] = gamma * np.dot(U[k]['mu'].transpose(), A[d]) + 2 * Alpha_D[d] * mylambda(Xi_DK[d][k]) - 0.5 + tmp
+			tmp += Z[d][n][k] #??? how to reference ???
+		Eta['mu'][d][k] = gamma * np.dot(U['mu'][k].transpose(), A['mu'][d]) + 2 * Alpha_D[d] * mylambda(Xi_DK[d][k]) - 0.5 + tmp
 		Eta['mu'][d][k] *= Eta['Sigma'][d][k]
 
 	return Eta
@@ -37,10 +37,10 @@ def update_a(d, A, c, gamma, U, Eta):
 		tmp1 = 0
 		tmp2 = 0
 		for k in range(K):
-			tmp1 += np.dot(U['mu'][k].transpose(), U['mu'][k])
-			tmp2 += Eta['mu'][d][k] * U['mu'][k]
-		A['Sigma'] = inv(gamma * tmp1 + gamma * K * U[k]['Sigma'] + c * np.identity(doc_dim))
-		A['mu'][d] = gamma * A['Sigma'] * tmp2
+			tmp1 += np.dot(U['mu'][k], U['mu'][k].transpose())
+			tmp2 += np.dot(Eta['mu'][d][k], U['mu'][k].transpose())
+		A['Sigma'] = inv(gamma * tmp1 + gamma * K * U['Sigma'][k] + c * np.identity(doc_dim))
+		A['mu'][d] = A['Sigma'] * tmp2
 	else:
 		tmp2 = 0
 		for k in range(K):
