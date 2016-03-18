@@ -94,11 +94,11 @@ def update_u(k, U, kappa, A, Eta, gamma):
             tmp1 += np.dot(A['mu'][d], A['mu'][d].transpose())
             tmp2 += Eta['mu'][d][k] * A['mu'][d]
         U['Sigma'] = inv(kappa * np.identity(doc_dim) + gamma * D * A['Sigma'] + gamma * tmp1)
-        U['mu'][k] = gamma * U['Sigma'] * tmp2
+        U['mu'][k] = gamma * np.dot(U['Sigma'], tmp2)
     else:
         tmp2 = 0
         for d in range(D):
             mp2 += Eta['mu'][d][k] * A['mu'][d]
-        U['mu'][k] = gamma * U['Sigma'] * tmp2
+        U['mu'][k] = gamma * np.dot(U['Sigma'], tmp2)
 
     return U
