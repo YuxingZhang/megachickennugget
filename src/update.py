@@ -2,12 +2,18 @@ import numpy as np
 from sklearn.preprocessing import normalize
 from numpy.linalg import inv
 
+''' 
+
+FUNCTION ARGUMENTS ORDER:
+    function(index, parameters_to_change, parameters_to_use, global_parameters, CONSTANT)
+
+'''
 
 def lmd(xi):
     # Helper function on Page 5 under Eq. 1
     return 1 / (2 * xi) * (1 / (1 + np.exp(- xi)) - 0.5)
 
-def update_z(Z, d, n, K, V, mu_d, Rho, W, word2idx, xi, alpha): # correct
+def update_z(d, n, Z, mu_d, Rho, W, xi, alpha, word2idx, K, V): # correct
     # update the vector q(z_dn) of length K from Eq. 7
     # q(z_dn) is a multinomial distribution with q(z_dn=k) = Z_dn(k)
     for k in range(K):
