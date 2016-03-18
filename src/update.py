@@ -31,7 +31,7 @@ def update_eta(d, Eta, Xi_DK, Alpha_D, gamma, U, A, q_Z):
         tmp = 0
         for n in range(N[d]):
             tmp += q_Z[d][n][k] #??? how to reference ???
-        Eta['mu'][d][k] = gamma * np.dot(U[k]['mu'].transpose(), A['mu'][d]) + 2 * Alpha_D[d] * lmd(Xi_DK[d][k]) - 0.5 + tmp
+        Eta['mu'][d][k] = gamma * np.dot(U['mu'][k].transpose(), A['mu'][d]) + 2 * Alpha_D[d] * lmd(Xi_DK[d][k]) - 0.5 + tmp
         Eta['mu'][d][k] *= Eta['Sigma'][d][k]
 
     return Eta
