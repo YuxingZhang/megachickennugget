@@ -31,11 +31,10 @@ def update_eta(d, Eta, Xi_DK, Alpha_D, gamma, U, A, q_Z):
         Eta['Sigma'][d][k] = 1 / (gamma - 2 * lmd(Xi_DK[d][k]))
         tmp = 0
         for n in range(N[d]):
-            tmp += q_Z[d][n][k] #??? how to reference ???
+            tmp += q_Z[d][n][k]
         Eta['mu'][d][k] = gamma * np.dot(U['mu'][k].transpose(), A['mu'][d]) + 2 * Alpha_D[d] * lmd(Xi_DK[d][k]) - 0.5 + tmp
         Eta['mu'][d][k] *= Eta['Sigma'][d][k]
 
-    return Eta
 
 def update_a(d, A, c, gamma, U, Eta):
     # update Sigma only for the first document
@@ -53,8 +52,6 @@ def update_a(d, A, c, gamma, U, Eta):
             tmp2 += Eta['mu'][d][k] * U['mu'][k]
         A['mu'][d] = gamma * np.dot(A['Sigma'], tmp2)
 
-    return A
-
 def update_rho(k, Rho, q_Z, beta, word_emb, U_prime, Alpha_K, Xi_KW):
     for w in range(V):
         c_kw = 0
@@ -68,15 +65,11 @@ def update_rho(k, Rho, q_Z, beta, word_emb, U_prime, Alpha_K, Xi_KW):
         Rho['mu'][k][w] = beta * np.dot(word_emb[w].transpose(), U_prime['mu'][k]) + c_kw - m_k * (0.5 - 2 * Alpha_K[k] * lmd(Xi_KW[k][w]))
         Rho['mu'][k][w] *= Rho['Sigma'][k][w]
 
-    return Rho
-
 def compute_u_prime_sigma(U_prime, beta, l, word_emb):
     tmp = 0
     for w in range(V):
         tmp += np.dot(word_emb[w], word_emb[w].transpose())
     U_prime['Sigma'] = inv(l * np.identity(word_dim) + beta * tmp)
-
-    return U_prime
 
 def update_u_prime(k, U_prime, beta, word_emb, Rho):
     tmp = 0
@@ -84,7 +77,6 @@ def update_u_prime(k, U_prime, beta, word_emb, Rho):
         tmp += word_emb[w] * Rho['mu'][k][w]
     U_prime['mu'] = beta * np.dot(U_prime['Sigma'], tmp)
 
-    return U_prime
 
 def update_u(k, U, kappa, A, Eta, gamma):
     if k == 0:
@@ -101,4 +93,4 @@ def update_u(k, U, kappa, A, Eta, gamma):
             mp2 += Eta['mu'][d][k] * A['mu'][d]
         U['mu'][k] = gamma * np.dot(U['Sigma'], tmp2)
 
-    return U
+
