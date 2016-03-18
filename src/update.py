@@ -8,8 +8,8 @@ def mylambda(xi):
 	return 1 / (2 * xi) * (1 / (1 + np.exp(- xi)) - 0.5)
 
 def update_z(Z, d, n, K, V, mu_d, Rho, word_idx, xi, alpha):
-	# update the vector z_dn of length K from Eq. 7
-	# q(z_dn) is a multinomial distribution with q(z_dn=k) = z_dn(k)
+	# update the vector q(z_dn) of length K from Eq. 7
+	# q(z_dn) is a multinomial distribution with q(z_dn=k) = Z_dn(k)
 	for z in range(K):
 		E1 = mu_d(z)
 		tmp = 0
@@ -88,35 +88,12 @@ def update_u(k, U, kappa, A, Eta, gamma):
 			tmp1 += np.dot(A['mu'][d], A['mu'][d].transpose())
 			tmp2 += Eta['mu'][d][k] * A['mu'][d]
 		U['Sigma'] = inv(kappa * np.identity(doc_dim) + gamma * D * A['Sigma'] + gamma * tmp1)
-		U['mu'][k] = gamma
+		U['mu'][k] = gamma * U['Sigma'] * tmp2
+	else:
+		tmp2 = 0
+		for d in range(D):
+			mp2 += Eta['mu'][d][k] * A['mu'][d]
+		U['mu'][k] = gamma * U['Sigma'] * tmp2
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	return U
 
