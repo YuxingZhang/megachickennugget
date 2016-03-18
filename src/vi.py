@@ -103,6 +103,8 @@ def gen_normalparams(dim):
 
 
 def run():
+	word_emb_file = '???'
+	corpus_file = '???'
 	load_documents(word_emb_file, corpus_file)
     (Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D) = init_vars()
     # Yuxing Zhang TODO
@@ -112,8 +114,10 @@ def run():
         for d in B:
             for w_dn in d:
                 # TODO update q(z_dn) by Eq.7 
-            # TODO update ~mu_d by Eq 上次最后推出来的
-            # TODO update ~a_d by Eq 上次最后推出来的
+            # update Eta_d
+            Eta[d] = update_eta(Eta[d], Xi_DK[d], Alpha_D[d], gamma, U, A[d])
+            # update A_d
+            A[d] = update_a(A[d], c, gamma, U, Eta[d])
             if certain_interval:
                 # TODO update auxiliary variables ksi_d and alpha_d by Eq 2 and Eq 3
 
