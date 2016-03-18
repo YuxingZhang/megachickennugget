@@ -33,35 +33,35 @@ def init_vars(D, K, V, N, doc_dim, word_dim):
     # Z is the variational distribution of q(z_dn), q(z_dn = k) = Z(d, n, k)
     Z = list()
     for d in range(D):
-        Z.append([normalize(np.random.uniform(0, 1, (1, K)), 'l1') for i in range(N[d])])
+        Z.append([normalize(np.random.uniform(0, 1, (K, 1)), 'l1') for i in range(N[d])])
 
     # initialize Eta with parameters Sigma (D * K) and mu (D * K) that defines a multivariate Gaussian distribution
     # Eta_{dk} ~ Normal(mu[d][k], Sigma[d][k])
-    Eta = dict(Sigma = [np.random.rand(1, K) for d in range(D)], mu = [np.random.rand(1, K) for d in range(D)])
+    Eta = dict(Sigma = [np.random.rand(K, 1) for d in range(D)], mu = [np.random.rand(K, 1) for d in range(D)])
 
     # initialize A with parameters Sigma (doc_dim * doc_dim) and mu (D * doc_dim) such that
     # A_d ~ Normal(mu[d], Sigma)
-    A = dict(Sigma = np.diag(np.random.rand(1, doc_dim)), mu = [np.random.rand(1, doc_dim) for d in range(D)])
+    A = dict(Sigma = np.diag(np.random.rand(doc_dim, 1)), mu = [np.random.rand(doc_dim, 1) for d in range(D)])
 
     # initialize Rho with parameters Sigma (K * V) and mu (K * V) that defines a multivariate Gaussian distribution
     # Rho_{kw} ~ Normal(mu[k][w], Sigma[k][w])
-    Rho = dict(Sigma = [np.random.rand(1, V) for k in range(K)], mu = [np.random.rand(1, V) for k in range(K)])
+    Rho = dict(Sigma = [np.random.rand(V, 1) for k in range(K)], mu = [np.random.rand(V, 1) for k in range(K)])
 
     # initialize U_prime with parameters Sigma (word_dim * word_dim) and mu (K * word_dim) such that
     # U_prime_k ~ Normal(mu[k], Sigma)
-    U_prime = dict(Sigma = np.diag(np.random.rand(1, word_dim)), mu = [np.random.rand(1, word_dim) for k in range(K)])
+    U_prime = dict(Sigma = np.diag(np.random.rand(word_dim, 1)), mu = [np.random.rand(word_dim, 1) for k in range(K)])
 
     # initialize U with parameters Sigma (doc_dim * doc_dim) and mu (K * doc_dim) such that
     # U_k ~ Normal(mu[k], Sigma)
-    U = dict(Sigma = np.diag(np.random.rand(1, doc_dim)), mu = [np.random.rand(1, doc_dim) for k in range(K)])
+    U = dict(Sigma = np.diag(np.random.rand(doc_dim, 1)), mu = [np.random.rand(doc_dim, 1) for k in range(K)])
 
     # Xi_KW and Alpha_K are the auxiliary variable related to the lower bound used for q(z_dn)
-    Xi_KW = [np.random.rand(1, V) for i in range(K)]
-    Alpha_K = np.random.rand(1, K)
+    Xi_KW = [np.random.rand(V, 1) for i in range(K)]
+    Alpha_K = np.random.rand(K, 1)
 
     # Xi_DK and Alpha_D are the auxiliary variable related to the lower bound used for q(eta_d)
-    Xi_DK = [np.random.rand(1, K) for i in range(D)]
-    Alpha_D = np.random.rand(1, D)
+    Xi_DK = [np.random.rand(K, 1) for i in range(D)]
+    Alpha_D = np.random.rand(D, 1)
 
     return Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D
 
@@ -129,10 +129,10 @@ def run():
         # Tianshu Ren starts here TODO
         for k in K:
             # update rho
-            update_rho(k, Rho, q_Z, beta, word_emb, U_prime, Alpha_K, Xi_KW)
+            update.update_rho(k, Rho, q_Z, beta, word_emb, U_prime, Alpha_K, Xi_KW)
             # TODO update u_k_tild by Eq.10
             # update U_prime
-            update_u_prime(k, U_prime, beta, word_emb, Rho)
+            update.update_u_prime(k, U_prime, beta, word_emb, Rho)
             if certain_interval():
                 # TODO update xi_k by Eq. 5
                 # TODO update alpha_k by Eq. 6
