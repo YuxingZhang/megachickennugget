@@ -44,7 +44,7 @@ def init_vars(D, K, N, V, doc_dim, word_dim):
 		Rho.append(gen_normalparams(V))
 
 	# initialize U_prime s.t. U_prime_k contains two fields "mu" (1 * word_dim) and
-        # "Sigma" (word_dim * word_dim) that specifies a multivariate Gaussian
+    # "Sigma" (word_dim * word_dim) that specifies a multivariate Gaussian
 	U_prime = list()
 	for k in range(K):
 		U_prime.append(gen_normalparams(word_dim))
@@ -87,11 +87,10 @@ def load_documents(word_emb_file, corpus_file):
 		words = doc.split()
 		W.append(words)
 		N.append(len(words))
-
 	filein.close()
 	V = len(dictionary)
 
-	return dictionary, word_emb, W, V
+	return dictionary, word_emb, W, V, N
 
 def gen_normalparams(dim):
 	mu_tmp = np.random.rand(1, dim)
@@ -114,7 +113,7 @@ def run():
                 # TODO update auxiliary variables ksi_d and alpha_d by Eq 2 and Eq 3
 
 
-    # Tianshu Ren starts here TODO
+    	# Tianshu Ren starts here TODO
         for k in K:
     		# TODO update zeta_k_tild by Eq.8
     		# TODO update u_k_tild by Eq.10
