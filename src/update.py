@@ -3,17 +3,20 @@ from sklearn.preprocessing import normalize
 from numpy.linalg import inv
 
 ''' 
-
 FUNCTION ARGUMENTS ORDER:
     function(index, parameters_to_change, parameters_to_use, global_parameters, CONSTANT)
-
 '''
 
 def lmd(xi):
     # Helper function on Page 5 under Eq. 1
     return 1 / (2 * xi) * (1 / (1 + np.exp(- xi)) - 0.5)
 
-def update_z(d, n, Z, mu_d, Rho, W, xi, alpha, word2idx, K, V): # correct
+def update_z(d, n, # index
+        Z, # parameter to update 
+        mu_d, Rho, xi, alpha, # parameters to use
+        W, word2idx, # global parameters
+        K, V): # constant
+
     # update the vector q(z_dn) of length K from Eq. 7
     # q(z_dn) is a multinomial distribution with q(z_dn=k) = Z_dn(k)
     for k in range(K):
@@ -32,12 +35,12 @@ def update_z(d, n, Z, mu_d, Rho, W, xi, alpha, word2idx, K, V): # correct
         Z[d][n][k] = np.exp(E1 + E2)
     Z[d][n] = normalize(Z[d][n])
 
-def update_eta(d, Eta, Xi_DK, Alpha_D, gamma, U, A, q_Z):
+def update_eta(d, Eta, Xi_DK, Alpha_D, gamma, U, A, Z):
     for k in range(K):
         Eta['Sigma'][d][k] = 1 / (gamma - 2 * lmd(Xi_DK[d][k]))
         tmp = 0
         for n in range(N[d]):
-            tmp += q_Z[d][n][k]
+            tmp += Z[d][n][k]
         Eta['mu'][d][k] = gamma * np.dot(U['mu'][k].transpose(), A['mu'][d]) + 2 * Alpha_D[d] * lmd(Xi_DK[d][k]) - 0.5 + tmp
         Eta['mu'][d][k] *= Eta['Sigma'][d][k]
 
@@ -58,15 +61,15 @@ def update_a(d, A, c, gamma, U, Eta):
             tmp2 += Eta['mu'][d][k] * U['mu'][k]
         A['mu'][d] = gamma * np.dot(A['Sigma'], tmp2)
 
-def update_rho(k, Rho, q_Z, beta, word_emb, U_prime, Alpha_K, Xi_KW):
+def update_rho(k, Rho, Z, beta, word_emb, U_prime, Alpha_K, Xi_KW):
     for w in range(V):
         c_kw = 0
         m_k = 0
         for d in range(D):
             for n in range(N[d]):
                 if W[d][n] == idx2word[w]:
-                    c_kw += q_Z[d][n][k]
-                m_k += q_Z[d][n][k]
+                    c_kw += Z[d][n][k]
+                m_k += Z[d][n][k]
         Rho['Sigma'][k][w] = 1 / (beta + 2 * m_k * lmd(Xi_KW[k][w]))
         Rho['mu'][k][w] = beta * np.dot(word_emb[w].transpose(), U_prime['mu'][k]) + c_kw - m_k * (0.5 - 2 * Alpha_K[k] * lmd(Xi_KW[k][w]))
         Rho['mu'][k][w] *= Rho['Sigma'][k][w]
