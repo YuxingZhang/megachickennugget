@@ -8,9 +8,9 @@ def mylambda(xi):
 	return 1 / (2 * xi) * (1 / (1 + np.exp(- xi)) - 0.5)
 
 def update_z(Z, d, n, K, V, mu_d, Rho, word_idx, xi, alpha):
-	# update the vector q(z_dn) of length K from Eq. 7
-	# q(z_dn) is a multinomial distribution with q(z_dn=k) = Z_dn(k)
-	for z in range(K):
+    # update the vector q(z_dn) of length K from Eq. 7
+        # q(z_dn) is a multinomial distribution with q(z_dn = k) = Z[d, n, k]
+        for z in range(K):
 		E1 = mu_d(z)
 		tmp = 0
 		for w in V:
