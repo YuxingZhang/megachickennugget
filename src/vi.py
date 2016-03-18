@@ -31,37 +31,22 @@ def init_vars(D, K, N, V, doc_dim, word_dim):
 	Eta = list()
 	for d in range(D):
 		Eta.append(gen_normalparams(K))
-		# mu_tmp = np.random.rand(1, K)
-		# Sigma_tmp = np.diag(np.random.rand(1, K))
-		# Eta.append(dict(mu = mu_tmp, Sigma = Sigma_tmp))
 	# initialize A s.t. A_d contains two fields "mu" (1 * doc_dim) and "Sigma" (doc_dim * doc_dim) that specifies a multivariate gaussian
 	A = list()
 	for d in range(D):
 		A.append(gen_normalparams(doc_dim))
-		# mu_tmp = np.random.rand(1, doc_dim)
-		# Sigma_tmp = np.diag(np.random.rand(1, doc_dim))
-		# A.append(dict(mu = mu_tmp, Sigma = Sigma_tmp))
 	# initialize Rho s.t. Rho_k contains two fields "mu" (1 * V) and "Sigma" (V * V) that specifies a multivariate gaussian
 	Rho = list()
 	for k in range(K):
 		Rho.append(gen_normalparams(V))
-		# mu_tmp = np.random.rand(1, V)
-		# Sigma_tmp = np.diag(np.random.rand(1, V))
-		# Rho.append(dict(mu = mu_tmp, Sigma = Sigma_tmp))
 	# initialize U_prime s.t. U_prime_k contains two fields "mu" (1 * word_dim) and "Sigma" (word_dim * word_dim) that specifies a multivariate gaussian
 	U_prime = list()
 	for k in range(K):
 		U_prime.append(gen_normalparams(word_dim))
-		# mu_tmp = np.random.rand(1, word_dim)
-		# Sigma_tmp = np.diag(np.random.rand(1, word_dim))
-		# U_prime.append(dict(mu = mu_tmp, Sigma = Sigma_tmp))
 	# initialize U s.t. U_k contains two fields "mu" (1 * doc_dim) and "Sigma" (doc_dim, doc_dim)
 	U = list()
 	for k in range(K):
 		U.append(gen_normalparams(doc_dim))
-		# mu_tmp = np.random.rand(1, doc_dim)
-		# Sigma_tmp = np.diag(np.random.rand(1, doc_dim))
-		# U.append(dict(mu = mu_tmp, Sigma = Sigma_tmp))
 	XiK = [np.random.random((1, V))	for i in range(K)]
 	AlphaK = np.random.random((1, K))
 	XiD = 1 #TODO
