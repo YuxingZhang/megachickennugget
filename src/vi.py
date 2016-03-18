@@ -9,24 +9,24 @@ from sklearn.preprocessing import normalize
 # 	Variational parameters {u, u_prime, rho, alpha, eta, z}	
 # Variables:
 #	W:			Words in each documents, W[d][n] is the n-th word in the d-th doc
+#	N:			A list where N[d] = Number of words in document d
 #	K:			Total number of topics
 #	V:			Size of the vocabulary
 #	D:			Total number of documents
-#	N:			A list where N[d] = Number of words in document d
 # 	word_dim:	        Dimension of word embedding space
 # 	doc_dim:	        Dimension of document embedding space
 #	word_emb:			Word-embedding results for each word
 #	word2idx:			Index of each word in the word_emb vector
 
+W = list()
+N = list()
 K = 10 # number of topics
 V = 0 # 
 D = 0 #
-W = list()
-N = list()
 word_dim = 100
 doc_dim = 100 # embedding space dimension of document
+word_emb = list() # word embedding from word2vec
 word2idx = dict() # mapping from a word to it's index in the vocabulary
-word_emb = list()
 
 def init_vars(D, K, V, N, doc_dim, word_dim):
     # initialize Z s.t. Z_dn is a vector of size K as parameters for a categorical distribution
@@ -65,7 +65,7 @@ def init_vars(D, K, V, N, doc_dim, word_dim):
 
     return Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D
 
-def load_documents(word_emb_file, corpus_file):
+def load_documents(word_emb_file, corpus_file, V, idx2word):
     filein = open(word_emb_file, 'r')
     filein.readline()
     index = 0
