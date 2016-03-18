@@ -37,36 +37,21 @@ def init_vars():
 
     # initialize Eta s.t. Eta_d contains two fields "mu" (1 * K) and "Sigma" (K*K) that specifies a multivariate Gaussian
     Eta = dict(Sigma = [np.random.rand(1, K) for d in range(D)], mu = [np.random.rand(1, K) for d in range(D)])
-    # Eta = list()
-    # for d in range(D):
-    #     Eta.append(gen_normalparams(K))
 
     # initialize A s.t. A_d contains two fields "mu" (1 * doc_dim) and "Sigma" (doc_dim * doc_dim) that specifies a multivariate Gaussian
     A = dict(Sigma = np.diag(np.random.rand(1, doc_dim)), mu = [np.random.rand(1, doc_dim) for d in range(D)])
-    # A = list()
-    # for d in range(D):
-    #     A.append(gen_normalparams(doc_dim))
 
 
     # initialize Rho s.t. Rho_k contains two fields "mu" (1 * V) and "Sigma" (V * V) that specifies a multivariate Gaussian
     # Rho = dict(Sigma = np.diag(np.random.rand(1, V)), mu = [np.random.rand(1, V) for k in range(K)])
     Rho = dict(Sigma = [np.random.rand(1, V) for k in range(K)], mu = [np.random.rand(1, V) for k in range(K)])
-    # Rho = list()
-    # for k in range(K):
-    #     Rho.append(gen_normalparams(V))
 
     # initialize U_prime s.t. U_prime_k contains two fields "mu" (1 * word_dim) and
     # "Sigma" (word_dim * word_dim) that specifies a multivariate Gaussian
     U_prime = dict(Sigma = np.diag(np.random.rand(1, word_dim)), mu = [np.random.rand(1, word_dim) for k in range(K)])
-    # U_prime = list()
-    # for k in range(K):
-    #     U_prime.append(gen_normalparams(word_dim))
 
     # initialize U s.t. U_k contains two fields "mu" (1 * doc_dim) and "Sigma" (doc_dim, doc_dim)
     U = dict(Sigma = np.diag(np.random.rand(1, doc_dim)), mu = [np.random.rand(1, doc_dim) for k in range(K)])
-    # U = list()
-    # for k in range(K):
-    #     U.append(gen_normalparams(doc_dim))
 
     # Xi_KW and Alpha_K are the auxiliary variable related to the lower bound used for q(z_dn)
     Xi_KW = [np.random.rand(1, V) for i in range(K)]
@@ -127,11 +112,7 @@ def run():
             for w_dn in d:
                 # TODO update q(z_dn) by Eq.7 
             # update Eta_d
-<<<<<<< HEAD
-            Eta[d] = update.update_eta(Eta[d], Xi_DK[d], Alpha_D[d], gamma, U, A[d])
-=======
             Eta[d] = update.update_eta(Eta[d], Xi_DK[d], Alpha_D[d], gamma, U, A[d], q_Z[d])
->>>>>>> a553da0b8f8eda9c585ff7edae1616b2beff2325
             # update A_d
             A[d] = update.update_a(A[d], c, gamma, U, Eta[d])
             if certain_interval:
