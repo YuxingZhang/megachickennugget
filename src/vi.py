@@ -50,7 +50,7 @@ def init_vars(D, K, V, N, doc_dim, word_dim):
     U_prime = dict(Sigma = np.diag(np.random.rand(1, word_dim)), mu = [np.random.rand(1, word_dim) for k in range(K)])
 
     # initialize U with parameters Sigma (doc_dim * doc_dim) and mu (K * doc_dim) such that
-    # U_k follows ~ Normal(mu[k], Sigma)
+    # U_k ~ Normal(mu[k], Sigma)
     U = dict(Sigma = np.diag(np.random.rand(1, doc_dim)), mu = [np.random.rand(1, doc_dim) for k in range(K)])
 
     # Xi_KW and Alpha_K are the auxiliary variable related to the lower bound used for q(z_dn)
