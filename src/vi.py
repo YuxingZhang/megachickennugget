@@ -112,6 +112,11 @@ def load_documents(word_emb_file, corpus_file):
 def run():
 	word_emb_file = '???'
 	corpus_file = '???'
+	l = 1
+	c = 1
+	kappa = 1
+	beta = 1
+	gamma = 1
 	load_documents(word_emb_file, corpus_file)
     (Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D) = init_vars()
     # Yuxing Zhang TODO
@@ -122,9 +127,13 @@ def run():
             for w_dn in d:
                 # TODO update q(z_dn) by Eq.7 
             # update Eta_d
+<<<<<<< HEAD
             Eta[d] = update.update_eta(Eta[d], Xi_DK[d], Alpha_D[d], gamma, U, A[d])
+=======
+            Eta[d] = update.update_eta(Eta[d], Xi_DK[d], Alpha_D[d], gamma, U, A[d], q_Z[d])
+>>>>>>> a553da0b8f8eda9c585ff7edae1616b2beff2325
             # update A_d
-            A[d] = update_a(A[d], c, gamma, U, Eta[d])
+            A[d] = update.update_a(A[d], c, gamma, U, Eta[d])
             if certain_interval:
                 # TODO update auxiliary variables ksi_d and alpha_d by Eq 2 and Eq 3
 
