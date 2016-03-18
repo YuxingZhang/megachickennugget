@@ -122,11 +122,12 @@ def run():
 
         # Tianshu Ren starts here TODO
         for k in K:
-            # update rho
-            update.update_rho(k, Rho, q_Z, beta, word_emb, U_prime, Alpha_K, Xi_KW)
-            # TODO update u_k_tild by Eq.10
+            # update Rho
+            update.update_rho(k, Rho, Z, U_prime, Alpha_K, Xi_KW, beta, word_emb, D, N, V)
+            # update U
+            update.update_u(k, U, A, Eta, kappa, gamma, D)
             # update U_prime
-            update.update_u_prime(k, U_prime, beta, word_emb, Rho)
+            update.update_u_prime(k, U_prime, Rho, beta, word_emb, V)
             if certain_interval():
                 # TODO update xi_k by Eq. 5
                 # TODO update alpha_k by Eq. 6
