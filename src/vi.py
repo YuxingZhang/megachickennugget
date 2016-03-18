@@ -98,7 +98,7 @@ def gen_normalparams(dim):
     return dict(mu = mu_tmp, Sigma = Sigma_tmp)
 
 def run():
-    B = load_documents(file_path)
+    (dictionary, word_emb, W, V, N) = load_documents(file_path)
     (Z, Eta, A, Rho, U_prime, U, XiK, AlphaK, XiD, AlphaD) = init_vars(D, K, N, V, doc_dim, word_dim)
     # Yuxing Zhang TODO
     while true: # while not converge
@@ -122,6 +122,8 @@ def run():
                 # TODO update xi_k by Eq. 5
                 # TODO update alpha_k by Eq. 6
 
+        if converge:
+        	break
 
 if __name__ == "__main__":
     run()
