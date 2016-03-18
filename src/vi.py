@@ -75,10 +75,12 @@ def load_documents(word_emb_file, corpus_file):
     filein = open(word_emb_file, 'r')
     filein.readline()
     index = 0
+    idx2word = dict()
     for line in filein:
         vals = line.strip().split()
         # build the word2idx dictionary
         word2idx[vals[0]] = index
+        idx2word[index] = vals[0]
         # store the word-embedding results
         word_emb.append(vals[1: ])
         index += 1
