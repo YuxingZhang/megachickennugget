@@ -89,8 +89,7 @@ def load_documents(word_emb_file, corpus_file):
 		N.append(len(words))
 
 	filein.close()
-
-        V = len(dictionary)
+	V = len(dictionary)
 
 	return dictionary, word_emb, W, V
 
