@@ -96,4 +96,3 @@ def update_u(k, U, kappa, A, Eta, gamma):
 		U['mu'][k] = gamma * U['Sigma'] * tmp2
 
 	return U
-
