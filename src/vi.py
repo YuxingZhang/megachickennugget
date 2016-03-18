@@ -108,6 +108,8 @@ def run():
     gamma = 1
     load_documents(word_emb_file, corpus_file)
     (Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D) = init_vars(D, K, V, N, doc_dim, word_dim)
+
+    # TODO precompute Sigma^{(u')*} by Eq. 9
     # Yuxing Zhang TODO
     while true: # while not converge
         # TODO sample a batch of document B
@@ -119,6 +121,7 @@ def run():
             Eta[d] = update.update_eta(Eta[d], Xi_DK[d], Alpha_D[d], gamma, U, A[d], q_Z[d])
             # update A_d
             A[d] = update.update_a(A[d], c, gamma, U, Eta[d])
+            # TODO update Sigma^{(a)*} by Eq.??
             if certain_interval:
                 # TODO update auxiliary variables ksi_d and alpha_d by Eq 2 and Eq 3
 
@@ -128,6 +131,7 @@ def run():
             # TODO update zeta_k_tild by Eq.8
             # TODO update u_k_tild by Eq.10
             # TODO update u_prime_k_tild by Eq.9
+            # TODO update Sigma^{(u)*} by Eq. 10
             if certain_interval():
                 # TODO update xi_k by Eq. 5
                 # TODO update alpha_k by Eq. 6
