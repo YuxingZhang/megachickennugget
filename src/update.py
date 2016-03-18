@@ -7,7 +7,7 @@ def lmd(xi):
     # Helper function on Page 5 under Eq. 1
     return 1 / (2 * xi) * (1 / (1 + np.exp(- xi)) - 0.5)
 
-def update_z(Z, d, n, K, V, mu_d, Rho, W, word2idx, xi, alpha):
+def update_z(Z, d, n, K, V, mu_d, Rho, W, word2idx, xi, alpha): # correct
     # update the vector q(z_dn) of length K from Eq. 7
     # q(z_dn) is a multinomial distribution with q(z_dn=k) = Z_dn(k)
     for k in range(K):
