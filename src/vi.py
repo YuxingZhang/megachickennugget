@@ -71,7 +71,7 @@ def load_documents(word_emb_file, corpus_file):
     filein.readline()
     index = 0
     for line in filein:
-        vals = line.split()
+        vals = line.strip().split()
         # build the dictionary
         dictionary[vals[0]] = index
         # store the word-embedding results
@@ -84,7 +84,7 @@ def load_documents(word_emb_file, corpus_file):
     N = list()
     filein = open(corpus_file, 'r')
     for doc in filein:
-        words = doc.split()
+        words = doc.strip().split()
         W.append(words)
         N.append(len(words))
     filein.close()
