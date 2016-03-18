@@ -10,20 +10,20 @@ def lmd(xi):
 def update_z(Z, d, n, K, V, mu_d, Rho, W, word2idx, xi, alpha):
     # update the vector q(z_dn) of length K from Eq. 7
     # q(z_dn) is a multinomial distribution with q(z_dn=k) = Z_dn(k)
-    for z in range(K):
-        E1 = mu_d(z)
+    for k in range(K):
+        E1 = mu_d(k)
 
         tmp = 0
         for w in V:
-            tmp +=  - lmd(xi[z][w]) * (Rho['Sigma'][z][w] ** 2 + Rho['mu'][z][w] ** 2) \
-                    - (0.5 - 2 * alpha[z] * lmd(xi[z][w])) * Rho['mu'][z][w] \
-                    + xi[z][w] / 2 \
-                    - lmd(xi[z][w]) * (alpha[z] ** 2 - xi[z][w] ** 2) \
-                    - np.log(1 + np.exp(xi[z][w]))
+            tmp +=  - lmd(xi[k][w]) * (Rho['Sigma'][k][w] ** 2 + Rho['mu'][k][w] ** 2) \
+                    - (0.5 - 2 * alpha[k] * lmd(xi[k][w])) * Rho['mu'][k][w] \
+                    + xi[k][w] / 2 \
+                    - lmd(xi[k][w]) * (alpha[k] ** 2 - xi[k][w] ** 2) \
+                    - np.log(1 + np.exp(xi[k][w]))
 
         w_dn = W[d][n]
-        E2 = Rho['mu'][z][word2idx[w_dn]] + alpha[z] * (V / 2 - 1) + tmp
-        Z[d][n][z] = np.exp(E1 + E2)
+        E2 = Rho['mu'][k][word2idx[w_dn]] + alpha[k] * (V / 2 - 1) + tmp
+        Z[d][n][k] = np.exp(E1 + E2)
     Z[d][n] = normalize(Z[d][n])
 
 def update_eta(d, Eta, Xi_DK, Alpha_D, gamma, U, A, q_Z):
