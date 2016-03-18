@@ -15,15 +15,20 @@ from sklearn.preprocessing import normalize
 #	N:			A list where N[d] = Number of words in document d
 # 	word_dim:	        Dimension of word embedding space
 # 	doc_dim:	        Dimension of document embedding space
+#	word_emb:			Word-embedding results for each word
+#	word2idx:			Index of each word in the word_emb vector
 
 K = 10 # number of topics
-V = 10000 # 
-D = 20 #
+V = 0 # 
+D = 0 #
+W = list()
+N = list()
 word_dim = 100
 doc_dim = 100 # embedding space dimension of document
 word2idx = dict() # mapping from a word to it's index in the vocabulary
+word_emb = list()
 
-def init_vars(docs, doc_len, doc_dim, word_dim):
+def init_vars():
     # initialize Z s.t. Z_dn is a vector of size K as parameters for a categorical distribution
     # Z is the variational distribution of q(z_dn), q(z_dn = k) = Z(d, n, k)
     Z = list()
@@ -67,7 +72,6 @@ def init_vars(docs, doc_len, doc_dim, word_dim):
     return Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D
 
 def load_documents(word_emb_file, corpus_file):
-    word_emb = list()
     filein = open(word_emb_file, 'r')
     filein.readline()
     index = 0
@@ -81,8 +85,6 @@ def load_documents(word_emb_file, corpus_file):
     filein.close()
 
     # read in the corpus file
-    W = list()
-    N = list()
     filein = open(corpus_file, 'r')
     for doc in filein:
         words = doc.strip().split()
@@ -93,16 +95,16 @@ def load_documents(word_emb_file, corpus_file):
     # setting the vocabulary size
     V = len(word2idx)
 
-    return word_emb, W, N
 
 def gen_normalparams(dim):
     mu_tmp = np.random.rand(1, dim)
     Sigma_tmp = np.diag(np.random.rand(1, dim))
     return dict(mu = mu_tmp, Sigma = Sigma_tmp)
 
+
 def run():
-    (dictionary, word_emb, docs, V, doc_len) = load_documents(file_path)
-    (Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D) = init_vars(docs, doc_len)
+	load_documents(word_emb_file, corpus_file)
+    (Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D) = init_vars()
     # Yuxing Zhang TODO
     while true: # while not converge
         # TODO sample a batch of document B
