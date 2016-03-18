@@ -11,11 +11,13 @@ def lmd(xi):
     # Helper function on Page 5 under Eq. 1
     return 1 / (2 * xi) * (1 / (1 + np.exp(- xi)) - 0.5)
 
-def update_z(d, n, # index
+def update_z(
+        d, n, # index
         Z, # parameter to update 
         mu_d, Rho, xi, alpha, # parameters to use
         W, word2idx, # global parameters
-        K, V): # constant
+        K, V # constant
+        ): 
 
     # update the vector q(z_dn) of length K from Eq. 7
     # q(z_dn) is a multinomial distribution with q(z_dn=k) = Z_dn(k)
@@ -35,7 +37,7 @@ def update_z(d, n, # index
         Z[d][n][k] = np.exp(E1 + E2)
     Z[d][n] = normalize(Z[d][n])
 
-def update_eta(d, Eta, Xi_DK, Alpha_D, gamma, U, A, Z):
+def update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K):
     for k in range(K):
         Eta['Sigma'][d][k] = 1 / (gamma - 2 * lmd(Xi_DK[d][k]))
         tmp = 0
@@ -45,7 +47,7 @@ def update_eta(d, Eta, Xi_DK, Alpha_D, gamma, U, A, Z):
         Eta['mu'][d][k] *= Eta['Sigma'][d][k]
 
 
-def update_a(d, A, c, gamma, U, Eta):
+def update_a(d, A, U, Eta, c, gamma, K):
     # update Sigma only for the first document
     if d == 0:
         tmp1 = 0
@@ -61,7 +63,7 @@ def update_a(d, A, c, gamma, U, Eta):
             tmp2 += Eta['mu'][d][k] * U['mu'][k]
         A['mu'][d] = gamma * np.dot(A['Sigma'], tmp2)
 
-def update_rho(k, Rho, Z, beta, word_emb, U_prime, Alpha_K, Xi_KW):
+def update_rho(k, Rho, Z, U_prime, Alpha_K, Xi_KW, beta, word_emb, D, N, V):
     for w in range(V):
         c_kw = 0
         m_k = 0
@@ -74,20 +76,14 @@ def update_rho(k, Rho, Z, beta, word_emb, U_prime, Alpha_K, Xi_KW):
         Rho['mu'][k][w] = beta * np.dot(word_emb[w].transpose(), U_prime['mu'][k]) + c_kw - m_k * (0.5 - 2 * Alpha_K[k] * lmd(Xi_KW[k][w]))
         Rho['mu'][k][w] *= Rho['Sigma'][k][w]
 
-def compute_u_prime_sigma(U_prime, beta, l, word_emb):
-    tmp = 0
-    for w in range(V):
-        tmp += np.dot(word_emb[w], word_emb[w].transpose())
-    U_prime['Sigma'] = inv(l * np.identity(word_dim) + beta * tmp)
-
-def update_u_prime(k, U_prime, beta, word_emb, Rho):
+def update_u_prime(k, U_prime, Rho, beta, word_emb, V):
     tmp = 0
     for w in range(V):
         tmp += word_emb[w] * Rho['mu'][k][w]
     U_prime['mu'] = beta * np.dot(U_prime['Sigma'], tmp)
 
 
-def update_u(k, U, kappa, A, Eta, gamma):
+def update_u(k, U, A, Eta, kappa, gamma, D):
     if k == 0:
         tmp1 = 0
         tmp2 = 0
@@ -101,5 +97,11 @@ def update_u(k, U, kappa, A, Eta, gamma):
         for d in range(D):
             tmp2 += Eta['mu'][d][k] * A['mu'][d]
         U['mu'][k] = gamma * np.dot(U['Sigma'], tmp2)
+
+def compute_u_prime_sigma(U_prime, beta, l, word_emb, V):
+    tmp = 0
+    for w in range(V):
+        tmp += np.dot(word_emb[w], word_emb[w].transpose())
+    U_prime['Sigma'] = inv(l * np.identity(word_dim) + beta * tmp)
 
 
