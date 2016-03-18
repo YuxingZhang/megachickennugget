@@ -27,37 +27,47 @@ def init_vars(D, K, N, V, doc_dim, word_dim):
 	Z = list()
 	for d in range(D):
 		Z.append([normalize(np.random.uniform(0, 1, (1, K)), 'l1') for i in range(N[d])])
-	# initialize Eta s.t. Eta_d contains two fields "mu" (1 * K) and "Sigma" (K*K) that specifies a multivariate gaussian
+
+	# initialize Eta s.t. Eta_d contains two fields "mu" (1 * K) and "Sigma" (K*K) that specifies a multivariate Gaussian
 	Eta = list()
 	for d in range(D):
 		Eta.append(gen_normalparams(K))
-	# initialize A s.t. A_d contains two fields "mu" (1 * doc_dim) and "Sigma" (doc_dim * doc_dim) that specifies a multivariate gaussian
+
+	# initialize A s.t. A_d contains two fields "mu" (1 * doc_dim) and "Sigma" (doc_dim * doc_dim) that specifies a multivariate Gaussian
 	A = list()
 	for d in range(D):
 		A.append(gen_normalparams(doc_dim))
-	# initialize Rho s.t. Rho_k contains two fields "mu" (1 * V) and "Sigma" (V * V) that specifies a multivariate gaussian
+
+	# initialize Rho s.t. Rho_k contains two fields "mu" (1 * V) and "Sigma" (V * V) that specifies a multivariate Gaussian
 	Rho = list()
 	for k in range(K):
 		Rho.append(gen_normalparams(V))
-	# initialize U_prime s.t. U_prime_k contains two fields "mu" (1 * word_dim) and "Sigma" (word_dim * word_dim) that specifies a multivariate gaussian
+
+	# initialize U_prime s.t. U_prime_k contains two fields "mu" (1 * word_dim) and
+        # "Sigma" (word_dim * word_dim) that specifies a multivariate Gaussian
 	U_prime = list()
 	for k in range(K):
 		U_prime.append(gen_normalparams(word_dim))
+
 	# initialize U s.t. U_k contains two fields "mu" (1 * doc_dim) and "Sigma" (doc_dim, doc_dim)
 	U = list()
 	for k in range(K):
 		U.append(gen_normalparams(doc_dim))
-	XiK = [np.random.random((1, V))	for i in range(K)]
-	AlphaK = np.random.random((1, K))
-	XiD = 1 #TODO
-	AlphaD = 1 #TODO
 
-	return Z, Eta, A, Rho, U_prime, U, XiK, AlphaK, XiD, AlphaD
+        # Xi_KW and Alpha_K are the auxiliary variable related to the lower bound used for q(z_dn)
+	Xi_KW = [np.random.random((1, V)) for i in range(K)]
+	Alpha_K = np.random.random((1, K))
 
-def load_documents(word_embd_file, corpus_file):
-	word_embd = list()
+        # Xi_DK and Alpha_D are the auxiliary variable related to the lower bound used for q(eta_d)
+	Xi_DK = [np.random.random((1, K)) for i in range(D)] 
+	Alpha_D = np.random.random((1, D)) 
+
+	return Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D
+
+def load_documents(word_emb_file, corpus_file):
+	word_emb = list()
 	dictionary = dict()
-	filein = open(word_embd_file, 'r')
+	filein = open(word_emb_file, 'r')
 	filein.readline()
 	index = 0
 	for line in filein:
@@ -65,7 +75,7 @@ def load_documents(word_embd_file, corpus_file):
 		# build the dictionary
 		dictionary[vals[0]] = index
 		# store the word-embedding results
-		word_embd.append(vals[1: ])
+		word_emb.append(vals[1: ])
 		index += 1
 	filein.close()
 
@@ -80,7 +90,9 @@ def load_documents(word_embd_file, corpus_file):
 
 	filein.close()
 
-	return dictionary, word_embd, W
+        V = len(dictionary)
+
+	return dictionary, word_emb, W, V
 
 def gen_normalparams(dim):
 	mu_tmp = np.random.rand(1, dim)
