@@ -30,7 +30,7 @@ def update_eta(Eta_d, Xi_DK_d, Alpha_D_d, gamma, U, A_d):
 		Eta_d['mu'][k, k] = gamma * np.dot(U[k]['mu'].transpose(), A_d) + 2 * Alpha_D_d * mylambda(Xi_DK_d[k]) - 0.5 + tmp
 		Eta_d['mu'][k, k] *= Eta_d['Sigma'][k]
 
-		return Eta_d
+	return Eta_d
 
 def update_a(A_d, c, gamma, U, Eta_d):
 	tmp1 = 0

@@ -33,7 +33,7 @@ def init_vars():
     # Z is the variational distribution of q(z_dn), q(z_dn = k) = Z(d, n, k)
     Z = list()
     for d in range(D):
-        Z.append([normalize(np.random.uniform(0, 1, (1, K)), 'l1') for i in range(doc_len[d])])
+        Z.append([normalize(np.random.uniform(0, 1, (1, K)), 'l1') for i in range(N[d])])
 
     # initialize Eta s.t. Eta_d contains two fields "mu" (1 * K) and "Sigma" (K*K) that specifies a multivariate Gaussian
     Eta = list()
@@ -88,7 +88,7 @@ def load_documents(word_emb_file, corpus_file):
     filein = open(corpus_file, 'r')
     for doc in filein:
         words = doc.strip().split()
-        docs.append(words)
+        W.append(words)
         N.append(len(words))
     filein.close()
 
@@ -103,6 +103,8 @@ def gen_normalparams(dim):
 
 
 def run():
+	word_emb_file = '???'
+	corpus_file = '???'
 	load_documents(word_emb_file, corpus_file)
     (Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D) = init_vars()
     # Yuxing Zhang TODO
