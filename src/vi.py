@@ -18,16 +18,6 @@ from sklearn.preprocessing import normalize
 #	word_emb:			Word-embedding results for each word
 #	word2idx:			Index of each word in the word_emb vector
 
-W = list()
-N = list()
-K = 10 # number of topics
-V = 0 # 
-D = 0 #
-word_dim = 100
-doc_dim = 100 # embedding space dimension of document
-word_emb = list() # word embedding from word2vec
-word2idx = dict() # mapping from a word to it's index in the vocabulary
-
 def init_vars(D, K, V, N, doc_dim, word_dim):
     # initialize Z s.t. Z_dn is a vector of size K as parameters for a categorical distribution
     # Z is the variational distribution of q(z_dn), q(z_dn = k) = Z(d, n, k)
@@ -65,42 +55,70 @@ def init_vars(D, K, V, N, doc_dim, word_dim):
 
     return Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D
 
-def load_documents(word_emb_file, corpus_file, V, idx2word):
-    filein = open(word_emb_file, 'r')
-    filein.readline()
+def load_documents(word_emb_file, corpus_file, word_emb, word2idx, idx2word, W, N):
+    f = open(word_emb_file, 'r')
+    f.readline()
+    dat = f.readlines()
+    f.close()
     index = 0
-    idx2word = dict()
-    for line in filein:
-        vals = line.strip().split()
-        # build the word2idx dictionary
-        word2idx[vals[0]] = index
-        idx2word[index] = vals[0]
+    for line in dat:
+        vec = line.strip().split()
+
+        # build the word2idx dictionary and the idx2word dictionary
+        word2idx[vec[0]] = index
+        idx2word[index] = vec[0]
+
         # store the word-embedding results
-        word_emb.append(vals[1: ])
+        word_emb.append(vec[1: ])
         index += 1
-    filein.close()
 
     # read in the corpus file
-    filein = open(corpus_file, 'r')
-    for doc in filein:
+    f = open(corpus_file, 'r')
+    dat = f.readlines()
+    f.close()
+    for doc in dat:
         words = doc.strip().split()
         W.append(words)
         N.append(len(words))
-    filein.close()
 
-    # setting the vocabulary size
-    V = len(word2idx)
 
 def run():
+#	W:			        Words in each documents, W[d][n] is the n-th word in the d-th doc
+#	N:			        A list where N[d] = Number of words in document d
+#	K:			        Total number of topics
+#	V:			        Size of the vocabulary
+#	D:			        Total number of documents
+# 	word_dim:	                Dimension of word embedding space
+# 	doc_dim:	                Dimension of document embedding space
+#	word_emb:			Word-embedding results for each word
+#	word2idx:			Index of each word in the word_emb vector
+#       l, c, kappa, beta, gamma        Hyper parameters for the model
+
     # initialize all variables
-    word_emb_file = '???'
-    corpus_file = '???'
     l = 1
     c = 1
     kappa = 1
     beta = 1
     gamma = 1
-    load_documents(word_emb_file, corpus_file)
+
+    W = list()
+    N = list()
+    K = 10 # number of topics
+    V = 0 # 
+    D = 0 #
+    word_dim = 100
+    doc_dim = 100 # embedding space dimension of document
+    word_emb = list() # word embedding from word2vec
+    word2idx = dict() # mapping from a word to it's index in the vocabulary
+    idx2word = dict() # mapping from index of a word in the vocabulary to the word itself
+
+    word_emb_input = '???' # TODO
+    corpus_input = '???' # TODO
+    load_documents(word_emb_input, corpus_input, word_emb, word2idx, idx2word, W, N):
+
+    # setting the vocabulary size
+    V = len(word2idx)
+
     (Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D) = init_vars(D, K, V, N, doc_dim, word_dim)
 
     # TODO precompute Sigma^{(u')*} by Eq. 9
@@ -137,3 +155,4 @@ def run():
 
 if __name__ == "__main__":
     run()
+
