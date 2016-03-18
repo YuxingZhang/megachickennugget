@@ -64,7 +64,22 @@ def update_rho(k, Rho, q_Z, beta, word_emb, U_prime, Alpha_K, Xi_KW):
 
 	return Rho
 
-def update_u_prime(k, )
+def compute_u_prime_sigma(U_prime, beta, l, word_emb):
+	tmp = 0
+	for w in range(V):
+		tmp += np.dot(word_emb[w], word_emb[w].transpose())
+	U_prime['Sigma'] = inv(l * np.identity(word_dim) + beta * tmp)
+
+	return U_prime
+
+def update_u_prime(k, U_prime, beta, word_emb, Rho):
+	tmp = 0
+	for w in range(V):
+		tmp += word_emb[w] * Rho['mu'][k][w]
+	U_prime['mu'] = beta * U_prime['Sigma'] * tmp
+
+	return U_prime
+
 
 
 

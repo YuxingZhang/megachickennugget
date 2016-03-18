@@ -110,6 +110,7 @@ def run():
     (Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D) = init_vars(D, K, V, N, doc_dim, word_dim)
 
     # TODO precompute Sigma^{(u')*} by Eq. 9
+    compute_u_prime_sigma(U_prime, beta, l, word_emb)
     # Yuxing Zhang TODO
     while true: # while not converge
         # TODO sample a batch of document B
@@ -118,7 +119,7 @@ def run():
             for w_dn in d:
                 # TODO update q(z_dn) by Eq.7 
             # update Eta_d
-            Eta[d] = update.update_eta(Eta[d], Xi_DK[d], Alpha_D[d], gamma, U, A[d], q_Z[d])
+            Eta[d] = update.update_eta(d, Eta, Xi_DK, Alpha_D, gamma, U, A, q_Z)
             # update A_d
             A[d] = update.update_a(A[d], c, gamma, U, Eta[d])
             # TODO update Sigma^{(a)*} by Eq.??
