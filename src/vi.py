@@ -119,18 +119,20 @@ def run():
             for w_dn in d:
                 # TODO update q(z_dn) by Eq.7 
             # update Eta_d
-            Eta[d] = update.update_eta(d, Eta, Xi_DK, Alpha_D, gamma, U, A, q_Z)
+            update.update_eta(d, Eta, Xi_DK, Alpha_D, gamma, U, A, q_Z)
             # update A_d
-            A[d] = update.update_a(d, A, c, gamma, U, Eta)
+            update.update_a(d, A, c, gamma, U, Eta)
             if certain_interval:
                 # TODO update auxiliary variables ksi_d and alpha_d by Eq 2 and Eq 3
 
 
         # Tianshu Ren starts here TODO
         for k in K:
-            # TODO update zeta_k_tild by Eq.8
+            # update rho
+            update_rho(k, Rho, q_Z, beta, word_emb, U_prime, Alpha_K, Xi_KW)
             # TODO update u_k_tild by Eq.10
-            # TODO update u_prime_k_tild by Eq.9
+            # update U_prime
+            update_u_prime(k, U_prime, beta, word_emb, Rho)
             if certain_interval():
                 # TODO update xi_k by Eq. 5
                 # TODO update alpha_k by Eq. 6
