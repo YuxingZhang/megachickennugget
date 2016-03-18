@@ -23,7 +23,7 @@ D = 20 #
 
 def init_vars(D, K, N, V, doc_dim, word_dim):
 	# initialize Z s.t. Z_dn is a vector of size K as parameters for a categorical distribution
-        # Z is the variational distribution of q(z_dn), q(z_dn = k) = Z(d, n, k)
+    # Z is the variational distribution of q(z_dn), q(z_dn = k) = Z(d, n, k)
 	Z = list()
 	for d in range(D):
 		Z.append([normalize(np.random.uniform(0, 1, (1, K)), 'l1') for i in range(N[d])])
@@ -54,11 +54,11 @@ def init_vars(D, K, N, V, doc_dim, word_dim):
 	for k in range(K):
 		U.append(gen_normalparams(doc_dim))
 
-        # Xi_KW and Alpha_K are the auxiliary variable related to the lower bound used for q(z_dn)
+    # Xi_KW and Alpha_K are the auxiliary variable related to the lower bound used for q(z_dn)
 	Xi_KW = [np.random.random((1, V)) for i in range(K)]
 	Alpha_K = np.random.random((1, K))
 
-        # Xi_DK and Alpha_D are the auxiliary variable related to the lower bound used for q(eta_d)
+    # Xi_DK and Alpha_D are the auxiliary variable related to the lower bound used for q(eta_d)
 	Xi_DK = [np.random.random((1, K)) for i in range(D)] 
 	Alpha_D = np.random.random((1, D)) 
 
