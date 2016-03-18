@@ -11,7 +11,7 @@ from sklearn.preprocessing import normalize
 #	K:			Number of topics
 #	V:			Size of vocabulary
 #	D:			Number of documents
-#	N:			A list where N[i] = Number of words in document i
+#	doc_len:			A list where doc_len[i] = Number of words in document i
 # 	word_dim:	Dimension of word embedding
 # 	doc_dim:	Dimension of document embedding
 
@@ -21,12 +21,12 @@ V = 10000 #
 word_dim = 100
 D = 20 #
 
-def init_vars(D, K, N, V, doc_dim, word_dim):
+def init_vars(docs, K, doc_len, V, doc_dim, word_dim):
     # initialize Z s.t. Z_dn is a vector of size K as parameters for a categorical distribution
     # Z is the variational distribution of q(z_dn), q(z_dn = k) = Z(d, n, k)
     Z = list()
     for d in range(D):
-        Z.append([normalize(np.random.uniform(0, 1, (1, K)), 'l1') for i in range(N[d])])
+        Z.append([normalize(np.random.uniform(0, 1, (1, K)), 'l1') for i in range(doc_len[d])])
 
     # initialize Eta s.t. Eta_d contains two fields "mu" (1 * K) and "Sigma" (K*K) that specifies a multivariate Gaussian
     Eta = list()
@@ -80,17 +80,19 @@ def load_documents(word_emb_file, corpus_file):
     filein.close()
 
     # read in the corpus file
-    W = list()
-    N = list()
+    docs = list()
+    doc_len = list()
     filein = open(corpus_file, 'r')
     for doc in filein:
-        words = doc.strip().split()
-        W.append(words)
-        N.append(len(words))
+        docs = doc.strip().split()
+        docs.append(words)
+        doc_len.append(len(words))
     filein.close()
+
+    # updating the vocabulary size
     V = len(dictionary)
 
-    return dictionary, word_emb, W, V, N
+    return dictionary, word_emb, docs, V, doc_len
 
 def gen_normalparams(dim):
     mu_tmp = np.random.rand(1, dim)
@@ -98,8 +100,8 @@ def gen_normalparams(dim):
     return dict(mu = mu_tmp, Sigma = Sigma_tmp)
 
 def run():
-    (dictionary, word_emb, W, V, N) = load_documents(file_path)
-    (Z, Eta, A, Rho, U_prime, U, XiK, AlphaK, XiD, AlphaD) = init_vars(D, K, N, V, doc_dim, word_dim)
+    (dictionary, word_emb, docs, V, doc_len) = load_documents(file_path)
+    (Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D) = init_vars(docs, K, doc_len, V, doc_dim, word_dim)
     # Yuxing Zhang TODO
     while true: # while not converge
         # TODO sample a batch of document B
