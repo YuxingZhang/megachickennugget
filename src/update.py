@@ -1,6 +1,8 @@
 import sys
 import nympy as np
+import sklearn
 from sklearn.preprocessing import normalize
+from numpy.linalg import inv
 
 def mylambda(xi):
 	# Helper function on Page 5 under Eq. 1
@@ -10,7 +12,7 @@ def update_q_z(zvec, d, n, K, V, mu_d, Rho, word_idx, xi, alpha):
 	# update the vector z_dn of length K from Eq. 7
 	# q(z_dn) is a multinomial distribution with q(z_dn=k) = z_dn(k)
 
-	for k in range(K):
+	for z in range(K):
 		E1 = mu_d(z)
 		tmp1 = 0
 		tmp2 = 0
@@ -24,4 +26,20 @@ def update_q_z(zvec, d, n, K, V, mu_d, Rho, word_idx, xi, alpha):
 
 	return normalize(zvec)
 
-def update_mu(muvec, d,)
+def update_eta(Eta_d, Xi_DK_d, Alpha_D_d, gamma, U, A_d):
+	for k in range(K):
+		Eta_d['Sigma'][k] = 1 / (gamma - 2 * mylambda(Xi_DK_d[k]))
+		tmp = 0
+		for w in range(V):
+			tmp += q_Z[d][n][k] #??? how to reference ???
+		Eta_d['mu'][k, k] = gamma * np.dot(U[k]['mu'].transpose(), A_d) + 2 * Alpha_D_d * mylambda(Xi_DK_d[k]) - 0.5 + tmp
+		Eta_d['mu'][k, k] *= Eta_d['Sigma'][k]
+
+def update_a(c, gamma, U, Eta_d):
+	tmp1 = 0
+	tmp2 = 0
+	for k in range(K):
+		tmp1 += np.dot(U[k]['mu'], U[k]['mu'])
+		tmp2 += Eta_d['mu'][k] * U[k]['mu']
+	A_d['Sigma'] = inv(gamma * tmp + gamma * K * U[k]['Sigma'] + c * np.identity(doc_dim))
+	A_d['mu'] = gamma * A_d['Sigma'] * tmp2
