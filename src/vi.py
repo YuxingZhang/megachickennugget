@@ -108,20 +108,9 @@ def run():
 	beta = 1
 	gamma = 1
 	load_documents(word_emb_file, corpus_file)
-    (Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D) = init_vars()
+	(Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D) = init_vars(D, K, V, N, doc_dim, word_dim)
     # precompute sigma for U_prime according to Eq 9
     compute_u_prime_sigma(U_prime, beta, l, word_emb)
-=======
-    word_emb_file = '???'
-    corpus_file = '???'
-    l = 1
-    c = 1
-    kappa = 1
-    beta = 1
-    gamma = 1
-    load_documents(word_emb_file, corpus_file)
-    (Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D) = init_vars(D, K, V, N, doc_dim, word_dim)
->>>>>>> 0515818e25759308059824ddbdec963c67f42b3d
     # Yuxing Zhang TODO
     while true: # while not converge
         # TODO sample a batch of document B
