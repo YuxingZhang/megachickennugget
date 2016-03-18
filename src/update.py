@@ -6,11 +6,11 @@ def mylambda(xi):
 	# Helper function on Page 5 under Eq. 1
 	return 1 / (2 * xi) * (1 / (1 + exp(- xi)) - 0.5)
 
-def update_z(zvec, d, n, K, V, mu_d, Rho, word_idx, xi, alpha):
+def update_q_z(zvec, d, n, K, V, mu_d, Rho, word_idx, xi, alpha):
 	# update the vector z_dn of length K from Eq. 7
 	# q(z_dn) is a multinomial distribution with q(z_dn=k) = z_dn(k)
 
-	for z in range(K):
+	for k in range(K):
 		E1 = mu_d(z)
 		tmp1 = 0
 		tmp2 = 0

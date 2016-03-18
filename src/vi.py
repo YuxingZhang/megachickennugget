@@ -8,11 +8,11 @@ from sklearn.preprocessing import normalize
 # Output:
 # 	Variational parameters {u, u_prime, rho, alpha, eta, z}	
 # Variables:
-#       TODO add specification of the variables
+#	W:			Words in the corpus
 #	K:			Number of topics
 #	V:			Size of vocabulary
 #	D:			Number of documents
-#	doc_len:			A list where doc_len[i] = Number of words in document i
+#	N:			A list where N[i] = Number of words in document i
 # 	word_dim:	Dimension of word embedding
 # 	doc_dim:	Dimension of document embedding
 
@@ -81,19 +81,19 @@ def load_documents(word_emb_file, corpus_file):
     filein.close()
 
     # read in the corpus file
-    docs = list()
-    doc_len = list()
+    W = list()
+    N = list()
     filein = open(corpus_file, 'r')
     for doc in filein:
-        docs = doc.strip().split()
+        words = doc.strip().split()
         docs.append(words)
-        doc_len.append(len(words))
+        N.append(len(words))
     filein.close()
 
     # updating the vocabulary size
     V = len(dictionary)
 
-    return dictionary, word_emb, docs, V, doc_len
+    return dictionary, word_emb, W, V, N
 
 def gen_normalparams(dim):
     mu_tmp = np.random.rand(1, dim)
