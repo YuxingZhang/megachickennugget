@@ -21,7 +21,7 @@ def update_q_z(Z_dn, K, V, mu_d, Rho, word_idx, xi, alpha):
 		Z_dn[z] = np.exp(E1 + E2)
 		Z_dn = normalize(Z_dn)
 
-def update_eta(Eta_d, Xi_DK_d, Alpha_D_d, gamma, U, A_d):
+def update_eta(Eta_d, Xi_DK_d, Alpha_D_d, gamma, U, A_d, q_z):
 	for k in range(K):
 		Eta_d['Sigma'][k] = 1 / (gamma - 2 * mylambda(Xi_DK_d[k]))
 		tmp = 0
@@ -38,7 +38,7 @@ def update_a(A_d, c, gamma, U, Eta_d):
 	for k in range(K):
 		tmp1 += np.dot(U[k]['mu'], U[k]['mu'])
 		tmp2 += Eta_d['mu'][k] * U[k]['mu']
-	A_d['Sigma'] = inv(gamma * tmp + gamma * K * U[k]['Sigma'] + c * np.identity(doc_dim))
+	A_d['Sigma'] = inv(gamma * tmp1 + gamma * K * U[k]['Sigma'] + c * np.identity(doc_dim))
 	A_d['mu'] = gamma * A_d['Sigma'] * tmp2
 
 	return A_d
