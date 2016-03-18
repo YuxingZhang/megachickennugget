@@ -3,7 +3,7 @@ from sklearn.preprocessing import normalize
 from numpy.linalg import inv
 
 
-def mylambda(xi):
+def lmd(xi):
     # Helper function on Page 5 under Eq. 1
     return 1 / (2 * xi) * (1 / (1 + np.exp(- xi)) - 0.5)
 
@@ -12,21 +12,26 @@ def update_z(Z, d, n, K, V, mu_d, Rho, word_idx, xi, alpha):
     # q(z_dn) is a multinomial distribution with q(z_dn=k) = Z_dn(k)
     for z in range(K):
         E1 = mu_d(z)
-        tmp = 0
+
+        expected_sum = 0
         for w in V:
-            tmp += mylambda(xi[z][w]) * (Rho['Sigma'][z][w] ** 2 + Rho['mu'][z][w] ** 2) - (1/2 - 2 * alpha[z] * mylambda(xi[z][w])) * Rho['mu'][z][w] \
-                    + xi[z][w] / 2 - mylambda(xi[z][w]) * (alpha[z] ** 2 - xi[z][w] ** 2) - np.log(1 + np.exp(xi[z][w]))
-        E2 = Rho['mu'][z][word_idx] + alpha[z](V / 2 - 1) - tmp
+            expected_sum += lmd(xi[z][w]) * (Rho['Sigma'][z][w] ** 2 + Rho['mu'][z][w] ** 2) \
+                    - (1/2 - 2 * alpha[z] * lmd(xi[z][w])) * Rho['mu'][z][w] \
+                    + xi[z][w] / 2 \
+                    - lmd(xi[z][w]) * (alpha[z] ** 2 - xi[z][w] ** 2) \
+                    - np.log(1 + np.exp(xi[z][w]))
+
+        E2 = Rho['mu'][z][word_idx] + alpha[z](V / 2 - 1) - expected_sum
         Z[d][n][z] = np.exp(E1 + E2)
     Z[d][n] = normalize(Z[d][n])
 
 def update_eta(d, Eta, Xi_DK, Alpha_D, gamma, U, A, q_Z):
     for k in range(K):
-        Eta['Sigma'][d][k] = 1 / (gamma - 2 * mylambda(Xi_DK[d][k]))
+        Eta['Sigma'][d][k] = 1 / (gamma - 2 * lmd(Xi_DK[d][k]))
         tmp = 0
         for n in range(N[d]):
             tmp += q_Z[d][n][k] #??? how to reference ???
-        Eta['mu'][d][k] = gamma * np.dot(U[k]['mu'].transpose(), A['mu'][d]) + 2 * Alpha_D[d] * mylambda(Xi_DK[d][k]) - 0.5 + tmp
+        Eta['mu'][d][k] = gamma * np.dot(U[k]['mu'].transpose(), A['mu'][d]) + 2 * Alpha_D[d] * lmd(Xi_DK[d][k]) - 0.5 + tmp
         Eta['mu'][d][k] *= Eta['Sigma'][d][k]
 
     return Eta
@@ -58,8 +63,8 @@ def update_rho(k, Rho, q_Z, beta, word_emb, U_prime, Alpha_K, Xi_KW):
                 if W[d][n] == idx2word[w]:
                     c_kw += q_Z[d][n][k]
                 m_k += q_Z[d][n][k]
-        Rho['Sigma'][k][w] = 1 / (beta + 2 * m_k * mylambda(Xi_KW[k][w]))
-        Rho['mu'][k][w] = beta * np.dot(word_emb[w].transpose(), U_prime['mu'][k]) + c_kw - m_k * (0.5 - 2 * Alpha_K[k] * mylambda(Xi_KW[k][w]))
+        Rho['Sigma'][k][w] = 1 / (beta + 2 * m_k * lmd(Xi_KW[k][w]))
+        Rho['mu'][k][w] = beta * np.dot(word_emb[w].transpose(), U_prime['mu'][k]) + c_kw - m_k * (0.5 - 2 * Alpha_K[k] * lmd(Xi_KW[k][w]))
         Rho['mu'][k][w] *= Rho['Sigma'][k][w]
 
     return Rho
