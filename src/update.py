@@ -37,7 +37,7 @@ def update_a(d, A, c, gamma, U, Eta):
 		tmp1 = 0
 		tmp2 = 0
 		for k in range(K):
-			tmp1 += np.dot(U['mu'][k].transpose(), U['mu'][k])
+			tmp1 += np.dot(U['mu'][k], U['mu'][k].transpose())
 			tmp2 += Eta['mu'][d][k] * U['mu'][k]
 		A['Sigma'] = inv(gamma * tmp1 + gamma * K * U[k]['Sigma'] + c * np.identity(doc_dim))
 		A['mu'][d] = gamma * A['Sigma'] * tmp2
@@ -79,6 +79,13 @@ def update_u_prime(k, U_prime, beta, word_emb, Rho):
 	U_prime['mu'] = beta * U_prime['Sigma'] * tmp
 
 	return U_prime
+
+def update_u(k, U, kappa, A, Eta, gamma):
+	if k == 0:
+		tmp1 = 0
+		tmp2 = 0
+		for d in range(D):
+			tmp1 += np.dot(A['mu'][d], A['mu'][d].transpose())
 
 
 
