@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.preprocessing import normalize
 from numpy.linalg import inv
+from numpy.linalg import norm
 
 ''' 
 FUNCTION ARGUMENTS ORDER:
@@ -33,9 +34,13 @@ def update_auxiliary(idx, Alpha, Xi, Var, Sidx):
     Alpha[idx] = (0.5 * (Sidx / 2 - 1) + tmp1) / tmp2
 
 
-def update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V): 
+def update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V, eps):
     # Update the vector q(z_dn) of length K from Eq. 7
     # q(z_dn) is a multinomial distribution with q(z_dn=k) = Z[d][n][k]
+
+    converge = False
+    z_dn_old = Z[d][n]
+
     for k in range(K):
         E1 = Eta[d][k]  # First expectation term
 
@@ -52,8 +57,12 @@ def update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V):
         Z[d][n][k] = np.exp(E1 + E2)
     Z[d][n] = normalize(Z[d][n])
 
+    if norm(Z[d][n] - z_dn_old) / norm(z_dn_old) < eps:
+        converge = True
+    return converge
 
-def update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K):
+
+def update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K, eps):
     # Update q(eta_d) by Eq. (11) and (12)
     # Last checked Mar. 27 2:31pm
     for k in range(K):
@@ -65,7 +74,7 @@ def update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K):
         Eta['mu'][d][k] *= Eta['Sigma'][d][k]
 
 
-def update_a(d, A, U, Eta, c, gamma, doc_dim, K):
+def update_a(d, A, U, Eta, c, gamma, doc_dim, K, eps):
     # Update Sigma only for the first document
     # Last checked Mar. 27 3:06pm
     if d == 0:
