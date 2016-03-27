@@ -9,9 +9,10 @@ if __name__ == '__main__':
 		'how', 'no', 'since', 'very', 'however', 'any', 'just', 'only', 'also'])
 
 	path = '/Users/Lidan/Documents/CMU Yr1 Sem2/10-708/Project/newsdata/'
-	input_file = 'new_corpus.txt'
-	output_file = 'new_wordcount.dat'
-	output_dict_file = 'new_vocab.dat'
+	input_file = 'corpus.txt'
+	new_corpus_file = 'new_corpus.txt'
+	output_file = 'wordcount.dat'
+	output_dict_file = 'vocab.dat'
 
 	vocab = list()
 	vocab_hm = dict()
@@ -39,12 +40,14 @@ if __name__ == '__main__':
 		print vocab[i], ' ', vocab_hm[vocab[i]]
 
 	f = open(path + input_file, 'r')
+	fout_corpus = open(path + new_corpus_file, 'w')
 	for l in f.readlines():
 		d = dict()
 		l = l[:-1]
 		words = l.split(' ')
 		for w in words:
 			if vocab_hm.has_key(w):
+				fout_corpus.write(w + ' ')
 				if d.has_key(w):
 					d[w] += 1
 				else:
@@ -53,6 +56,8 @@ if __name__ == '__main__':
 		for i in range(len(vocab)):
 			if d.has_key(vocab[i]):
 				f_out.write(' ' + str(i) + ':' + str(d[vocab[i]]))
-		f_out.write('\n\n')
+		f_out.write('\n')
+		fout_corpus.write('\n')
 	f.close()
 	f_out.close()
+	fout_corpus.close()

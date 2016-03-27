@@ -6,8 +6,8 @@ if __name__ == '__main__':
 
     path = '/Users/Lidan/Documents/CMU Yr1 Sem2/10-708/Project/newsdata/'
     input_file = 'file_names'
-    mid_file = 'new_output.txt'
-    output_file = 'new_corpus.txt'
+    mid_file = 'output.txt'
+    output_file = 'corpus.txt'
 
     
     f = open(path + input_file, 'r')
@@ -27,11 +27,12 @@ if __name__ == '__main__':
     for line in f:
         line = re.sub("- ", '', line)
         line = re.sub("-", " ", line)
+        line = re.sub("_", '', line)
         line = re.sub(r"\d+", '', line)
         line = re.sub(r"[^\w\s]", '', line)
         line = re.sub(r"\s+", ' ', line)
         line = line.lower()
         fout.write(line.strip())
-        fout.write('\n\n')
+        fout.write('\n')
     fout.close()
     f.close()
