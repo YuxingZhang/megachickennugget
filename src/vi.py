@@ -18,6 +18,9 @@ from sklearn.preprocessing import normalize
 #   word_emb:           Word-embedding results for each word
 #   word2idx:           Index of each word in the word_emb vector
 
+def converge(a, a_new, eps):
+    ''' If any difference is big, return false '''
+
 def init_vars(D, K, V, N, doc_dim, word_dim):
     # initialize Z s.t. Z_dn is a vector of size K as parameters for a categorical distribution
     # Z is the variational distribution of q(z_dn), q(z_dn = k) = Z(d, n, k)
@@ -136,8 +139,19 @@ def run():
     # TODO precompute Sigma^{(u')*} by Eq. 9
     compute_u_prime_sigma(U_prime, beta, l, word_emb, V)
 
-    while true: # while not converge
+    iteration = 1000
+    random_idx = np.random.permutation(len(W))
+    batch_size = 20
+    current_batch = len(random_idx)
+    number_of_batch = int((len(random_idx) + batch_size - 1) / batch_size)
+    while iteration > 0: # while not converge
+        converge = True
+        iteration -= 1
         # TODO sample a batch of document B
+        current_batch -= 1
+        if current_batch < 0:
+            current_batch += 20
+        B = random_idx[current_batch * batch_size : (current_batch + 1) * batch_size]
         # udpate local distribution
         for d in B:
             for n in N[d]:
@@ -149,7 +163,7 @@ def run():
 
 
         # update global distributions
-        for k in K:
+        for k in range(K):
             # update Rho
             update.update_rho(k, Rho, Z, U_prime, Alpha_K, Xi_KW, beta, word_emb, D, N, V)
             # update U
