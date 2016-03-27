@@ -156,30 +156,30 @@ def run():
         for d in B:
             for n in N[d]:
                 cvg = update.update_z(d, n, Z, Eta, Rho, Xi_KW_z, Alpha_K_z, W, word2idx, K, V)
-                if !cvg:
+                if not cvg:
                     has_converge = False
             # update Eta
             cvg = update.update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K)
-            if !cvg:
+            if not cvg:
                 has_converge = False
             # update A
             cvg = update.update_a(d, A, U, Eta, c, gamma, K)
-            if !cvg:
+            if not cvg:
                 has_converge = False
 
         # update global distributions
         for k in range(K):
             # update Rho
             cvg = update.update_rho(k, Rho, Z, U_prime, Alpha_K, Xi_KW, beta, word_emb, D, N, V)
-            if !cvg:
+            if not cvg:
                 has_converge = False
             # update U
             cvg = update.update_u(k, U, A, Eta, kappa, gamma, D)
-            if !cvg:
+            if not cvg:
                 has_converge = False
             # update U_prime
             cvg = update.update_u_prime(k, U_prime, Rho, beta, word_emb, V)
-            if !cvg:
+            if not cvg:
                 has_converge = False
 
         ''' update the auxiliary vars using in q(z_dn) and q(rho) '''
