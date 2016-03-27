@@ -161,6 +161,7 @@ def run():
         update_auxiliary(k, Alpha_K, Xi_KW, Rho, W) 
         ''' update the auxiliary vars using in q(eta) '''
         update_auxiliary(d, Alpha_D, Xi_DK, Eta, K):
+
         if converge:
             break
 
