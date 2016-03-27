@@ -56,6 +56,14 @@ def init_vars(D, K, V, N, doc_dim, word_dim):
     return Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D
 
 def load_documents(word_emb_file, corpus_file, word_emb, word2idx, idx2word, W, N):
+    '''
+    This function read and load the 
+        word_emb: store the embedding of the words in the same order as the index
+        word2idx: store the index of each word, using the order of the words in the vocabulary
+        idx2word: can access the word from the index
+        W: all the documents, the i-th word in the d-th document is W[d][i]
+    '''
+     
     f = open(word_emb_file, 'r')
     f.readline()
     dat = f.readlines()
@@ -135,8 +143,7 @@ def run():
             # update A
             update.update_a(d, A, U, Eta, c, gamma, K)
             if certain_interval:
-                update.update_xi_D()
-                update.update_alpha_D()
+                update_auxiliary_D(d, Alpha_D, Xi_DK, K):
                 # TODO update auxiliary variables ksi_d and alpha_d by Eq 2 and Eq 3
 
 
@@ -149,10 +156,8 @@ def run():
             # update U_prime
             update.update_u_prime(k, U_prime, Rho, beta, word_emb, V)
             if certain_interval():
-                update.update_xi_K()
-                # TODO update xi_k by Eq. 5
-                update.update_alpha_K()
-                # TODO update alpha_k by Eq. 6
+                # TODO update xi_k by Eq. 5 and update alpha_k by Eq. 6
+                update_auxiliary_K(d, Alpha_D, Xi_DK, K) # TODO change the argument here 
 
         if converge:
             break
