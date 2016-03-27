@@ -45,15 +45,19 @@ def init_vars(D, K, V, N, doc_dim, word_dim):
     # U_k ~ Normal(mu[k], Sigma)
     U = dict(Sigma = np.diag(np.random.rand(doc_dim, 1)), mu = [np.random.rand(doc_dim, 1) for k in range(K)])
 
-    # Xi_KW and Alpha_K are the auxiliary variable related to the lower bound used for q(z_dn)
-    Xi_KW = [np.random.rand(V, 1) for i in range(K)]
-    Alpha_K = np.random.rand(K, 1)
+    ''' Xi_KW and Alpha_K are the auxiliary variable related to the lower bound used for q(z_dn) '''
+    Xi_KW_z = [np.random.rand(V, 1) for i in range(K)]
+    Alpha_K_z = np.random.rand(K, 1)
 
-    # Xi_DK and Alpha_D are the auxiliary variable related to the lower bound used for q(eta_d)
+    ''' Xi_KW and Alpha_K are the auxiliary variable related to the lower bound used for q(rho_k) '''
+    Xi_KW_rho = [np.random.rand(V, 1) for i in range(K)]
+    Alpha_K_rho = np.random.rand(K, 1)
+
+    ''' Xi_DK and Alpha_D are the auxiliary variable related to the lower bound used for q(eta_d) '''
     Xi_DK = [np.random.rand(K, 1) for i in range(D)]
     Alpha_D = np.random.rand(D, 1)
 
-    return Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D
+    return Z, Eta, A, Rho, U_prime, U, Xi_KW_z, Alpha_K_z, Xi_KW_rho, Alpha_K_rho, Xi_DK, Alpha_D
 
 def load_documents(word_emb_file, corpus_file, word_emb, word2idx, idx2word, W, N):
     '''
@@ -127,7 +131,7 @@ def run():
     # setting the vocabulary size
     V = len(word2idx)
 
-    (Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D) = init_vars(D, K, V, N, doc_dim, word_dim)
+    (Z, Eta, A, Rho, U_prime, U, Xi_KW_z, Alpha_K_z, Xi_KW_rho, Alpha_K_rho, Xi_DK, Alpha_D) = init_vars(D, K, V, N, doc_dim, word_dim)
 
     # TODO precompute Sigma^{(u')*} by Eq. 9
     compute_u_prime_sigma(U_prime, beta, l, word_emb, V)
@@ -137,14 +141,11 @@ def run():
         # udpate local distribution
         for d in B:
             for n in N[d]:
-                update.update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V)
+                update.update_z(d, n, Z, Eta, Rho, Xi_KW_z, Alpha_K_z, W, word2idx, K, V)
             # update Eta
             update.update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K)
             # update A
             update.update_a(d, A, U, Eta, c, gamma, K)
-            if certain_interval:
-                update_auxiliary_D(d, Alpha_D, Xi_DK, Rho, K):
-                # TODO update auxiliary variables ksi_d and alpha_d by Eq 2 and Eq 3
 
 
         # update global distributions
@@ -155,10 +156,11 @@ def run():
             update.update_u(k, U, A, Eta, kappa, gamma, D)
             # update U_prime
             update.update_u_prime(k, U_prime, Rho, beta, word_emb, V)
-            if certain_interval():
-                # TODO update xi_k by Eq. 5 and update alpha_k by Eq. 6
-                update_auxiliary_K(d, Alpha_D, Xi_DK, K) # TODO change the argument here 
 
+        ''' update the auxiliary vars using in q(z_dn) and q(rho) '''
+        update_auxiliary(k, Alpha_K, Xi_KW, Rho, W) 
+        ''' update the auxiliary vars using in q(eta) '''
+        update_auxiliary(d, Alpha_D, Xi_DK, Eta, K):
         if converge:
             break
 

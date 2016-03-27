@@ -59,7 +59,7 @@ def update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K):
         tmp = 0
         for n in range(N[d]):
             tmp += Z[d][n][k]
-        Eta['mu'][d][k] = gamma * np.dot(U['mu'][k].transpose(), A['mu'][d]) + 2 * Alpha_D[d] * lmd(Xi_DK[d][k]) - 0.5 + tmp
+        Eta['mu'][d][k] = gamma * np.dot(U['mu'][k].transpose(), A['mu'][d]) + 2 * Alpha_D_eta[d] * lmd(Xi_DK[d][k]) - 0.5 + tmp
         Eta['mu'][d][k] *= Eta['Sigma'][d][k]
 
 
