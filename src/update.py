@@ -9,33 +9,43 @@ FUNCTION ARGUMENTS ORDER:
 
 def lmd(xi):
     # Helper function on Page 5 under Eq. 1
+    # Last checked Mar. 27 1:55pm
     return 1 / (2 * xi) * (1 / (1 + np.exp(- xi)) - 0.5)
+
 
 def update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V): 
     # update the vector q(z_dn) of length K from Eq. 7
-    # q(z_dn) is a multinomial distribution with q(z_dn=k) = Z_dn(k)
+    # q(z_dn) is a multinomial distribution with q(z_dn=k) = Z[d][n][k]
     for k in range(K):
-        E1 = Eta[d][k]
+        E1 = Eta[d][k]  # First expectation term
 
         tmp = 0
         for w in V:
-            tmp +=  - lmd(Xi_KW[k][w]) * (Rho['Sigma'][k][w] ** 2 + Rho['mu'][k][w] ** 2) \
+            tmp +=  - lmd(Xi_KW[k][w]) * (Rho['Sigma'][k][w] + Rho['mu'][k][w] ** 2) \
                     - (0.5 - 2 * Alpha_K[k] * lmd(Xi_KW[k][w])) * Rho['mu'][k][w] \
                     + Xi_KW[k][w] / 2 \
                     - lmd(Xi_KW[k][w]) * (Alpha_K[k] ** 2 - Xi_KW[k][w] ** 2) \
                     - np.log(1 + np.exp(Xi_KW[k][w]))
 
         w_dn = W[d][n]
-        E2 = Rho['mu'][k][word2idx[w_dn]] + Alpha_K[k] * (V / 2 - 1) + tmp
+        E2 = Rho['mu'][k][word2idx[w_dn]] + Alpha_K[k] * (V / 2 - 1) + tmp  # Second expectation term
         Z[d][n][k] = np.exp(E1 + E2)
     Z[d][n] = normalize(Z[d][n])
 
-def update_auxiliary_d(d, Alpha_D, Xi_DK, K):
-    tmp = 0
-    for k in range(K):
-        tmp += lmd(Xi_DK[d][k]) * Eta
 
-
+def update_auxiliary(idx, Alpha, Xi, Var, Sidx):
+    # idx is the index to update in Alpha and Xi
+    # Alpha is a vector s.t. Alpha[idx] is a scalar that corresponds to the auxiliary variable used to update Var[idx]
+    # Xi is a matrix s.t. Xi[idx] is a vector that corresponds to the auxiliary variables used to update Var[idx]
+    # Var is the random variable, e.g. Rho, Eta, Z that uses the auxiliary variable
+    # Sidx is the the index that is summed over in this update, i.e. sum_{i=1}^Sidx
+    tmp1 = 0
+    tmp2 = 0
+    for i in range(Sidx):
+        tmp1 += lmd(Xi[idx][i]) * Var['mu'][i]
+        tmp2 += lmd(Xi[idx][i])
+        Xi[idx] = np.sqrt(Var['Sigma'][i] + Var['mu'][i] ** 2 - 2 * Alpha[idx] * Var['mu'][i] + Alpha[idx] ** 2)
+    Alpha[idx] = (0.5 * (Sidx / 2 - 1) + tmp1) / tmp2
 
 
 def update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K):
@@ -64,7 +74,10 @@ def update_a(d, A, U, Eta, c, gamma, K):
             tmp2 += Eta['mu'][d][k] * U['mu'][k]
         A['mu'][d] = gamma * np.dot(A['Sigma'], tmp2)
 
-def update_rho(k, Rho, Z, U_prime, Alpha_K, Xi_KW, beta, word_emb, D, N, V):
+
+def update_rho(k, Rho, Z, U_prime, Alpha_K, Xi_KW, beta, word_emb, D, W, idx2word, N, V):
+    # Update parameters for q(rho_k) by Eq. 2 and 3
+    # Last checked Mar. 27 1:53pm
     for w in range(V):
         c_kw = 0
         m_k = 0
@@ -74,8 +87,9 @@ def update_rho(k, Rho, Z, U_prime, Alpha_K, Xi_KW, beta, word_emb, D, N, V):
                     c_kw += Z[d][n][k]
                 m_k += Z[d][n][k]
         Rho['Sigma'][k][w] = 1 / (beta + 2 * m_k * lmd(Xi_KW[k][w]))
-        Rho['mu'][k][w] = beta * np.dot(word_emb[w].transpose(), U_prime['mu'][k]) + c_kw - m_k * (0.5 - 2 * Alpha_K[k] * lmd(Xi_KW[k][w]))
+        Rho['mu'][k][w] = beta * np.dot(word_emb[w].transpose(), U_prime['mu'][k]) + c_kw - m_k * (0.5 - 2 * Alpha_K[k] * lmd(Xi_KW[k][w])) # word_emb[w].transpose()?
         Rho['mu'][k][w] *= Rho['Sigma'][k][w]
+
 
 def update_u_prime(k, U_prime, Rho, beta, word_emb, V):
     tmp = 0
@@ -98,6 +112,7 @@ def update_u(k, U, A, Eta, kappa, gamma, D):
         for d in range(D):
             tmp2 += Eta['mu'][d][k] * A['mu'][d]
         U['mu'][k] = gamma * np.dot(U['Sigma'], tmp2)
+
 
 def compute_u_prime_sigma(U_prime, beta, l, word_emb, V):
     tmp = 0
