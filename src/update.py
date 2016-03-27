@@ -38,7 +38,7 @@ def update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V, eps):
     # Update the vector q(z_dn) of length K from Eq. 7
     # q(z_dn) is a multinomial distribution with q(z_dn=k) = Z[d][n][k]
 
-    converge = False
+    converge = True
     z_dn_old = Z[d][n]
 
     for k in range(K):
@@ -57,14 +57,21 @@ def update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V, eps):
         Z[d][n][k] = np.exp(E1 + E2)
     Z[d][n] = normalize(Z[d][n])
 
-    if norm(Z[d][n] - z_dn_old) / norm(z_dn_old) < eps:
-        converge = True
+    for k in range(K):
+        if abs(Z[d][n][k] - z_dn_old[k]) / abs(z_dn_old[k]) > eps:
+            converge = False
+            break
     return converge
 
 
 def update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K, eps):
     # Update q(eta_d) by Eq. (11) and (12)
     # Last checked Mar. 27 2:31pm
+
+    converge = True
+    mu_old = Eta['mu'][d]
+    sig_old = Eta['Sigma'][d]
+
     for k in range(K):
         Eta['Sigma'][d][k] = 1 / (gamma - 2 * lmd(Xi_DK[d][k]))
         tmp = 0
@@ -73,10 +80,21 @@ def update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K, eps):
         Eta['mu'][d][k] = gamma * np.dot(U['mu'][k].transpose(), A['mu'][d]) + 2 * Alpha_D[d] * lmd(Xi_DK[d][k]) - 0.5 + tmp
         Eta['mu'][d][k] *= Eta['Sigma'][d][k]
 
+    for k in range(K):
+        if max(abs(Eta['mu'][d][k] - mu_old[k]) / abs(mu_old[k]), abs(Eta['Sigma'][d][k] - sig_old[k]) / abs(sig_old[k])) > eps:
+            converge = False
+            break
+    return converge
+
 
 def update_a(d, A, U, Eta, c, gamma, doc_dim, K, eps):
     # Update Sigma only for the first document
     # Last checked Mar. 27 3:06pm
+
+    converge = True
+    mu_old = A['mu'][d]
+    sig_old = A['Sigma']
+
     if d == 0:
         tmp1 = 0
         tmp2 = 0
@@ -91,10 +109,24 @@ def update_a(d, A, U, Eta, c, gamma, doc_dim, K, eps):
             tmp2 += Eta['mu'][d][k] * U['mu'][k]
         A['mu'][d] = gamma * np.dot(A['Sigma'], tmp2)
 
+    for k in range(K):
+        if abs(A['mu'][d][k] - mu_old[k]) / abs(mu_old[k]) > eps:
+            converge = False
+            break
+    if converge:
+        if abs(A['Sigma'] - sig_old) / abs(sig_old) > eps:
+            converge = False
+    return converge
 
-def update_rho(k, Rho, Z, U_prime, Alpha_K, Xi_KW, word_emb, W, idx2word, beta, D, N, V):
+
+def update_rho(k, Rho, Z, U_prime, Alpha_K, Xi_KW, word_emb, W, idx2word, beta, D, N, V, eps):
     # Update parameters for q(rho_k) by Eq. 2 and 3
     # Last checked Mar. 27 1:53pm
+
+    converge = True
+    mu_old = Rho['mu'][k]
+    sig_old = Rho['Sigma'][k]
+
     for w in range(V):
         c_kw = 0
         m_k = 0
@@ -107,19 +139,39 @@ def update_rho(k, Rho, Z, U_prime, Alpha_K, Xi_KW, word_emb, W, idx2word, beta, 
         Rho['mu'][k][w] = beta * np.dot(word_emb[w].transpose(), U_prime['mu'][k]) + c_kw - m_k * (0.5 - 2 * Alpha_K[k] * lmd(Xi_KW[k][w])) # word_emb[w].transpose()?
         Rho['mu'][k][w] *= Rho['Sigma'][k][w]
 
+    for w in range(V):
+        if max(abs(Rho['mu'][d][w] - mu_old[w]) / abs(mu_old[w]), abs(Rho['Sigma'][d][w] - sig_old[w]) / abs(sig_old[w])) > eps:
+            converge = False
+            break
+    return converge
 
-def update_u_prime(k, U_prime, Rho, word_emb, beta, V):
+
+def update_u_prime(k, U_prime, Rho, word_emb, beta, V, eps):
     # Update U'['mu'] by Eq. (5)
     # Last checked Mar. 27 4:38pm
+
+    converge = True
+    mu_old = U_prime['mu'][k]
+
     tmp = 0
     for w in range(V):
         tmp += word_emb[w] * Rho['mu'][k][w]
     U_prime['mu'][k] = beta * np.dot(U_prime['Sigma'], tmp)
 
+    for w in range(V):
+        if abs(U_prime['mu'][k][w] - mu_old[w]) / abs(mu_old[w]) > eps:
+            converge = False
+            break
+    return converge
 
-def update_u(k, U, A, Eta, kappa, gamma, doc_dim, D):
+
+def update_u(k, U, A, Eta, kappa, gamma, doc_dim, D, eps):
     # Update parameters for q(u) by Eq. (7) and (8)
     # Last checked Mar. 27 3:34pm
+    converge = True
+    mu_old = U['mu'][k]
+    sig_old = U['Sigma'][k]
+
     if k == 0:
         tmp1 = 0
         tmp2 = 0
@@ -134,6 +186,14 @@ def update_u(k, U, A, Eta, kappa, gamma, doc_dim, D):
             tmp2 += Eta['mu'][d][k] * A['mu'][d]
         U['mu'][k] = gamma * np.dot(U['Sigma'], tmp2)
 
+    for d in range(D):
+        if abs(U['mu'][k][d] - mu_old[d]) / abs(mu_old[d]) > eps:
+            converge = False
+            break
+    if converge:
+        if max(abs(U['Sigma'][k] - sig_old) / abs(sig_old)) > eps:
+            converge = False
+    return converge
 
 def compute_u_prime_sigma(U_prime, word_emb, beta, l, word_dim, V):
     # Update U'['Sigma'] only at the start of VI by Eq. (6)
