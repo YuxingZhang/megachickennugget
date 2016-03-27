@@ -139,13 +139,13 @@ def run():
     # TODO precompute Sigma^{(u')*} by Eq. 9
     compute_u_prime_sigma(U_prime, beta, l, word_emb, V)
 
-    iteration = 1000
     random_idx = np.random.permutation(len(W))
     batch_size = 20
+    eps = 0.01
     current_batch = len(random_idx)
     number_of_batch = int((len(random_idx) + batch_size - 1) / batch_size)
-    while iteration > 0: # while not converge
-        converge = True
+    while True: # while not converge
+        has_converge = True
         iteration -= 1
         # TODO sample a batch of document B
         current_batch -= 1
@@ -155,28 +155,39 @@ def run():
         # udpate local distribution
         for d in B:
             for n in N[d]:
-                update.update_z(d, n, Z, Eta, Rho, Xi_KW_z, Alpha_K_z, W, word2idx, K, V)
+                cvg = update.update_z(d, n, Z, Eta, Rho, Xi_KW_z, Alpha_K_z, W, word2idx, K, V)
+                if !cvg:
+                    has_converge = False
             # update Eta
-            update.update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K)
+            cvg = update.update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K)
+            if !cvg:
+                has_converge = False
             # update A
-            update.update_a(d, A, U, Eta, c, gamma, K)
-
+            cvg = update.update_a(d, A, U, Eta, c, gamma, K)
+            if !cvg:
+                has_converge = False
 
         # update global distributions
         for k in range(K):
             # update Rho
-            update.update_rho(k, Rho, Z, U_prime, Alpha_K, Xi_KW, beta, word_emb, D, N, V)
+            cvg = update.update_rho(k, Rho, Z, U_prime, Alpha_K, Xi_KW, beta, word_emb, D, N, V)
+            if !cvg:
+                has_converge = False
             # update U
-            update.update_u(k, U, A, Eta, kappa, gamma, D)
+            cvg = update.update_u(k, U, A, Eta, kappa, gamma, D)
+            if !cvg:
+                has_converge = False
             # update U_prime
-            update.update_u_prime(k, U_prime, Rho, beta, word_emb, V)
+            cvg = update.update_u_prime(k, U_prime, Rho, beta, word_emb, V)
+            if !cvg:
+                has_converge = False
 
         ''' update the auxiliary vars using in q(z_dn) and q(rho) '''
         update_auxiliary(k, Alpha_K, Xi_KW, Rho, W) 
         ''' update the auxiliary vars using in q(eta) '''
         update_auxiliary(d, Alpha_D, Xi_DK, Eta, K):
 
-        if converge:
+        if has_converge:
             break
 
 if __name__ == "__main__":
