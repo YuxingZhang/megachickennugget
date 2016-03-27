@@ -129,7 +129,7 @@ def run():
 
     word_emb_input = '???' # TODO
     corpus_input = '???' # TODO
-    load_documents(word_emb_input, corpus_input, word_emb, word2idx, idx2word, W, N):
+    load_documents(word_emb_input, corpus_input, word_emb, word2idx, idx2word, W, N)
 
     # setting the vocabulary size
     V = len(word2idx)
@@ -137,7 +137,7 @@ def run():
     (Z, Eta, A, Rho, U_prime, U, Xi_KW_z, Alpha_K_z, Xi_KW_rho, Alpha_K_rho, Xi_DK, Alpha_D) = init_vars(D, K, V, N, doc_dim, word_dim)
 
     # TODO precompute Sigma^{(u')*} by Eq. 9
-    compute_u_prime_sigma(U_prime, beta, l, word_emb, V)
+    update.compute_u_prime_sigma(U_prime, beta, l, word_emb, V)
 
     random_idx = np.random.permutation(len(W))
     batch_size = 20
@@ -146,7 +146,6 @@ def run():
     number_of_batch = int((len(random_idx) + batch_size - 1) / batch_size)
     while True: # while not converge
         has_converge = True
-        iteration -= 1
         # TODO sample a batch of document B
         current_batch -= 1
         if current_batch < 0:
@@ -183,9 +182,9 @@ def run():
                 has_converge = False
 
         ''' update the auxiliary vars using in q(z_dn) and q(rho) '''
-        update_auxiliary(k, Alpha_K, Xi_KW, Rho, W) 
+        update.update_auxiliary(k, Alpha_K, Xi_KW, Rho, W)
         ''' update the auxiliary vars using in q(eta) '''
-        update_auxiliary(d, Alpha_D, Xi_DK, Eta, K):
+        update.update_auxiliary(d, Alpha_D, Xi_DK, Eta, K)
 
         if has_converge:
             break
