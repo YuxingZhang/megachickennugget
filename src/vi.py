@@ -126,7 +126,7 @@ def run():
 
     while true: # while not converge
         # TODO sample a batch of document B
-        # TODO 
+        # udpate local distribution
         for d in B:
             for n in N[d]:
                 update.update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V)
@@ -135,10 +135,12 @@ def run():
             # update A
             update.update_a(d, A, U, Eta, c, gamma, K)
             if certain_interval:
+                update.update_xi_D()
+                update.update_alpha_D()
                 # TODO update auxiliary variables ksi_d and alpha_d by Eq 2 and Eq 3
 
 
-        # Tianshu Ren starts here TODO
+        # update global distributions
         for k in K:
             # update Rho
             update.update_rho(k, Rho, Z, U_prime, Alpha_K, Xi_KW, beta, word_emb, D, N, V)
@@ -147,7 +149,9 @@ def run():
             # update U_prime
             update.update_u_prime(k, U_prime, Rho, beta, word_emb, V)
             if certain_interval():
+                update.update_xi_K()
                 # TODO update xi_k by Eq. 5
+                update.update_alpha_K()
                 # TODO update alpha_k by Eq. 6
 
         if converge:
