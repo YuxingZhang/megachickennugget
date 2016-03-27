@@ -4,27 +4,34 @@ import string
 
 if __name__ == '__main__':
 
-    path = '/Users/Lidan/Dropbox/10708 project/nipsdata/'
+    path = '/Users/Lidan/Documents/CMU Yr1 Sem2/10-708/Project/newsdata/'
     input_file = 'file_names'
+    mid_file = 'new_output.txt'
     output_file = 'new_corpus.txt'
+
     
     f = open(path + input_file, 'r')
     docs = f.readlines()
     f.close()
-    fout = open(path + output_file, 'w')
-    
-    for line in docs:
-        f = open(path + line.strip(), 'r')
-        doc = f.readlines()
+    fmid = open(path + mid_file, 'w')
+    for files in docs:
+        f = open(path + files.strip(), 'r')
+        for line in f:
+            fmid.write(line.strip() + ' ')
         f.close()
-        for line in doc:
-            line = re.sub(r"\d+", '', line)
-            line = re.sub(r"[^\w\s]", '', line)
-            line = re.sub(r"\s+", ' ', line)
-            line = line.lower()
-            if line.strip() != '':
-                fout.write(line.strip() + ' ')
+        fmid.write('\n')
+    fmid.close()
 
-        fout.write('\n')
-
+    f = open(path + mid_file, 'r')
+    fout = open(path + output_file, 'w')
+    for line in f:
+        line = re.sub("- ", '', line)
+        line = re.sub("-", " ", line)
+        line = re.sub(r"\d+", '', line)
+        line = re.sub(r"[^\w\s]", '', line)
+        line = re.sub(r"\s+", ' ', line)
+        line = line.lower()
+        fout.write(line.strip())
+        fout.write('\n\n')
     fout.close()
+    f.close()

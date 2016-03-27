@@ -5,11 +5,12 @@ import string
 if __name__ == '__main__':
 	remove = set(['the', 'will', 'a', 'this', 'that', 'of', 'an', 'to', 'as', 'is', 'are', 'was', \
 		'for', 'where', 'with', 'which', 'in', 'and', 'by', 'we', 'be', 'can', 'on', 'at', 'from',\
-		'some', 'too', 'it', 'not', 'or', 'were', 'one', 'then', 'if', 'all', 'when'])
+		'some', 'too', 'it', 'not', 'or', 'were', 'one', 'then', 'if', 'all', 'when', 'there', 'must',\
+		'how', 'no', 'since', 'very', 'however', 'any', 'just', 'only', 'also'])
 
-	path = '/Users/Lidan/Dropbox/10708 project/nipsdata/'
+	path = '/Users/Lidan/Documents/CMU Yr1 Sem2/10-708/Project/newsdata/'
 	input_file = 'new_corpus.txt'
-	output_file = 'new_wordcount.txt'
+	output_file = 'new_wordcount.dat'
 	output_dict_file = 'new_vocab.dat'
 
 	vocab = list()
@@ -34,6 +35,8 @@ if __name__ == '__main__':
 	f_out_dict.close()
 
 	print 'total vocabs' + str(len(vocab))
+	for i in range(len(vocab)):
+		print vocab[i], ' ', vocab_hm[vocab[i]]
 
 	f = open(path + input_file, 'r')
 	for l in f.readlines():
@@ -47,37 +50,9 @@ if __name__ == '__main__':
 				else:
 					d[w] = 1
 		f_out.write(str(len(d)))
-		i = 0
 		for i in range(len(vocab)):
 			if d.has_key(vocab[i]):
 				f_out.write(' ' + str(i) + ':' + str(d[vocab[i]]))
-			# else:
-				# f_out.write(' ' + str(i) + ':' + str(0))
-			# f_out_dict.write(str(i) + ':' + k + ' ')
-			# i += 1
-		f_out.write('\n')
-		# f_out_dict.write('\n')
+		f_out.write('\n\n')
 	f.close()
 	f_out.close()
-
-
-	#
-    # f = open(path + input_file, 'r')
-    # docs = f.readlines()
-    # f.close()
-    # fout = open(path + output_file, 'w')
-    #
-    # for line in docs:
-    #     f = open(path + line.strip(), 'r')
-    #     doc = f.readlines()
-    #     f.close()
-    #     for w in doc:
-    #         line = re.sub(r"\d+", '', line)
-    #         line = re.sub(r"[^\w\s]", '', line)
-    #         line = re.sub(r"\s+", ' ', line)
-    #         if line.strip() != '':
-    #             fout.write(line.strip() + ' ')
-	#
-    #     fout.write('\n')
-	#
-    # fout.close()
