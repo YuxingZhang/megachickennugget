@@ -30,6 +30,14 @@ def update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V):
         Z[d][n][k] = np.exp(E1 + E2)
     Z[d][n] = normalize(Z[d][n])
 
+def update_auxiliary_d(d, Alpha_D, Xi_DK, K):
+    tmp = 0
+    for k in range(K):
+        tmp += lmd(Xi_DK[d][k]) * Eta
+
+
+
+
 def update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K):
     for k in range(K):
         Eta['Sigma'][d][k] = 1 / (gamma - 2 * lmd(Xi_DK[d][k]))

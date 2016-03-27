@@ -4,19 +4,19 @@ import update
 from sklearn.preprocessing import normalize
 
 # Input: 
-# 	Documents {B_1,...,B_D}
+#   Documents {B_1,...,B_D}
 # Output:
-# 	Variational parameters {u, u_prime, rho, alpha, eta, z}	
+#   Variational parameters {u, u_prime, rho, alpha, eta, z} 
 # Variables:
-#	W:			Words in each documents, W[d][n] is the n-th word in the d-th doc
-#	N:			A list where N[d] = Number of words in document d
-#	K:			Total number of topics
-#	V:			Size of the vocabulary
-#	D:			Total number of documents
-# 	word_dim:	        Dimension of word embedding space
-# 	doc_dim:	        Dimension of document embedding space
-#	word_emb:			Word-embedding results for each word
-#	word2idx:			Index of each word in the word_emb vector
+#   W:          Words in each documents, W[d][n] is the n-th word in the d-th doc
+#   N:          A list where N[d] = Number of words in document d
+#   K:          Total number of topics
+#   V:          Size of the vocabulary
+#   D:          Total number of documents
+#   word_dim:           Dimension of word embedding space
+#   doc_dim:            Dimension of document embedding space
+#   word_emb:           Word-embedding results for each word
+#   word2idx:           Index of each word in the word_emb vector
 
 def init_vars(D, K, V, N, doc_dim, word_dim):
     # initialize Z s.t. Z_dn is a vector of size K as parameters for a categorical distribution
@@ -83,15 +83,15 @@ def load_documents(word_emb_file, corpus_file, word_emb, word2idx, idx2word, W, 
 
 
 def run():
-#	W:			        Words in each documents, W[d][n] is the n-th word in the d-th doc
-#	N:			        A list where N[d] = Number of words in document d
-#	K:			        Total number of topics
-#	V:			        Size of the vocabulary
-#	D:			        Total number of documents
-# 	word_dim:	                Dimension of word embedding space
-# 	doc_dim:	                Dimension of document embedding space
-#	word_emb:			Word-embedding results for each word
-#	word2idx:			Index of each word in the word_emb vector
+#   W:                  Words in each documents, W[d][n] is the n-th word in the d-th doc
+#   N:                  A list where N[d] = Number of words in document d
+#   K:                  Total number of topics
+#   V:                  Size of the vocabulary
+#   D:                  Total number of documents
+#   word_dim:                   Dimension of word embedding space
+#   doc_dim:                    Dimension of document embedding space
+#   word_emb:           Word-embedding results for each word
+#   word2idx:           Index of each word in the word_emb vector
 #       l, c, kappa, beta, gamma        Hyper parameters for the model
 
     # initialize all variables
