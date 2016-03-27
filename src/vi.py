@@ -55,7 +55,7 @@ def init_vars(D, K, V, N, doc_dim, word_dim):
 
     return Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D
 
-def load_documents(word_emb_file, corpus_file, word_emb, word2idx, idx2word, W, N):
+def load_documents(word_emb_file, corpus_file):
     '''
     This function read and load the word embedding and the corpus
         word_emb: store the embedding of the words in the same order as the index
@@ -63,7 +63,12 @@ def load_documents(word_emb_file, corpus_file, word_emb, word2idx, idx2word, W, 
         idx2word: can access the word from the index
         W: all the documents, the i-th word in the d-th document is W[d][i]
     '''
-     
+    W = list()
+    N = list()
+    word_emb = list() # word embedding from word2vec
+    word2idx = dict() # mapping from a word to it's index in the vocabulary
+    idx2word = dict() # mapping from index of a word in the vocabulary to the word itself
+
     f = open(word_emb_file, 'r')
     f.readline()
     dat = f.readlines()
@@ -89,6 +94,8 @@ def load_documents(word_emb_file, corpus_file, word_emb, word2idx, idx2word, W, 
         W.append(words)
         N.append(len(words))
 
+    return word_emb, word2idx, idx2word, W, N
+
 
 def run():
 #   W:                  Words in each documents, W[d][n] is the n-th word in the d-th doc
@@ -109,20 +116,16 @@ def run():
     beta = 1
     gamma = 1
 
-    W = list()
-    N = list()
+
     K = 10 # number of topics
     V = 0 # 
     D = 0 #
-    word_dim = 100
+    word_dim = 200
     doc_dim = 100 # embedding space dimension of document
-    word_emb = list() # word embedding from word2vec
-    word2idx = dict() # mapping from a word to it's index in the vocabulary
-    idx2word = dict() # mapping from index of a word in the vocabulary to the word itself
 
     word_emb_input = '???' # TODO
     corpus_input = '???' # TODO
-    load_documents(word_emb_input, corpus_input, word_emb, word2idx, idx2word, W, N)
+    (word_emb, word2idx, idx2word, W, N) = load_documents(word_emb_input, corpus_input)
 
     # setting the vocabulary size
     V = len(word2idx)
@@ -142,9 +145,9 @@ def run():
         # TODO sample a batch of document B
         current_batch -= 1
         if current_batch < 0:
-            current_batch += 20
+            current_batch += number_of_batch
         B = random_idx[current_batch * batch_size : (current_batch + 1) * batch_size]
-        # udpate local distribution
+        # update local distribution
         for d in B:
             for n in N[d]:
                 cvg = update.update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V, eps)
@@ -158,7 +161,7 @@ def run():
             cvg = update.update_a(d, A, U, Eta, c, gamma, doc_dim, K, eps)
             if not cvg:
                 has_converge = False
-
+            update.update_auxiliary(d, Alpha_D, Xi_DK, Eta, K)  # update the auxiliary vars using in q(eta)
         # update global distributions
         for k in range(K):
             # update Rho
@@ -173,11 +176,7 @@ def run():
             cvg = update.update_u_prime(k, U_prime, Rho, word_emb, beta, V, eps)
             if not cvg:
                 has_converge = False
-
-        ''' update the auxiliary vars using in q(z_dn) and q(rho) '''
-        update.update_auxiliary(k, Alpha_K, Xi_KW, Rho, W)
-        ''' update the auxiliary vars using in q(eta) '''
-        update.update_auxiliary(d, Alpha_D, Xi_DK, Eta, K)
+            update.update_auxiliary(k, Alpha_K, Xi_KW, Rho, W)  # update the auxiliary vars using in q(z_dn) and q(rho)
 
         if has_converge:
             break
