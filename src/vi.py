@@ -57,7 +57,7 @@ def init_vars(D, K, V, N, doc_dim, word_dim):
 
 def load_documents(word_emb_file, corpus_file, word_emb, word2idx, idx2word, W, N):
     '''
-    This function read and load the 
+    This function read and load the word embedding and the corpus
         word_emb: store the embedding of the words in the same order as the index
         word2idx: store the index of each word, using the order of the words in the vocabulary
         idx2word: can access the word from the index
@@ -143,7 +143,7 @@ def run():
             # update A
             update.update_a(d, A, U, Eta, c, gamma, K)
             if certain_interval:
-                update_auxiliary_D(d, Alpha_D, Xi_DK, K):
+                update_auxiliary_D(d, Alpha_D, Xi_DK, Rho, K):
                 # TODO update auxiliary variables ksi_d and alpha_d by Eq 2 and Eq 3
 
 
