@@ -130,7 +130,7 @@ def run():
     (Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D) = init_vars(D, K, V, N, doc_dim, word_dim)
 
     # TODO precompute Sigma^{(u')*} by Eq. 9
-    update.compute_u_prime_sigma(U_prime, beta, l, word_emb,word_dim, V)
+    update.compute_u_prime_sigma(U_prime, word_emb, beta, l, word_dim, V)
 
     random_idx = np.random.permutation(len(W))
     batch_size = 20
@@ -155,22 +155,22 @@ def run():
             if not cvg:
                 has_converge = False
             # update A
-            cvg = update.update_a(d, A, U, Eta, c, gamma, K, eps)
+            cvg = update.update_a(d, A, U, Eta, c, gamma, doc_dim, K, eps)
             if not cvg:
                 has_converge = False
 
         # update global distributions
         for k in range(K):
             # update Rho
-            cvg = update.update_rho(k, Rho, Z, U_prime, Alpha_K, Xi_KW, beta, word_emb, D, N, V, eps)
+            cvg = update.update_rho(k, Rho, Z, U_prime, Alpha_K, Xi_KW, word_emb, W, idx2word, beta, D, N, V, eps)
             if not cvg:
                 has_converge = False
             # update U
-            cvg = update.update_u(k, U, A, Eta, kappa, gamma, D, eps)
+            cvg = update.update_u(k, U, A, Eta, kappa, gamma, doc_dim, D, eps)
             if not cvg:
                 has_converge = False
             # update U_prime
-            cvg = update.update_u_prime(k, U_prime, Rho, beta, word_emb, V, eps)
+            cvg = update.update_u_prime(k, U_prime, Rho, word_emb, beta, V, eps)
             if not cvg:
                 has_converge = False
 
