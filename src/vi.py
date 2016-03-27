@@ -18,44 +18,47 @@ from sklearn.preprocessing import normalize
 #   word_emb:           Word-embedding results for each word
 #   word2idx:           Index of each word in the word_emb vector
 
+def converge(a, a_new, eps):
+    ''' If any difference is big, return false '''
+
 def init_vars(D, K, V, N, doc_dim, word_dim):
     # initialize Z s.t. Z_dn is a vector of size K as parameters for a categorical distribution
     # Z is the variational distribution of q(z_dn), q(z_dn = k) = Z(d, n, k)
     Z = list()
     for d in range(D):
-        Z.append([normalize(np.random.uniform(0, 1, (K, 1)), 'l1') for i in range(N[d])])
+        Z.append([normalize(np.random.uniform(0, 1, K), 'l1') for i in range(N[d])])
 
     # initialize Eta with parameters Sigma (D * K) and mu (D * K) that defines a multivariate Gaussian distribution
     # Eta_{dk} ~ Normal(mu[d][k], Sigma[d][k])
-    Eta = dict(Sigma = [np.random.rand(K, 1) for d in range(D)], mu = [np.random.rand(K, 1) for d in range(D)])
+    Eta = dict(Sigma = [np.random.rand(K) for d in range(D)], mu = [np.random.rand(K) for d in range(D)])
 
     # initialize A with parameters Sigma (doc_dim * doc_dim) and mu (D * doc_dim) such that
     # A_d ~ Normal(mu[d], Sigma)
-    A = dict(Sigma = np.diag(np.random.rand(doc_dim, 1)), mu = [np.random.rand(doc_dim, 1) for d in range(D)])
+    A = dict(Sigma = np.diag(np.random.rand(doc_dim)), mu = [np.random.rand(doc_dim) for d in range(D)])
 
     # initialize Rho with parameters Sigma (K * V) and mu (K * V) that defines a multivariate Gaussian distribution
     # Rho_{kw} ~ Normal(mu[k][w], Sigma[k][w])
-    Rho = dict(Sigma = [np.random.rand(V, 1) for k in range(K)], mu = [np.random.rand(V, 1) for k in range(K)])
+    Rho = dict(Sigma = [np.random.rand(V) for k in range(K)], mu = [np.random.rand(V) for k in range(K)])
 
     # initialize U_prime with parameters Sigma (word_dim * word_dim) and mu (K * word_dim) such that
     # U_prime_k ~ Normal(mu[k], Sigma)
-    U_prime = dict(Sigma = np.diag(np.random.rand(word_dim, 1)), mu = [np.random.rand(word_dim, 1) for k in range(K)])
+    U_prime = dict(Sigma = np.diag(np.random.rand(word_dim)), mu = [np.random.rand(word_dim) for k in range(K)])
 
     # initialize U with parameters Sigma (doc_dim * doc_dim) and mu (K * doc_dim) such that
     # U_k ~ Normal(mu[k], Sigma)
-    U = dict(Sigma = np.diag(np.random.rand(doc_dim, 1)), mu = [np.random.rand(doc_dim, 1) for k in range(K)])
+    U = dict(Sigma = np.diag(np.random.rand(doc_dim)), mu = [np.random.rand(doc_dim) for k in range(K)])
 
     ''' Xi_KW and Alpha_K are the auxiliary variable related to the lower bound used for q(z_dn) '''
-    Xi_KW_z = [np.random.rand(V, 1) for i in range(K)]
-    Alpha_K_z = np.random.rand(K, 1)
+    Xi_KW_z = [np.random.rand(V) for i in range(K)]
+    Alpha_K_z = np.random.rand(K)
 
     ''' Xi_KW and Alpha_K are the auxiliary variable related to the lower bound used for q(rho_k) '''
-    Xi_KW_rho = [np.random.rand(V, 1) for i in range(K)]
-    Alpha_K_rho = np.random.rand(K, 1)
+    Xi_KW_rho = [np.random.rand(V) for i in range(K)]
+    Alpha_K_rho = np.random.rand(K)
 
     ''' Xi_DK and Alpha_D are the auxiliary variable related to the lower bound used for q(eta_d) '''
-    Xi_DK = [np.random.rand(K, 1) for i in range(D)]
-    Alpha_D = np.random.rand(D, 1)
+    Xi_DK = [np.random.rand(K) for i in range(D)]
+    Alpha_D = np.random.rand(D)
 
     return Z, Eta, A, Rho, U_prime, U, Xi_KW_z, Alpha_K_z, Xi_KW_rho, Alpha_K_rho, Xi_DK, Alpha_D
 
@@ -136,33 +139,55 @@ def run():
     # TODO precompute Sigma^{(u')*} by Eq. 9
     compute_u_prime_sigma(U_prime, beta, l, word_emb, V)
 
-    while true: # while not converge
+    random_idx = np.random.permutation(len(W))
+    batch_size = 20
+    eps = 0.01
+    current_batch = len(random_idx)
+    number_of_batch = int((len(random_idx) + batch_size - 1) / batch_size)
+    while True: # while not converge
+        has_converge = True
+        iteration -= 1
         # TODO sample a batch of document B
+        current_batch -= 1
+        if current_batch < 0:
+            current_batch += 20
+        B = random_idx[current_batch * batch_size : (current_batch + 1) * batch_size]
         # udpate local distribution
         for d in B:
             for n in N[d]:
-                update.update_z(d, n, Z, Eta, Rho, Xi_KW_z, Alpha_K_z, W, word2idx, K, V)
+                cvg = update.update_z(d, n, Z, Eta, Rho, Xi_KW_z, Alpha_K_z, W, word2idx, K, V)
+                if !cvg:
+                    has_converge = False
             # update Eta
-            update.update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K)
+            cvg = update.update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K)
+            if !cvg:
+                has_converge = False
             # update A
-            update.update_a(d, A, U, Eta, c, gamma, K)
-
+            cvg = update.update_a(d, A, U, Eta, c, gamma, K)
+            if !cvg:
+                has_converge = False
 
         # update global distributions
-        for k in K:
+        for k in range(K):
             # update Rho
-            update.update_rho(k, Rho, Z, U_prime, Alpha_K, Xi_KW, beta, word_emb, D, N, V)
+            cvg = update.update_rho(k, Rho, Z, U_prime, Alpha_K, Xi_KW, beta, word_emb, D, N, V)
+            if !cvg:
+                has_converge = False
             # update U
-            update.update_u(k, U, A, Eta, kappa, gamma, D)
+            cvg = update.update_u(k, U, A, Eta, kappa, gamma, D)
+            if !cvg:
+                has_converge = False
             # update U_prime
-            update.update_u_prime(k, U_prime, Rho, beta, word_emb, V)
+            cvg = update.update_u_prime(k, U_prime, Rho, beta, word_emb, V)
+            if !cvg:
+                has_converge = False
 
         ''' update the auxiliary vars using in q(z_dn) and q(rho) '''
         update_auxiliary(k, Alpha_K, Xi_KW, Rho, W) 
         ''' update the auxiliary vars using in q(eta) '''
         update_auxiliary(d, Alpha_D, Xi_DK, Eta, K):
 
-        if converge:
+        if has_converge:
             break
 
 if __name__ == "__main__":
