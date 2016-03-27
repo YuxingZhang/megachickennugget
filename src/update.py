@@ -34,11 +34,16 @@ def update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V):
 
 
 def update_auxiliary(idx, Alpha, Xi, Var, Sidx):
-    # idx is the index to update in Alpha and Xi
-    # Alpha is a vector s.t. Alpha[idx] is a scalar that corresponds to the auxiliary variable used to update Var[idx]
-    # Xi is a matrix s.t. Xi[idx] is a vector that corresponds to the auxiliary variables used to update Var[idx]
-    # Var is the random variable, e.g. Rho, Eta, Z that uses the auxiliary variable
-    # Sidx is the the index that is summed over in this update, i.e. sum_{i=1}^Sidx
+    '''
+    q(Var[idx]) = \prod_{i=1}^Sidx N(Var[idx][i]; Var['mu'][idx][i], Var['Sigma'][idx][i])
+
+    :param idx: the index to update in Alpha and Xi
+    :param Alpha: a vector s.t. Alpha[idx] is a scalar that corresponds to the auxiliary variable used to update Var[idx]
+    :param Xi: a matrix s.t. Xi[idx] is a vector that corresponds to the auxiliary variables used to update Var[idx]
+    :param Var: the random variable, e.g. Rho, Eta, Z that uses the auxiliary variable
+    :param Sidx: the the index that is summed over in this update, i.e. sum_{i=1}^Sidx
+    :return: null. Update in function
+    '''
     tmp1 = 0
     tmp2 = 0
     for i in range(Sidx):
