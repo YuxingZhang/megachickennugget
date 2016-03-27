@@ -35,7 +35,7 @@ def update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V):
 
 def update_auxiliary(idx, Alpha, Xi, Var, Sidx):
     '''
-    q(Var[idx]) = \prod_{i=1}^Sidx N(Var[idx][i]; Var['mu'][idx][i], Var['Sigma'][idx][i])
+    q(Var[idx]) = \prod_{i=1}^{Sidx} N(Var[idx][i]; Var['mu'][idx][i], Var['Sigma'][idx][i])
 
     :param idx: the index to update in Alpha and Xi
     :param Alpha: a vector s.t. Alpha[idx] is a scalar that corresponds to the auxiliary variable used to update Var[idx]
@@ -54,6 +54,8 @@ def update_auxiliary(idx, Alpha, Xi, Var, Sidx):
 
 
 def update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K):
+    # Update q(eta_d) by Eq. (11) and (12)
+    # Last checked Mar. 27 2:31pm
     for k in range(K):
         Eta['Sigma'][d][k] = 1 / (gamma - 2 * lmd(Xi_DK[d][k]))
         tmp = 0
@@ -63,7 +65,7 @@ def update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K):
         Eta['mu'][d][k] *= Eta['Sigma'][d][k]
 
 
-def update_a(d, A, U, Eta, c, gamma, K):
+def update_a(d, A, U, Eta, c, gamma, doc_dim, K):
     # update Sigma only for the first document
     if d == 0:
         tmp1 = 0
