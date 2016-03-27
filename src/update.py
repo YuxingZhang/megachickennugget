@@ -99,22 +99,13 @@ def update_rho(k, Rho, Z, U_prime, Alpha_K, Xi_KW, word_emb, W, idx2word, beta, 
         Rho['mu'][k][w] *= Rho['Sigma'][k][w]
 
 
-def update_u_prime(k, U_prime, Rho, word_emb, beta, l, word_dim, V):
-    # Update U'[Sigma] only for the first topic
-    # Last checked Mar. 27 3:25pm
-    if k == 0:
-        tmp1 = 0
-        tmp2 = 0
-        for w in range(V):
-            tmp1 += np.dot(word_emb[w], word_emb[w].transpose())
-            tmp2 += word_emb[w] * Rho['mu'][k][w]
-        U_prime['Sigma'] = inv(l * np.identity(word_dim) + beta * tmp1)
-        U_prime['mu'][k] = beta * np.dot(U_prime['Sigma'], tmp2)
-    else:
-        tmp2 = 0
-        for w in range(V):
-            tmp2 += word_emb[w] * Rho['mu'][k][w]
-        U_prime['mu'][k] = beta * np.dot(U_prime['Sigma'], tmp2)
+def update_u_prime(k, U_prime, Rho, word_emb, beta, V):
+    # Update U'['mu'] by Eq. (5)
+    # Last checked Mar. 27 4:38pm
+    tmp = 0
+    for w in range(V):
+        tmp += word_emb[w] * Rho['mu'][k][w]
+    U_prime['mu'][k] = beta * np.dot(U_prime['Sigma'], tmp)
 
 
 def update_u(k, U, A, Eta, kappa, gamma, doc_dim, D):
@@ -135,10 +126,11 @@ def update_u(k, U, A, Eta, kappa, gamma, doc_dim, D):
         U['mu'][k] = gamma * np.dot(U['Sigma'], tmp2)
 
 
-# def compute_u_prime_sigma(U_prime, beta, l, word_emb, V):
-#     tmp = 0
-#     for w in range(V):
-#         tmp += np.dot(word_emb[w], word_emb[w].transpose())
-#     U_prime['Sigma'] = inv(l * np.identity(word_dim) + beta * tmp)
+def compute_u_prime_sigma(U_prime, word_emb, beta, l, word_dim, V):
+    # Update U'['Sigma'] only at the start of VI by Eq. (6)
+    tmp = 0
+    for w in range(V):
+        tmp += np.dot(word_emb[w], word_emb[w].transpose())
+    U_prime['Sigma'] = inv(l * np.identity(word_dim) + beta * tmp)
 
 
