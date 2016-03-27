@@ -13,26 +13,6 @@ def lmd(xi):
     return 1 / (2 * xi) * (1 / (1 + np.exp(- xi)) - 0.5)
 
 
-def update_z(d, n, Z, Eta, Rho, Xi_KW_z, Alpha_K_z, W, word2idx, K, V): 
-    # update the vector q(z_dn) of length K from Eq. 7
-    # q(z_dn) is a multinomial distribution with q(z_dn=k) = Z[d][n][k]
-    for k in range(K):
-        E1 = Eta[d][k]  # First expectation term
-
-        tmp = 0
-        for w in V:
-            tmp +=  - lmd(Xi_KW_z[k][w]) * (Rho['Sigma'][k][w] + Rho['mu'][k][w] ** 2) \
-                    - (0.5 - 2 * Alpha_K_z[k] * lmd(Xi_KW_z[k][w])) * Rho['mu'][k][w] \
-                    + Xi_KW_z[k][w] / 2 \
-                    - lmd(Xi_KW_z[k][w]) * (Alpha_K_z[k] ** 2 - Xi_KW_z[k][w] ** 2) \
-                    - np.log(1 + np.exp(Xi_KW_z[k][w]))
-
-        w_dn = W[d][n]
-        E2 = Rho['mu'][k][word2idx[w_dn]] + Alpha_K_z[k] * (V / 2 - 1) + tmp  # Second expectation term
-        Z[d][n][k] = np.exp(E1 + E2)
-    Z[d][n] = normalize(Z[d][n])
-
-
 def update_auxiliary(idx, Alpha, Xi, Var, Sidx):
     '''
     q(Var[idx]) = \prod_{i=1}^{Sidx} N(Var[idx][i]; Var['mu'][idx][i], Var['Sigma'][idx][i])
@@ -53,6 +33,26 @@ def update_auxiliary(idx, Alpha, Xi, Var, Sidx):
     Alpha[idx] = (0.5 * (Sidx / 2 - 1) + tmp1) / tmp2
 
 
+def update_z(d, n, Z, Eta, Rho, Xi_KW_z, Alpha_K_z, W, word2idx, K, V): 
+    # Update the vector q(z_dn) of length K from Eq. 7
+    # q(z_dn) is a multinomial distribution with q(z_dn=k) = Z[d][n][k]
+    for k in range(K):
+        E1 = Eta[d][k]  # First expectation term
+
+        tmp = 0
+        for w in V:
+            tmp +=  - lmd(Xi_KW_z[k][w]) * (Rho['Sigma'][k][w] + Rho['mu'][k][w] ** 2) \
+                    - (0.5 - 2 * Alpha_K_z[k] * lmd(Xi_KW_z[k][w])) * Rho['mu'][k][w] \
+                    + Xi_KW_z[k][w] / 2 \
+                    - lmd(Xi_KW_z[k][w]) * (Alpha_K_z[k] ** 2 - Xi_KW_z[k][w] ** 2) \
+                    - np.log(1 + np.exp(Xi_KW_z[k][w]))
+
+        w_dn = W[d][n]
+        E2 = Rho['mu'][k][word2idx[w_dn]] + Alpha_K_z[k] * (V / 2 - 1) + tmp  # Second expectation term
+        Z[d][n][k] = np.exp(E1 + E2)
+    Z[d][n] = normalize(Z[d][n])
+
+
 def update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K):
     # Update q(eta_d) by Eq. (11) and (12)
     # Last checked Mar. 27 2:31pm
@@ -66,7 +66,8 @@ def update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K):
 
 
 def update_a(d, A, U, Eta, c, gamma, doc_dim, K):
-    # update Sigma only for the first document
+    # Update Sigma only for the first document
+    # Last checked Mar. 27 3:06pm
     if d == 0:
         tmp1 = 0
         tmp2 = 0
@@ -82,7 +83,7 @@ def update_a(d, A, U, Eta, c, gamma, doc_dim, K):
         A['mu'][d] = gamma * np.dot(A['Sigma'], tmp2)
 
 
-def update_rho(k, Rho, Z, U_prime, Alpha_K_rho, Xi_KW_rho, beta, word_emb, D, W, idx2word, N, V):
+def update_rho(k, Rho, Z, U_prime, Alpha_K_rho, Xi_KW_rho, word_emb, W, idx2word, beta, D, N, V):
     # Update parameters for q(rho_k) by Eq. 2 and 3
     # Last checked Mar. 27 1:53pm
     for w in range(V):
@@ -98,14 +99,27 @@ def update_rho(k, Rho, Z, U_prime, Alpha_K_rho, Xi_KW_rho, beta, word_emb, D, W,
         Rho['mu'][k][w] *= Rho['Sigma'][k][w]
 
 
-def update_u_prime(k, U_prime, Rho, beta, word_emb, V):
-    tmp = 0
-    for w in range(V):
-        tmp += word_emb[w] * Rho['mu'][k][w]
-    U_prime['mu'] = beta * np.dot(U_prime['Sigma'], tmp)
+def update_u_prime(k, U_prime, Rho, word_emb, beta, l, word_dim, V):
+    # Update U'[Sigma] only for the first topic
+    # Last checked Mar. 27 3:25pm
+    if k == 0:
+        tmp1 = 0
+        tmp2 = 0
+        for w in range(V):
+            tmp1 += np.dot(word_emb[w], word_emb[w].transpose())
+            tmp2 += word_emb[w] * Rho['mu'][k][w]
+        U_prime['Sigma'] = inv(l * np.identity(word_dim) + beta * tmp1)
+        U_prime['mu'][k] = beta * np.dot(U_prime['Sigma'], tmp2)
+    else:
+        tmp2 = 0
+        for w in range(V):
+            tmp2 += word_emb[w] * Rho['mu'][k][w]
+        U_prime['mu'][k] = beta * np.dot(U_prime['Sigma'], tmp2)
 
 
-def update_u(k, U, A, Eta, kappa, gamma, D):
+def update_u(k, U, A, Eta, kappa, gamma, doc_dim, D):
+    # Update parameters for q(u) by Eq. (7) and (8)
+    # Last checked Mar. 27 3:34pm
     if k == 0:
         tmp1 = 0
         tmp2 = 0
@@ -121,10 +135,10 @@ def update_u(k, U, A, Eta, kappa, gamma, D):
         U['mu'][k] = gamma * np.dot(U['Sigma'], tmp2)
 
 
-def compute_u_prime_sigma(U_prime, beta, l, word_emb, V):
-    tmp = 0
-    for w in range(V):
-        tmp += np.dot(word_emb[w], word_emb[w].transpose())
-    U_prime['Sigma'] = inv(l * np.identity(word_dim) + beta * tmp)
+# def compute_u_prime_sigma(U_prime, beta, l, word_emb, V):
+#     tmp = 0
+#     for w in range(V):
+#         tmp += np.dot(word_emb[w], word_emb[w].transpose())
+#     U_prime['Sigma'] = inv(l * np.identity(word_dim) + beta * tmp)
 
 
