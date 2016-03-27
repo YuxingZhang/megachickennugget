@@ -18,9 +18,6 @@ from sklearn.preprocessing import normalize
 #   word_emb:           Word-embedding results for each word
 #   word2idx:           Index of each word in the word_emb vector
 
-def converge(a, a_new, eps):
-    ''' If any difference is big, return false '''
-
 def init_vars(D, K, V, N, doc_dim, word_dim):
     # initialize Z s.t. Z_dn is a vector of size K as parameters for a categorical distribution
     # Z is the variational distribution of q(z_dn), q(z_dn = k) = Z(d, n, k)
@@ -48,19 +45,15 @@ def init_vars(D, K, V, N, doc_dim, word_dim):
     # U_k ~ Normal(mu[k], Sigma)
     U = dict(Sigma = np.diag(np.random.rand(doc_dim)), mu = [np.random.rand(doc_dim) for k in range(K)])
 
-    ''' Xi_KW and Alpha_K are the auxiliary variable related to the lower bound used for q(z_dn) '''
-    Xi_KW_z = [np.random.rand(V) for i in range(K)]
-    Alpha_K_z = np.random.rand(K)
-
-    ''' Xi_KW and Alpha_K are the auxiliary variable related to the lower bound used for q(rho_k) '''
-    Xi_KW_rho = [np.random.rand(V) for i in range(K)]
-    Alpha_K_rho = np.random.rand(K)
+    ''' Xi_KW and Alpha_K are the auxiliary variable related to the lower bound used for q(z_dn) and q(rho) '''
+    Xi_KW = [np.random.rand(V) for i in range(K)]
+    Alpha_K = np.random.rand(K)
 
     ''' Xi_DK and Alpha_D are the auxiliary variable related to the lower bound used for q(eta_d) '''
     Xi_DK = [np.random.rand(K) for i in range(D)]
     Alpha_D = np.random.rand(D)
 
-    return Z, Eta, A, Rho, U_prime, U, Xi_KW_z, Alpha_K_z, Xi_KW_rho, Alpha_K_rho, Xi_DK, Alpha_D
+    return Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D
 
 def load_documents(word_emb_file, corpus_file, word_emb, word2idx, idx2word, W, N):
     '''
@@ -134,7 +127,7 @@ def run():
     # setting the vocabulary size
     V = len(word2idx)
 
-    (Z, Eta, A, Rho, U_prime, U, Xi_KW_z, Alpha_K_z, Xi_KW_rho, Alpha_K_rho, Xi_DK, Alpha_D) = init_vars(D, K, V, N, doc_dim, word_dim)
+    (Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D) = init_vars(D, K, V, N, doc_dim, word_dim)
 
     # TODO precompute Sigma^{(u')*} by Eq. 9
     update.compute_u_prime_sigma(U_prime, beta, l, word_emb, V)
