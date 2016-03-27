@@ -100,7 +100,7 @@ def update_rho(k, Rho, Z, U_prime, Alpha_K, Xi_KW, word_emb, W, idx2word, beta, 
 
 
 def update_u_prime(k, U_prime, Rho, word_emb, beta, V):
-    # Update U'[Sigma] only for the first topic
+    # Update U'['mu'] by Eq. (5)
     # Last checked Mar. 27 4:38pm
     tmp = 0
     for w in range(V):
@@ -127,6 +127,7 @@ def update_u(k, U, A, Eta, kappa, gamma, doc_dim, D):
 
 
 def compute_u_prime_sigma(U_prime, word_emb, beta, l, word_dim, V):
+    # Update U'['Sigma'] only at the start of VI by Eq. (6)
     tmp = 0
     for w in range(V):
         tmp += np.dot(word_emb[w], word_emb[w].transpose())
