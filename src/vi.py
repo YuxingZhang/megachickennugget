@@ -65,24 +65,28 @@ def load_documents(word_emb_file, corpus_file):
     '''
     W = list()
     N = list()
-    word_emb = list() # word embedding from word2vec
     word2idx = dict() # mapping from a word to it's index in the vocabulary
     idx2word = dict() # mapping from index of a word in the vocabulary to the word itself
 
     f = open(word_emb_file, 'r')
-    f.readline()
+    first_line = f.readline().strip().split()
+    vocabulary_size = first_line[0]
+    embedding_dim = first_line[1]
+
+    word_emb = np.empty([int(vocabulary_size), int(embedding_dim)]) # word embedding from word2vec
+
     dat = f.readlines()
     f.close()
     index = 0
     for line in dat:
-        vec = line.strip().split()
+        vec = np.asarray(line.strip().split())
 
         # build the word2idx dictionary and the idx2word dictionary
         word2idx[vec[0]] = index
         idx2word[index] = vec[0]
 
         # store the word-embedding results
-        word_emb.append(vec[1: ])
+        word_emb[index] = vec[1: ]
         index += 1
 
     # read in the corpus file
@@ -94,6 +98,7 @@ def load_documents(word_emb_file, corpus_file):
         W.append(words)
         N.append(len(words))
 
+    word_emb = np.asarray(word_emb) # convert to numpy array
     return word_emb, word2idx, idx2word, W, N
 
 
@@ -123,8 +128,8 @@ def run():
     word_dim = 200
     doc_dim = 100 # embedding space dimension of document
 
-    word_emb_input = '???' # TODO
-    corpus_input = '???' # TODO
+    word_emb_input = '../vectors.txt' # TODO
+    corpus_input = '../new_corpus.txt' # TODO
     (word_emb, word2idx, idx2word, W, N) = load_documents(word_emb_input, corpus_input)
 
     # setting the vocabulary size
@@ -176,7 +181,7 @@ def run():
             cvg = update.update_u_prime(k, U_prime, Rho, word_emb, beta, V, eps)
             if not cvg:
                 has_converge = False
-            update.update_auxiliary(k, Alpha_K, Xi_KW, Rho, W)  # update the auxiliary vars using in q(z_dn) and q(rho)
+            update.update_auxiliary(k, Alpha_K, Xi_KW, Rho, V)  # update the auxiliary vars using in q(z_dn) and q(rho)
 
         if has_converge:
             break

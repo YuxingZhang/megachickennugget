@@ -140,7 +140,7 @@ def update_rho(k, Rho, Z, U_prime, Alpha_K, Xi_KW, word_emb, W, idx2word, beta, 
         Rho['mu'][k][w] *= Rho['Sigma'][k][w]
 
     for w in range(V):
-        if max(abs(Rho['mu'][d][w] - mu_old[w]) / abs(mu_old[w]), abs(Rho['Sigma'][d][w] - sig_old[w]) / abs(sig_old[w])) > eps:
+        if max(abs(Rho['mu'][k][w] - mu_old[w]) / abs(mu_old[w]), abs(Rho['Sigma'][k][w] - sig_old[w]) / abs(sig_old[w])) > eps:
             converge = False
             break
     return converge
