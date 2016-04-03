@@ -2,6 +2,7 @@ import sys
 import numpy as np
 import update
 from sklearn.preprocessing import normalize
+import warnings
 
 # Input: 
 #   Documents {B_1,...,B_D}
@@ -134,6 +135,7 @@ def run():
 
     # setting the vocabulary size
     V = len(word2idx)
+    D = len(W)
 
     (Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D) = init_vars(D, K, V, N, doc_dim, word_dim)
 
@@ -146,6 +148,7 @@ def run():
     number_of_batch = int((len(random_idx) + batch_size - 1) / batch_size)
     current_batch = number_of_batch
     while True: # while not converge
+        print current_batch
         has_converge = True
         # randomly sample a batch of document B
         current_batch -= 1
@@ -187,5 +190,6 @@ def run():
             break
 
 if __name__ == "__main__":
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
     run()
 
