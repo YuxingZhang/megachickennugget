@@ -143,18 +143,18 @@ def run():
     random_idx = np.random.permutation(len(W))
     batch_size = 20
     eps = 0.01
-    current_batch = len(random_idx)
     number_of_batch = int((len(random_idx) + batch_size - 1) / batch_size)
+    current_batch = number_of_batch
     while True: # while not converge
         has_converge = True
-        # TODO sample a batch of document B
+        # randomly sample a batch of document B
         current_batch -= 1
         if current_batch < 0:
             current_batch += number_of_batch
         B = random_idx[current_batch * batch_size : (current_batch + 1) * batch_size]
         # update local distribution
         for d in B:
-            for n in N[d]:
+            for n in range(N[d]):
                 cvg = update.update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V, eps)
                 if not cvg:
                     has_converge = False

@@ -27,10 +27,24 @@ def update_auxiliary(idx, Alpha, Xi, Var, Sidx):
     '''
     tmp1 = 0
     tmp2 = 0
+    '''
+    print len(Xi)
+    print Sidx
+    print Xi[0].shape
+    print Var['mu'][0].shape
+    print Var['Sigma'][0].shape
+    print "start loop"
+    '''
     for i in range(Sidx):
-        tmp1 += lmd(Xi[idx][i]) * Var['mu'][i]
+        '''
+        print "==========="
+        print "i = " + str(i)
+        print "idx = " + str(idx)
+        print "Xi[idx][i] = " + str(Xi[idx][i])
+        '''
         tmp2 += lmd(Xi[idx][i])
-        Xi[idx] = np.sqrt(Var['Sigma'][i] + Var['mu'][i] ** 2 - 2 * Alpha[idx] * Var['mu'][i] + Alpha[idx] ** 2)
+        tmp1 += lmd(Xi[idx][i]) * Var['mu'][idx][i]
+        Xi[idx][i] = np.sqrt(Var['Sigma'][idx][i] + Var['mu'][idx][i] ** 2 - 2 * Alpha[idx] * Var['mu'][idx][i] + Alpha[idx] ** 2)
     Alpha[idx] = (0.5 * (Sidx / 2 - 1) + tmp1) / tmp2
 
 
