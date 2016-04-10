@@ -236,3 +236,22 @@ def update_c(A, doc_dim, D):
     for d in range(D):
         tmp += np.dot(A['mu'][d], A['mu'][d])
     return D * doc_dim / (tmp + D * np.trace(A['Sigma']))
+
+def update_beta(U_prime, word_emb, Rho, V, K):
+    tmp = 0
+    for k in range(K):
+        for w in range(V):
+            tmp += np.trace(np.dot(np.dot(U_prime['mu'][k], U_prime['mu'][k].transpose()) \
+            + U_prime['Sigma'], np.dot(word_emb[w], word_emb[w].transpose()))) + Rho['mu'][k][w]**2 \
+            + Rho['Sigma'][k][w] - 2 * np.dot(word_emb[w].transpose(), U_prime['mu'][k]) * Rho['mu'][k][w]
+    return K * V / tmp
+
+def update_gamma(Eta, A, U, D, K):
+    tmp = 0
+    for d in range(D):
+        for k in range(K):
+            tmp += Eta['mu'][d][k] 
+
+
+
+
