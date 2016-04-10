@@ -102,7 +102,6 @@ def load_documents(word_emb_file, corpus_file):
     word_emb = np.asarray(word_emb) # convert to numpy array
     return word_emb, word2idx, idx2word, W, N
 
-
 def run():
 #   W:                  Words in each documents, W[d][n] is the n-th word in the d-th doc
 #   N:                  A list where N[d] = Number of words in document d
@@ -122,7 +121,6 @@ def run():
     beta = 1
     gamma = 1
 
-
     K = 10 # number of topics
     V = 0 # 
     D = 0 #
@@ -139,55 +137,66 @@ def run():
 
     (Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D) = init_vars(D, K, V, N, doc_dim, word_dim)
 
-    # TODO precompute Sigma^{(u')*} by Eq. 9
-    update.compute_u_prime_sigma(U_prime, word_emb, beta, l, word_dim, V)
-
     random_idx = np.random.permutation(len(W))
     batch_size = 20
     eps = 0.01
     number_of_batch = int((len(random_idx) + batch_size - 1) / batch_size)
     current_batch = number_of_batch
-    while True: # while not converge
-        print current_batch
-        has_converge = True
-        # randomly sample a batch of document B
-        current_batch -= 1
-        if current_batch < 0:
-            current_batch += number_of_batch
-        B = random_idx[current_batch * batch_size : (current_batch + 1) * batch_size]
-        # update local distribution
-        for d in B:
-            for n in range(N[d]):
-                cvg = update.update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V, eps)
+
+    iter = 0
+    MAX_ITER = 100
+    while iter < MAX_ITER:
+        # VI step to update variational parameters
+        while True: # while not converge
+            # TODO precompute Sigma^{(u')*} by Eq. 9
+            update.compute_u_prime_sigma(U_prime, word_emb, beta, l, word_dim, V)
+            print current_batch
+            has_converge = True
+            # randomly sample a batch of document B
+            current_batch -= 1
+            if current_batch < 0:
+                current_batch += number_of_batch
+            B = random_idx[current_batch * batch_size : (current_batch + 1) * batch_size]
+            # update local distribution
+            for d in B:
+                for n in range(N[d]):
+                    cvg = update.update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V, eps)
+                    if not cvg:
+                        has_converge = False
+                # update Eta
+                cvg = update.update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K, eps)
                 if not cvg:
                     has_converge = False
-            # update Eta
-            cvg = update.update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K, eps)
-            if not cvg:
-                has_converge = False
-            # update A
-            cvg = update.update_a(d, A, U, Eta, c, gamma, doc_dim, K, eps)
-            if not cvg:
-                has_converge = False
-            update.update_auxiliary(d, Alpha_D, Xi_DK, Eta, K)  # update the auxiliary vars using in q(eta)
-        # update global distributions
-        for k in range(K):
-            # update Rho
-            cvg = update.update_rho(k, Rho, Z, U_prime, Alpha_K, Xi_KW, word_emb, W, idx2word, beta, D, N, V, eps)
-            if not cvg:
-                has_converge = False
-            # update U
-            cvg = update.update_u(k, U, A, Eta, kappa, gamma, doc_dim, D, eps)
-            if not cvg:
-                has_converge = False
-            # update U_prime
-            cvg = update.update_u_prime(k, U_prime, Rho, word_emb, beta, V, eps)
-            if not cvg:
-                has_converge = False
-            update.update_auxiliary(k, Alpha_K, Xi_KW, Rho, V)  # update the auxiliary vars using in q(z_dn) and q(rho)
+                # update A
+                cvg = update.update_a(d, A, U, Eta, c, gamma, doc_dim, K, eps)
+                if not cvg:
+                    has_converge = False
+                update.update_auxiliary(d, Alpha_D, Xi_DK, Eta, K)  # update the auxiliary vars using in q(eta)
+            # update global distributions
+            for k in range(K):
+                # update Rho
+                cvg = update.update_rho(k, Rho, Z, U_prime, Alpha_K, Xi_KW, word_emb, W, idx2word, beta, D, N, V, eps)
+                if not cvg:
+                    has_converge = False
+                # update U
+                cvg = update.update_u(k, U, A, Eta, kappa, gamma, doc_dim, D, eps)
+                if not cvg:
+                    has_converge = False
+                # update U_prime
+                cvg = update.update_u_prime(k, U_prime, Rho, word_emb, beta, V, eps)
+                if not cvg:
+                    has_converge = False
+                update.update_auxiliary(k, Alpha_K, Xi_KW, Rho, V)  # update the auxiliary vars using in q(z_dn) and q(rho)
 
-        if has_converge:
-            break
+            if has_converge:
+                break
+
+        # Update parameters in the original distribution p
+        l = update.update_l(U_prime, word_dim, K)
+        kappa = update.update_kappa(U, doc_dim, K)
+        c = update.update_c(A, doc_dim, D)
+
+        iter += 1
 
 if __name__ == "__main__":
     warnings.filterwarnings("ignore", category=DeprecationWarning)
