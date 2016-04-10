@@ -222,17 +222,17 @@ def compute_u_prime_sigma(U_prime, word_emb, beta, l, word_dim, V):
 def update_l(U_prime, word_dim, K):
     tmp = 0
     for k in range(K):
-        tmp += np.dot(U_prime['mu'][k], U_prime['mu'][k])
+        tmp += np.dot(U_prime['mu'][k].transpose(), U_prime['mu'][k])
     return K * word_dim / (tmp + K * np.trace(U_prime['Sigma']))
 
 def update_kappa(U, doc_dim, K):
     tmp = 0
     for k in range(K):
-        tmp += np.dot(U['mu'][k], U['mu'][k])
+        tmp += np.dot(U['mu'][k].transpose(), U['mu'][k])
     return K * doc_dim / (tmp + K * np.trace(U['Sigma']))
 
 def update_c(A, doc_dim, D):
     tmp = 0
     for d in range(D):
-        tmp += np.dot(A['mu'][d], A['mu'][d])
+        tmp += np.dot(A['mu'][d].transpose(), A['mu'][d])
     return D * doc_dim / (tmp + D * np.trace(A['Sigma']))
