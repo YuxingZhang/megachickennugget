@@ -52,6 +52,9 @@ def update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V, eps):
     # Update the vector q(z_dn) of length K from Eq. 7
     # q(z_dn) is a multinomial distribution with q(z_dn=k) = Z[d][n][k]
 
+    print d
+    print n
+    print len(Z)
     converge = True
     z_dn_old = Z[d][n]
 
@@ -216,4 +219,20 @@ def compute_u_prime_sigma(U_prime, word_emb, beta, l, word_dim, V):
         tmp += np.dot(word_emb[w], word_emb[w].transpose())
     U_prime['Sigma'] = inv(l * np.identity(word_dim) + beta * tmp)
 
+def update_l(U_prime, word_dim, K):
+    tmp = 0
+    for k in range(K):
+        tmp += np.dot(U_prime['mu'][k], U_prime['mu'][k])
+    return K * word_dim / (tmp + K * np.trace(U_prime['Sigma']))
 
+def update_kappa(U, doc_dim, K):
+    tmp = 0
+    for k in range(K):
+        tmp += np.dot(U['mu'][k], U['mu'][k])
+    return K * doc_dim / (tmp + K * np.trace(U['Sigma']))
+
+def update_c(A, doc_dim, D):
+    tmp = 0
+    for d in range(D):
+        tmp += np.dot(A['mu'][d], A['mu'][d])
+    return D * doc_dim / (tmp + D * np.trace(A['Sigma']))
