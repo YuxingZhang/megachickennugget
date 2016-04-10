@@ -59,7 +59,7 @@ def update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V, eps):
     z_dn_old = Z[d][n]
 
     for k in range(K):
-        E1 = Eta[d][k]  # First expectation term
+        E1 = Eta['mu'][d][k]  # First expectation term
 
         tmp = 0
         for w in V:
@@ -250,4 +250,8 @@ def update_gamma(Eta, A, U, D, K):
     tmp = 0
     for d in range(D):
         for k in range(K):
-            tmp += Eta['mu'][d][k] 
+            tmp += Eta['mu'][d][k]**2 + Eta['Sigma'][d][k] - 2 * Eta['mu'][d][k] * np.dot(U['mu'][k].transpose()), \
+                A['mu'][d]) + np.trace(np.dot(np.dot(A['mu'][d], A['mu'][d].transpose()) + A['Sigma'], \
+                np.dot(U['mu'][k], U['mu'][k].transpose()) + U['Sigma']))
+    return D * K / tmp
+
