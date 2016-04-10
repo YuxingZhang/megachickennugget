@@ -195,6 +195,8 @@ def run():
         l = update.update_l(U_prime, word_dim, K)
         kappa = update.update_kappa(U, doc_dim, K)
         c = update.update_c(A, doc_dim, D)
+        beta = update.update_beta(U_prime, word_emb, Rho, V, K)
+        gamma = update.update_gamma(Eta, A, U, D, K)
 
         iter += 1
 

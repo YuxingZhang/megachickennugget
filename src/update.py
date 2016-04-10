@@ -250,7 +250,7 @@ def update_gamma(Eta, A, U, D, K):
     tmp = 0
     for d in range(D):
         for k in range(K):
-            tmp += Eta['mu'][d][k]**2 + Eta['Sigma'][d][k] - 2 * Eta['mu'][d][k] * np.dot(U['mu'][k].transpose()), \
+            tmp += Eta['mu'][d][k]**2 + Eta['Sigma'][d][k] - 2 * Eta['mu'][d][k] * np.dot(U['mu'][k].transpose(), \
                 A['mu'][d]) + np.trace(np.dot(np.dot(A['mu'][d], A['mu'][d].transpose()) + A['Sigma'], \
                 np.dot(U['mu'][k], U['mu'][k].transpose()) + U['Sigma']))
     return D * K / tmp
