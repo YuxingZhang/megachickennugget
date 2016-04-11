@@ -51,17 +51,17 @@ def update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V, eps):
     # Update the vector q(z_dn) of length K from Eq. 7
     # q(z_dn) is a multinomial distribution with q(z_dn=k) = Z[d][n][k]
 
-    print d
-    print n
-    print len(Z)
     converge = True
     z_dn_old = Z[d][n]
 
+    print "hello from the other side, n = " + str(n)
+
     for k in range(K):
+
         E1 = Eta['mu'][d][k]  # First expectation term
 
         tmp = 0
-        for w in V:
+        for w in range(V):
             tmp +=  - lmd(Xi_KW[k][w]) * (Rho['Sigma'][k][w] + Rho['mu'][k][w] ** 2) \
                     - (0.5 - 2 * Alpha_K[k] * lmd(Xi_KW[k][w])) * Rho['mu'][k][w] \
                     + Xi_KW[k][w] / 2 \
@@ -70,8 +70,9 @@ def update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V, eps):
 
         w_dn = W[d][n]
         E2 = Rho['mu'][k][word2idx[w_dn]] + Alpha_K[k] * (V / 2 - 1) + tmp  # Second expectation term
+        print "E2 = " + str(E2)
         Z[d][n][k] = np.exp(E1 + E2)
-    Z[d][n] = normalize(Z[d][n])
+    Z[d][n] = normalize(Z[d][n])[0]
 
     for k in range(K):
         if abs(Z[d][n][k] - z_dn_old[k]) / abs(z_dn_old[k]) > eps:

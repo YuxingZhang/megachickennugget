@@ -24,7 +24,7 @@ def init_vars(D, K, V, N, doc_dim, word_dim):
     # Z is the variational distribution of q(z_dn), q(z_dn = k) = Z(d, n, k)
     Z = list()
     for d in range(D):
-        Z.append([normalize(np.random.uniform(0, 1, K), 'l1') for i in range(N[d])])
+        Z.append([normalize(np.random.uniform(0, 1, K), 'l1')[0] for i in range(N[d])])
 
     # initialize Eta with parameters Sigma (D * K) and mu (D * K) that defines a multivariate Gaussian distribution
     # Eta_{dk} ~ Normal(mu[d][k], Sigma[d][k])
@@ -69,12 +69,14 @@ def load_documents(word_emb_file, corpus_file):
     word2idx = dict() # mapping from a word to it's index in the vocabulary
     idx2word = dict() # mapping from index of a word in the vocabulary to the word itself
 
+
     f = open(word_emb_file, 'r')
     first_line = f.readline().strip().split()
     vocabulary_size = first_line[0]
     embedding_dim = first_line[1]
 
     word_emb = np.empty([int(vocabulary_size), int(embedding_dim)]) # word embedding from word2vec
+
 
     dat = f.readlines()
     f.close()
@@ -127,15 +129,20 @@ def run():
     word_dim = 200
     doc_dim = 100 # embedding space dimension of document
 
+    print "hello"
+
     word_emb_input = '../vectors.txt' # TODO
     corpus_input = '../new_corpus.txt' # TODO
     (word_emb, word2idx, idx2word, W, N) = load_documents(word_emb_input, corpus_input)
 
     # setting the vocabulary size
     V = len(word2idx)
+    print "V = " + str(V)
     D = len(W)
 
     (Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D) = init_vars(D, K, V, N, doc_dim, word_dim)
+
+    print "kan wo"
 
     random_idx = np.random.permutation(len(W))
     batch_size = 20
@@ -143,14 +150,17 @@ def run():
     number_of_batch = int((len(random_idx) + batch_size - 1) / batch_size)
     current_batch = number_of_batch
 
-    iter = 0
+    print "ni zai"
+
+    iteration = 0
     MAX_ITER = 100
-    while iter < MAX_ITER:
+    while iteration < MAX_ITER:
+        print "iteration # " + str(iteration)
         # VI step to update variational parameters
         while True: # while not converge
             # TODO precompute Sigma^{(u')*} by Eq. 9
             update.compute_u_prime_sigma(U_prime, word_emb, beta, l, word_dim, V)
-            print current_batch
+            print "current_batch = " + str(current_batch)
             has_converge = True
             # randomly sample a batch of document B
             current_batch -= 1
@@ -198,7 +208,7 @@ def run():
         beta = update.update_beta(U_prime, word_emb, Rho, V, K)
         gamma = update.update_gamma(Eta, A, U, D, K)
 
-        iter += 1
+        iteration += 1
 
 if __name__ == "__main__":
     warnings.filterwarnings("ignore", category=DeprecationWarning)
