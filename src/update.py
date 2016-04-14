@@ -70,7 +70,7 @@ def update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V, eps):
 
         w_dn = W[d][n]
         E2 = Rho['mu'][k][word2idx[w_dn]] + Alpha_K[k] * (V / 2 - 1) + tmp  # Second expectation term
-        print "E2 = " + str(E2)
+        print "E2 = " + str(E2) + "  , E1 = " + str(E1)
         Z[d][n][k] = np.exp(E1 + E2)
     Z[d][n] = normalize(Z[d][n])[0]
 
