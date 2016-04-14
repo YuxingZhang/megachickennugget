@@ -117,11 +117,11 @@ def run():
 #       l, c, kappa, beta, gamma        Hyper parameters for the model
 
     # initialize all variables
-    l = 1
-    c = 1
-    kappa = 1
-    beta = 1
-    gamma = 1
+    l = 1.0
+    c = 1.0
+    kappa = 1.0
+    beta = 1.0
+    gamma = 1.0
 
     K = 10 # number of topics
     V = 0 # 
@@ -142,7 +142,7 @@ def run():
 
     (Z, Eta, A, Rho, U_prime, U, Xi_KW, Alpha_K, Xi_DK, Alpha_D) = init_vars(D, K, V, N, doc_dim, word_dim)
 
-    print "kan wo"
+    # print "kan wo"
 
     random_idx = np.random.permutation(len(W))
     batch_size = 20
@@ -150,7 +150,7 @@ def run():
     number_of_batch = int((len(random_idx) + batch_size - 1) / batch_size)
     current_batch = number_of_batch
 
-    print "ni zai"
+    # print "ni zai"
 
     iteration = 0
     MAX_ITER = 100
@@ -174,6 +174,7 @@ def run():
                     if not cvg:
                         has_converge = False
                 # update Eta
+                print "updating eta"
                 cvg = update.update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K, eps)
                 if not cvg:
                     has_converge = False
