@@ -47,8 +47,9 @@ int main() {
     // initialization
     vector<double**> Z; // each element is a n_d * K matrix 
     for (int i = 0; i < D; i++) {
-        double tmp[N[i]][K];
+        double** tmp = new double*[N[i]];
         for (int j = 0; j < N[i]; j++) {
+            tmp[j] = new double[K];
             double sum = RandomDoubleVector(tmp[j]);
             for (int k = 0; k < K; k++) {
                 tmp[j][k] /= sum;
