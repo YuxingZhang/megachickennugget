@@ -3,6 +3,8 @@
 #include <cstring>
 #include <map>
 #include <vector>
+#include <set>
+#include <algorithm>
 //#include "load.cpp"
 
 using namespace std;
@@ -109,6 +111,45 @@ int main() {
         RandomDoubleVector(xi_DK[i]);
     }
     RandomDoubleVector(alpha_D);
+
+    // train for each batch
+    vector<int> random_index;
+    for (int i = 0; i < W.size(); i++) {
+        random_index.push_back(i);
+    }
+    random_shuffle(random_index.begin(), random_index.end());
+    const int BATCH_SIZE = 20;
+    const double EPS = 0.01;
+    int num_of_batch = (int)((random_index.size() + BATCH_SIZE 
+            - 1) / BATCH_SIZE);
+    int cur_batch = num_of_batch;
+
+    int iteration = 0;
+    while (true) {
+        iteration++;
+
+        while (true) {
+            ComputeUpSigma(up_s, word_embedding, beta, l, WORD_DIM, V);
+
+            bool has_converge = true;
+            cur_batch--;
+            if (cur_batch < 0) {
+                cur_batch += num_of_batch;
+            }
+
+            // create a batch index set
+            set<int> idx_set;
+            for (int i = cur_batch * BATCH_SIZE; i < (cur_batch + 1) * BATCH_SIZE && i < random_index.size(); i++) {
+                idx_set.insert(random_index[i]);
+            }
+
+            for (int d = idx_set.begin(); d != idx_set.end(); d++) {
+                for (int n = 0; n < N[d]; n++) {
+
+                }
+            }
+        }
+    }
 
 }
 
