@@ -63,8 +63,8 @@ def update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V, eps):
         tmp = 0.0
         for w in range(V):
             tmp +=  - lmd(Xi_KW[k][w]) * (Rho['Sigma'][k][w] + Rho['mu'][k][w] ** 2) \
-                    - (0.5 - 2 * Alpha_K[k] * lmd(Xi_KW[k][w])) * Rho['mu'][k][w] \
-                    + Xi_KW[k][w] / 2 \
+                    - (0.5 - 2.0 * Alpha_K[k] * lmd(Xi_KW[k][w])) * Rho['mu'][k][w] \
+                    + Xi_KW[k][w] / 2.0 \
                     - lmd(Xi_KW[k][w]) * (Alpha_K[k] ** 2 - Xi_KW[k][w] ** 2) \
                     - np.log(1.0 + np.exp(Xi_KW[k][w]))
 

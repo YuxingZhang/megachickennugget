@@ -6,7 +6,6 @@ def test_lmd():
 	print "unit testing update.lmd..."
 	res = update.lmd(xi)
 	truth = 1.0 / (2.0 * xi) * (1.0 / (1.0 + np.exp(-xi)) - 0.5)
-	print truth
 	if res == truth:
 		print "pass!"
 	else:
@@ -29,10 +28,12 @@ def test_update_auxiliary():
 		print "WRONG!!!"
 	print "\n"
 
+def test_update_z():
+	print "unit testing update.update_z..."
+
 def main():
 	test_lmd()
 	test_update_auxiliary()
 
 if __name__ == "__main__":
-    # warnings.filterwarnings("ignore", category=DeprecationWarning)
     main()
