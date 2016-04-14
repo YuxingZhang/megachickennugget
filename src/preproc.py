@@ -4,10 +4,10 @@ import string
 
 if __name__ == '__main__':
 
-    path = '/Users/Lidan/Documents/CMU Yr1 Sem2/10-708/Project/newsdata/'
-    input_file = 'file_names'
-    mid_file = 'output.txt'
-    output_file = 'corpus.txt'
+    path = '/Users/Lidan/Documents/CMU Yr1 Sem2/10-708/Project/nipsdata/'
+    input_file = 'a_result/file_names'
+    mid_file = 'a_result/output.txt'
+    output_file = 'a_result/corpus.txt'
 
     
     f = open(path + input_file, 'r')
