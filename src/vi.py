@@ -169,12 +169,12 @@ def run():
             B = random_idx[current_batch * batch_size : (current_batch + 1) * batch_size]
             # update local distribution
             for d in B:
+                print "Updating local distribution for documents"
                 for n in range(N[d]):
                     cvg = update.update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V, eps)
                     if not cvg:
                         has_converge = False
                 # update Eta
-                print "updating eta"
                 cvg = update.update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K, eps)
                 if not cvg:
                     has_converge = False
@@ -185,6 +185,7 @@ def run():
                 update.update_auxiliary(d, Alpha_D, Xi_DK, Eta, K)  # update the auxiliary vars using in q(eta)
             # update global distributions
             for k in range(K):
+                print "Updating global distribution for topics"
                 # update Rho
                 cvg = update.update_rho(k, Rho, Z, U_prime, Alpha_K, Xi_KW, word_emb, W, idx2word, beta, D, N, V, eps)
                 if not cvg:
