@@ -30,6 +30,11 @@ def test_update_auxiliary():
 
 def test_update_z():
 	print "unit testing update.update_z..."
+	d = 0
+	n = 0
+	Z = [np.array([[0.5, 0.5]])]
+	Eta = dict(mu = np.array([[0,0]]))
+	# Rho = dict(mu = )
 
 def main():
 	test_lmd()

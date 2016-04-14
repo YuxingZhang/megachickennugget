@@ -52,7 +52,7 @@ def update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V, eps):
     # q(z_dn) is a multinomial distribution with q(z_dn=k) = Z[d][n][k]
 
     converge = True
-    z_dn_old = Z[d][n]
+    z_dn_old = np.array(Z[d][n])
 
     # print "hello from the other side, n = " + str(n)
 
@@ -69,7 +69,10 @@ def update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V, eps):
                     - np.log(1.0 + np.exp(Xi_KW[k][w]))
 
         w_dn = W[d][n]
+        print tmp
         E2 = Rho['mu'][k][word2idx[w_dn]] + Alpha_K[k] * (V / 2.0 - 1.0) + tmp  # Second expectation term
+        print "E2" + str(E2)
+        print "E1" + str(E1)
         Z[d][n][k] = np.exp(E1 + E2)
     Z[d][n] = normalize(Z[d][n])[0]
 
@@ -85,8 +88,8 @@ def update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K, eps):
     # Last checked Mar. 27 2:31pm
 
     converge = True
-    mu_old = Eta['mu'][d]
-    sig_old = Eta['Sigma'][d]
+    mu_old = np.array(Eta['mu'][d])
+    sig_old = np.array(Eta['Sigma'][d])
 
     for k in range(K):
         Eta['Sigma'][d][k] = 1.0 / (gamma - 2.0 * lmd(Xi_DK[d][k]))
@@ -108,14 +111,14 @@ def update_a(d, A, U, Eta, c, gamma, doc_dim, K, eps):
     # Last checked Mar. 27 3:06pm
 
     converge = True
-    mu_old = A['mu'][d]
-    sig_old = A['Sigma']
+    mu_old = np.array(A['mu'][d])
+    sig_old = np.array(A['Sigma'])
 
     if d == 0:
         tmp1 = 0.0
         tmp2 = 0.0
         for k in range(K):
-            tmp1 += np.dot(U['mu'][k], U['mu'][k].transpose())
+            tmp1 += np.outer(U['mu'][k], U['mu'][k])
             tmp2 += Eta['mu'][d][k] * U['mu'][k]
         A['Sigma'] = inv(gamma * tmp1 + gamma * K * U['Sigma'] + c * np.identity(doc_dim))
         A['mu'][d] = gamma * np.dot(A['Sigma'], tmp2)
@@ -140,8 +143,8 @@ def update_rho(k, Rho, Z, U_prime, Alpha_K, Xi_KW, word_emb, W, idx2word, beta, 
     # Last checked Mar. 27 1:53pm
 
     converge = True
-    mu_old = Rho['mu'][k]
-    sig_old = Rho['Sigma'][k]
+    mu_old = np.array(Rho['mu'][k])
+    sig_old = np.array(Rho['Sigma'][k])
 
     for w in range(V):
         c_kw = 0.0
@@ -167,7 +170,7 @@ def update_u_prime(k, U_prime, Rho, word_emb, beta, V, eps):
     # Last checked Mar. 27 4:38pm
 
     converge = True
-    mu_old = U_prime['mu'][k]
+    mu_old = np.array(U_prime['mu'][k])
 
     tmp = 0.0
     for w in range(V):
@@ -185,14 +188,14 @@ def update_u(k, U, A, Eta, kappa, gamma, doc_dim, D, eps):
     # Update parameters for q(u) by Eq. (7) and (8)
     # Last checked Mar. 27 3:34pm
     converge = True
-    mu_old = U['mu'][k]
-    sig_old = U['Sigma'][k]
+    mu_old = np.array(U['mu'][k])
+    sig_old = np.array(U['Sigma'][k])
 
     if k == 0:
         tmp1 = 0.0
         tmp2 = 0.0
         for d in range(D):
-            tmp1 += np.dot(A['mu'][d], A['mu'][d].transpose())
+            tmp1 += np.outer(A['mu'][d], A['mu'][d])
             tmp2 += Eta['mu'][d][k] * A['mu'][d]
         U['Sigma'] = inv(kappa * np.identity(doc_dim) + gamma * D * A['Sigma'] + gamma * tmp1)
         U['mu'][k] = gamma * np.dot(U['Sigma'], tmp2)

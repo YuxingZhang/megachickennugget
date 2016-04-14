@@ -117,11 +117,11 @@ def run():
 #       l, c, kappa, beta, gamma        Hyper parameters for the model
 
     # initialize all variables
-    l = 1
-    c = 1
-    kappa = 1
-    beta = 1
-    gamma = 1
+    l = 1.0
+    c = 1.0
+    kappa = 1.0
+    beta = 1.0
+    gamma = 1.0
 
     K = 10 # number of topics
     V = 0 # 
