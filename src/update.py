@@ -133,7 +133,7 @@ def update_a(d, A, U, Eta, c, gamma, doc_dim, K, eps):
             converge = False
             break
     if converge:
-        if abs(A['Sigma'] - sig_old) / abs(sig_old) > eps:
+        if (abs(A['Sigma'] - sig_old) / abs(sig_old)).max() > eps:
             converge = False
     return converge
 
@@ -210,7 +210,7 @@ def update_u(k, U, A, Eta, kappa, gamma, doc_dim, D, eps):
             converge = False
             break
     if converge:
-        if max(abs(U['Sigma'][k] - sig_old) / abs(sig_old)) > eps:
+        if (abs(U['Sigma'] - sig_old) / abs(sig_old)).max() > eps:
             converge = False
     return converge
 
