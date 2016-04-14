@@ -69,10 +69,10 @@ def update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V, eps):
                     - np.log(1.0 + np.exp(Xi_KW[k][w]))
 
         w_dn = W[d][n]
-        print tmp
+        # print tmp
         E2 = Rho['mu'][k][word2idx[w_dn]] + Alpha_K[k] * (V / 2.0 - 1.0) + tmp  # Second expectation term
-        print "E2" + str(E2)
-        print "E1" + str(E1)
+        # print "E2" + str(E2)
+        # print "E1" + str(E1)
         Z[d][n][k] = np.exp(E1 + E2)
     Z[d][n] = normalize(Z[d][n])[0]
 
@@ -92,11 +92,11 @@ def update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K, eps):
     sig_old = np.array(Eta['Sigma'][d])
 
     for k in range(K):
-        Eta['Sigma'][d][k] = 1.0 / (gamma - 2.0 * lmd(Xi_DK[d][k]))
+        Eta['Sigma'][d][k] = 1.0 / (gamma + 2.0 * N[d] * lmd(Xi_DK[d][k]))
         tmp = 0.0
         for n in range(N[d]):
             tmp += Z[d][n][k]
-        Eta['mu'][d][k] = gamma * np.dot(U['mu'][k].transpose(), A['mu'][d]) + 2.0 * Alpha_D[d] * lmd(Xi_DK[d][k]) - 0.5 + tmp
+        Eta['mu'][d][k] = gamma * np.dot(U['mu'][k].transpose(), A['mu'][d]) + N[d] * (2.0 * Alpha_D[d] * lmd(Xi_DK[d][k]) - 0.5) + tmp
         Eta['mu'][d][k] *= Eta['Sigma'][d][k]
 
     for k in range(K):
