@@ -6,7 +6,7 @@ double lambda(double xi){
 void ComputeUpSigma(mat& up_s, mat& word_embedding, double& beta, double& l, int WORD_DIM, int V){
     mat temp(WORD_DIM, WORD_DIM, fill::zeros);
     for(int i = 0; i < V; i++){
-        temp += (word_embedding.row(i) * word_embedding.row(i).t());
+        temp += (word_embedding.row(i).t() * word_embedding.row(i));
     }
     up_s = (l * eye<mat>(WORD_DIM, WORD_DIM) + beta * temp).i();
     return;
@@ -46,5 +46,47 @@ bool UpdateEta(int d, mat& eta_m, mat& eta_s, mat& xi_DK, vec& alpha_D, mat& u_m
 
 /* update a */
 bool UpdateA(int d, mat& a_m, mat& a_s, mat& u_m, mat& u_s, mat& eta_m, double c, double gamma, int DOC_DIM, int K, double EPS){
+    bool converge = true;
+    mat temp1(DOC_DIM, DOC_DIM, fill::zeros);
+    vec temp2(DOC_DIM, fill::zeros);
 
+    vec mu_old = a_u.row(d);
+    mat sigma_old = a_s;
+    
+    if(d == 0){
+        for(int k = 0; k < K; k++){
+            temp1 += (u_m.row(k).t() * u_m.row(k));
+            temp2 += (eta_m(d, k) * u_m.row(k).t());
+        }
+        a_s = (gamma * temp1 + gamma * K * u_s + c * eye(DOC_DIM, DOC_DIM)).i();
+        a_m.row(d) = gamma * (a_s * temp2);
+    }
+    else{
+        for(int k = 0; k < K; k++){
+            temp2 += (eta_m(d, k) * u_m.row(k).t());
+        }
+        a_m.row(d) = gamma * (a_s * temp2);
+    }
+
+    for(int k = 0; k < K; k++){
+        if(abs(a_u(d, k) - mu_old(k)) / abs(mu_old(k)) > EPS){
+            converge = false;
+            break;
+        }
+    }
+    if(converge){
+        if(max(abs(a_s - sigma_old) / abs(sigma_old)) > EPS){
+            converge = false;
+        }
+    }
+    return converge;
 }
+
+
+
+
+
+
+
+
+
