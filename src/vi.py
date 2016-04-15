@@ -251,7 +251,7 @@ def print_toptopics(Eta, D):
         l = Eta['mu'][d]
         top_list = l.argsort()[0:2]
         for idx in top_list:
-            print "Topic index " + str[idx] + "\n"
+            print "Topic index " + str(idx) + "\n"
 
 if __name__ == "__main__":
     warnings.filterwarnings("ignore", category=DeprecationWarning)
