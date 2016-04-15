@@ -6,6 +6,7 @@
 #include <set>
 #include <armadillo>
 #include <algorithm>
+#include <cmath>
 using namespace std;
 using namespace arma;
 #include "load.cpp"
@@ -67,6 +68,7 @@ int main() {
 
     mat xi_DK(D, K, fill::randu); // used in lower bound of eta_d
     vec alpha_D(D, fill::randu);
+
 
     // train for each batch
     vector<int> random_index;
