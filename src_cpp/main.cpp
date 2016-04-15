@@ -4,19 +4,13 @@
 #include <map>
 #include <vector>
 #include <set>
+#include <armadillo>
 #include <algorithm>
 using namespace std;
+using namespace arma;
 #include "load.cpp"
 
 void load_files(string embedding, string corpus, double** word_embd, map<string, int>& word2idx, map<int, string>& idx2word, vector<vector<string> >& W, vector<int>& N);
-double RandomDoubleVector(double v[]) {
-    double sum = 0.0;
-    for (size_t i = 0; i < (sizeof(v) / sizeof(v[0])); i++) {
-        v[i] = ((double) rand() / (RAND_MAX));
-        sum += v[i];
-    }
-    return sum;
-}
 
 int main() {
     // Reading input files, including the corpus and the embedding
@@ -45,73 +39,34 @@ int main() {
     double gamma = 1.0;
 
     // initialization
-    vector<double**> Z; // each element is a n_d * K matrix 
+    vector<mat> z; // each element is a n_d * K matrix 
     for (int i = 0; i < D; i++) {
-        double** tmp = new double*[N[i]];
-        for (int j = 0; j < N[i]; j++) {
-            tmp[j] = new double[K];
-            double sum = RandomDoubleVector(tmp[j]);
-            for (int k = 0; k < K; k++) {
-                tmp[j][k] /= sum;
-            }
-        }
-        Z.push_back(tmp);
+        mat tmp(N[i], K, fill::randu);
+        normalise(tmp, 1, 1);
+        z.push_back(tmp);
     }
 
-    double eta_m[D][K]; // mean of eta
-    double eta_s[D][K]; // sigma of eta
-    for (int i = 0; i < D; i++) {
-        RandomDoubleVector(eta_m[i]);
-        RandomDoubleVector(eta_s[i]);
-    }
+    // flag is diagonal or not
+    mat eta_m(D, K, fill::randu); // mean of eta
+    mat eta_s(D, K); // sigma of eta
 
-    double a_m[D][DOC_DIM];
-    double a_s[DOC_DIM][DOC_DIM]; // all a_d share the same matrix
-    for (int i = 0; i < D; i++) {
-        RandomDoubleVector(a_m[i]);
-    }
-    for (int i = 0; i < DOC_DIM; i++) {
-        a_s[i][i] = ((double) rand() / (RAND_MAX));
-    }
+    mat a_m(D, DOC_DIM, fill::randu);
+    mat a_s = diagmat(vec(DOC_DIM, fill::randu)); // all a_d share the same matrix
 
-    double rho_m[K][V]; // mean of rho
-    double rho_s[K][V]; // sigma of rho
-    for (int i = 0; i < K; i++) {
-        RandomDoubleVector(rho_m[i]);
-        RandomDoubleVector(rho_s[i]);
-    }
+    mat rho_m(K, V, fill::randu); // mean of rho
+    mat rho_s(K, V, fill::randu); // sigma of rho
 
-    double up_m[K][WORD_DIM]; // mean of u prime
-    double up_s[WORD_DIM][WORD_DIM]; // sigma of u prime, shared
-    for (int i = 0; i < K; i++) {
-        RandomDoubleVector(up_m[i]);
-    }
-    for (int i = 0; i < WORD_DIM; i++) {
-        up_s[i][i] = ((double) rand() / (RAND_MAX));
-    }
+    mat up_m(K, WORD_DIM, fill::randu); // mean of u prime
+    mat up_s = diagmat(vec(WORD_DIM, fill::randu)); // sigma of u prime, shared
 
-    double u_m[K][DOC_DIM]; // mean of u
-    double u_s[DOC_DIM][DOC_DIM]; // sigma of u, shared
-    for (int i = 0; i < K; i++) {
-        RandomDoubleVector(u_m[i]);
-    }
-    for (int i = 0; i < DOC_DIM; i++) {
-        u_s[i][i] = ((double) rand() / (RAND_MAX));
-    }
+    mat u_m(K, DOC_DIM, fill::randu); // mean of u
+    mat u_s = diagmat(vec(DOC_DIM, fill::randu)); // sigma of u, shared
 
-    double xi_KW[K][V]; // used in the lower bound of z_dn and rho
-    double alpha_K[K];
-    for (int i = 0; i < K; i++) {
-        RandomDoubleVector(xi_KW[i]);
-    }
-    RandomDoubleVector(alpha_K);
+    mat xi_KW(K, V, fill::randu); // used in lower bound of z_dn and rho
+    vec alpha_K(K, fill::randu);
 
-    double xi_DK[D][K]; // used in the lower bound of eta_d
-    double alpha_D[D];
-    for (int i = 0; i < D; i++) {
-        RandomDoubleVector(xi_DK[i]);
-    }
-    RandomDoubleVector(alpha_D);
+    mat xi_DK(D, K, fill::randu); // used in lower bound of eta_d
+    vec alpha_D(D, fill::randu);
 
     // train for each batch
     vector<int> random_index;
@@ -126,11 +81,11 @@ int main() {
     int cur_batch = num_of_batch;
 
     int iteration = 0;
-    /*while (true) {
+    while (true) {
         iteration++;
 
         while (true) {
-            ComputeUpSigma(up_s, word_embedding, beta, l, WORD_DIM, V);
+            //ComputeUpSigma(up_s, word_embedding, beta, l, WORD_DIM, V);
 
             bool has_converge = true;
             cur_batch--;
@@ -138,20 +93,21 @@ int main() {
                 cur_batch += num_of_batch;
             }
 
+            /*
             // create a batch index set
             set<int> idx_set;
             for (int i = cur_batch * BATCH_SIZE; i < (cur_batch + 1) * BATCH_SIZE && i < random_index.size(); i++) {
                 idx_set.insert(random_index[i]);
             }
 
-            for (int d = idx_set.begin(); d != idx_set.end(); d++) {
-                for (int n = 0; n < N[d]; n++) {
-                    ;
+            for (set<int>::iterator d = idx_set.begin(); d != idx_set.end(); d++) {
+                for (int n = 0; n < N[*d]; n++) {
+                    if (!UpdateZ(*d, n, z, eta_m)) { has_converge = false; }
                 }
+                if (!UpdateEta(*d, eta_m, eta_s, xi_DK, alpha_D, u_m, a_m, z, gamma, N, K, EPS)) { has_converge = false; }
             }
+            */
         }
-    }*/
+    }
     return 0;
-
 }
-
