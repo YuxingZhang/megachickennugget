@@ -230,9 +230,7 @@ def run():
         gamma = update.update_gamma(Eta, A, U, D, K)
 
         iteration += 1
-        # print_topwords(Rho, K, idx2word)
 
-    # nothiscannothappen = 0;
     print_topwords(Rho, K, idx2word)
     print_toptopics(Eta, D)
 

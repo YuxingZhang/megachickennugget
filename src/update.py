@@ -238,8 +238,8 @@ def update_beta(U_prime, word_emb, Rho, V, K):
     tmp = 0.0
     for k in range(K):
         for w in range(V):
-            tmp += np.trace(np.dot(np.dot(U_prime['mu'][k], U_prime['mu'][k].transpose())
-            + U_prime['Sigma'], np.dot(word_emb[w], word_emb[w].transpose()))) + Rho['mu'][k][w] ** 2
+            tmp += np.trace(np.dot(np.outer(U_prime['mu'][k], U_prime['mu'][k].transpose())
+            + U_prime['Sigma'], np.outer(word_emb[w], word_emb[w].transpose()))) + Rho['mu'][k][w] ** 2
             + Rho['Sigma'][k][w] - 2.0 * np.dot(word_emb[w].transpose(), U_prime['mu'][k]) * Rho['mu'][k][w]
     return K * V / tmp
 
@@ -248,7 +248,7 @@ def update_gamma(Eta, A, U, D, K):
     for d in range(D):
         for k in range(K):
             tmp += Eta['mu'][d][k] ** 2 + Eta['Sigma'][d][k] - 2.0 * Eta['mu'][d][k] * np.dot(U['mu'][k].transpose(),
-                A['mu'][d]) + np.trace(np.dot(np.dot(A['mu'][d], A['mu'][d].transpose()) + A['Sigma'],
-                np.dot(U['mu'][k], U['mu'][k].transpose()) + U['Sigma']))
+                A['mu'][d]) + np.trace(np.dot(np.outer(A['mu'][d], A['mu'][d].transpose()) + A['Sigma'],
+                np.outer(U['mu'][k], U['mu'][k].transpose()) + U['Sigma']))
     return D * K / tmp
 
