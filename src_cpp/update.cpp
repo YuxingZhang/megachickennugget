@@ -12,7 +12,7 @@ void ComputeUpSigma(mat& up_s, mat& word_embedding, double& beta, double& l, int
     return;
 }
 
-/* update z_dn */
+/* TODO update z_dn */
 bool UpdateZ(int d, int n, vector<mat>& z, mat& eta_m, mat& rho_m, mat& rho_s, mat& xi_KW, mat& alpha_K,
         vector< vector<string> >& W, map<int, string>& word2idx, int K, int V, double EPS) {
     bool converge = true;
@@ -27,6 +27,8 @@ bool UpdateZ(int d, int n, vector<mat>& z, mat& eta_m, mat& rho_m, mat& rho_s, m
     }
     return false;
 }
+
+/* TODO update auxiliary */
 
 /* update eta */
 bool UpdateEta(int d, mat& eta_m, mat& eta_s, mat& xi_DK, vec& alpha_D, mat& u_m, mat& a_m, vector<mat>& z, double gamma, vector<int>& N, int K, double EPS){
@@ -146,4 +148,7 @@ bool UpdateUp(int k, mat& up_m, mat& up_s, mat& rho_m, mat& word_embedding, doub
     }
     return converge;
 }
+
+/* update */
+
 
