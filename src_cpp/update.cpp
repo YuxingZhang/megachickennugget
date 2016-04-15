@@ -130,7 +130,7 @@ bool UpdateRho(int k, mat& rho_m, mat& rho_s, vector<mat>& z, mat& up_m, vec& al
 }
 
 /* update u_prime */
-bool UpdateUp(int k, mat& up_m, mat& up_s, mat& rho_m, mat& word_embedding, double beta, int V, int WORD_DIM, double EPS){
+bool UpdateUp(int k, mat& up_m, mat& up_s, mat& rho_m, mat& word_embedding, double beta, int WORD_DIM, int V, double EPS){
     bool converge = true;
    
     vec mu_old = up_m.row(k);
@@ -149,6 +149,8 @@ bool UpdateUp(int k, mat& up_m, mat& up_s, mat& rho_m, mat& word_embedding, doub
     return converge;
 }
 
-/* update */
+/* update l */
+void UpdateL(up_m, up_s, WORD_DIM, K){
 
+}
 

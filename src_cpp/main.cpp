@@ -113,7 +113,7 @@ int main() {
             for (int k = 0; k < K; k++) {
                 if (!UpdateRho(k, rho_m, rho_s, z, up_m, alpha_K, xi_KW, word_embedding, W, idx2word, beta, D, N, V, EPS)) { has_converge = false; }
                 if (!UpdateU(k, u_m, u_s, a_m, a_s, eta_m, kappa, gamma, DOC_DIM, D, EPS)) { has_converge = false; }
-                if (!UpdateUp(k, up_m, up_s, rho_m, word_embedding, beta, V, EPS)) { has_converge = false; }
+                if (!UpdateUp(k, up_m, up_s, rho_m, word_embedding, beta, WORD_DIM, V, EPS)) { has_converge = false; }
                 UpdateAuxiliary(k, alpha_K, xi_KW, rho_m, rho_s, V);
             }
             if (has_converge) { break; }
