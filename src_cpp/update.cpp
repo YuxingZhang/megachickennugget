@@ -13,7 +13,20 @@ void ComputeUpSigma(mat& up_s, mat& word_embedding, double& beta, double& l, int
 }
 
 /* update z_dn */
+bool UpdateZ(int d, int n, vector<mat>& z, mat& eta_m, mat& rho_m, mat& rho_s, mat& xi_KW, mat& alpha_K,
+        vector< vector<string> >& W, map<int, string>& word2idx, int K, int V, double EPS) {
+    bool converge = true;
+    vec z_dn_old = z[d].row(n);
 
+    double temp = 0.0;
+    for (int k = 0; k < K; k++) {
+        for (int w = 0; w < V; w++) {
+            temp += - lambda(xi_KW(k, w)) * (rho_s(k, w) + pow(rho_m(k, w), 2)) - (0.5 - 2.0 * alpha_K(k) * lmd(xi_KW(k, w)) * rho_m(k, w))
+                + xi_KW(k, w) / 2.0 - lmd(xi_KW(k, w)) * ();
+        }
+    }
+    return false;
+}
 
 /* update eta */
 bool UpdateEta(int d, mat& eta_m, mat& eta_s, mat& xi_DK, vec& alpha_D, mat& u_m, mat& a_m, vector<mat>& z, double gamma, vector<int>& N, int K, double EPS){
@@ -52,7 +65,7 @@ bool UpdateA(int d, mat& a_m, mat& a_s, mat& u_m, mat& u_s, mat& eta_m, double c
 
     vec mu_old = a_u.row(d);
     mat sigma_old = a_s;
-    
+
     if(d == 0){
         for(int k = 0; k < K; k++){
             temp1 += (u_m.row(k).t() * u_m.row(k));
@@ -81,12 +94,3 @@ bool UpdateA(int d, mat& a_m, mat& a_s, mat& u_m, mat& u_s, mat& eta_m, double c
     }
     return converge;
 }
-
-
-
-
-
-
-
-
-
