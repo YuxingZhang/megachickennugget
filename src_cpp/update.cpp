@@ -14,16 +14,20 @@ void ComputeUpSigma(mat& up_s, mat& word_embedding, double& beta, double& l, int
 
 /* TODO update z_dn */
 bool UpdateZ(int d, int n, vector<mat>& z, mat& eta_m, mat& rho_m, mat& rho_s, mat& xi_KW, mat& alpha_K,
-        vector< vector<string> >& W, map<int, string>& word2idx, int K, int V, double EPS) {
+        vector< vector<string> >& W, map<string, int>& word2idx, int K, int V, double EPS) {
     bool converge = true;
     vec z_dn_old = z[d].row(n);
 
     double temp = 0.0;
     for (int k = 0; k < K; k++) {
+        double E1 = eta_m(d, k);
         for (int w = 0; w < V; w++) {
-            temp += - lambda(xi_KW(k, w)) * (rho_s(k, w) + pow(rho_m(k, w), 2)) - (0.5 - 2.0 * alpha_K(k) * lmd(xi_KW(k, w)) * rho_m(k, w))
-                + xi_KW(k, w) / 2.0 - lmd(xi_KW(k, w)) * ();
+            temp += - lambda(xi_KW(k, w)) * (rho_s(k, w) + pow(rho_m(k, w), 2)) - (0.5 - 2.0 * alpha_K(k) * lambda(xi_KW(k, w)) * rho_m(k, w))
+                + xi_KW(k, w) / 2.0 - lambda(xi_KW(k, w)) * (pow(alpha_K(k), 2) - pow(xi_KW(k, w), 2)) - log(1.0 + exp(xi_KW(k, w)));
         }
+
+        int w_dn = W[d][n];
+        double E2 = 
     }
     return false;
 }
@@ -64,7 +68,7 @@ bool UpdateA(int d, mat& a_m, mat& a_s, mat& u_m, mat& u_s, mat& eta_m, double c
     mat temp1(DOC_DIM, DOC_DIM, fill::zeros);
     vec temp2(DOC_DIM, fill::zeros);
 
-    vec mu_old = a_u.row(d);
+    vec mu_old = a_m.row(d);
     mat sigma_old = a_s;
 
     if(d == 0){
@@ -83,15 +87,17 @@ bool UpdateA(int d, mat& a_m, mat& a_s, mat& u_m, mat& u_s, mat& eta_m, double c
     }
 
     for(int k = 0; k < K; k++){
-        if(abs(a_u(d, k) - mu_old(k)) / abs(mu_old(k)) > EPS){
+        if(abs(a_m(d, k) - mu_old(k)) / abs(mu_old(k)) > EPS){
             converge = false;
             break;
         }
     }
     if(converge){
-        if(max(abs(a_s - sigma_old) / abs(sigma_old)) > EPS){
-            converge = false;
+        /*
+        if((abs(a_s - sigma_old) / abs(sigma_old)).max() > EPS){
         }
+        */
+            converge = false;
     }
     return converge;
 }
