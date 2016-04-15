@@ -189,7 +189,7 @@ def update_u(k, U, A, Eta, kappa, gamma, doc_dim, D, eps):
     # Last checked Mar. 27 3:34pm
     converge = True
     mu_old = np.array(U['mu'][k])
-    sig_old = np.array(U['Sigma'][k])
+    sig_old = np.array(U['Sigma'])
 
     if k == 0:
         tmp1 = 0.0
