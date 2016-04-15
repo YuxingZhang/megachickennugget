@@ -33,9 +33,8 @@ bool UpdateEta(int d, mat& eta_m, mat& eta_s, mat& xi_DK, vec& alpha_D, mat& u_m
     bool converge = true;
     double temp;
 
-    vec mu_old, sigma_old;
-    mu_old = eta_m.row(d);
-    sigma_old = eta_s.row(d);
+    vec mu_old = eta_m.row(d);
+    vec sigma_old = eta_s.row(d);
 
     for(int k = 0; k < K; k++){
         eta_s(d, k) = 1.0 / (gamma + 2 * N[d] * lambda(xi_DK(d, k)));
@@ -98,11 +97,10 @@ bool UpdateA(int d, mat& a_m, mat& a_s, mat& u_m, mat& u_s, mat& eta_m, double c
 /* update rho */
 bool UpdateRho(int k, mat& rho_m, mat& rho_s, vector<mat>& z, mat& up_m, vec& alpha_K, mat& xi_KW, mat& word_embedding, vector<vector<string> >& W, map<int, string>& idx2word, double beta, int D, int N, int V, double EPS){
     bool converge = true;
-    vec mu_old, sigma_old;
     double c_kw, m_k;
 
-    mu_old = rho_m.row(k);
-    sigma_old = rho_s.row(k);
+    vec mu_old = rho_m.row(k);
+    vec sigma_old = rho_s.row(k);
 
     for(int w = 0; w < V; w++){
         c_kw = 0;
@@ -122,6 +120,26 @@ bool UpdateRho(int k, mat& rho_m, mat& rho_s, vector<mat>& z, mat& up_m, vec& al
 
     for(int w = 0; w < V; w++){
         if(max(abs(rho_m(k, w) - mu_old(w)) / abs(mu_old(w)), abs(rho_s(k, w) - sigma_old(w)) / abs(sigma_old(w))) > EPS){
+            converge = false;
+            break;
+        }
+    }
+    return converge;
+}
+
+/* update u_prime */
+bool UpdateUp(int k, mat& up_m, mat& up_s, mat& rho_m, mat& word_embedding, double beta, int V, int WORD_DIM, double EPS){
+    bool converge = true;
+   
+    vec mu_old = up_m.row(k);
+    vec temp(WORD_DIM, fill::zeros);
+    for(int w = 0; w < V; w++){
+        temp += word_embedding.row(w) * rho_m(k, w);
+    }
+    up_m.row(k) = beta * (up_s * temp);
+
+    for(int w = 0; w < V; w++){
+        if(abs(up_m(k, w) - mu_old(w)) / abs(mu_old(w)) > EPS){
             converge = false;
             break;
         }
