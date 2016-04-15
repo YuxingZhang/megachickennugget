@@ -26,13 +26,35 @@ bool UpdateZ(int d, int n, vector<mat>& z, mat& eta_m, mat& rho_m, mat& rho_s, m
                 + xi_KW(k, w) / 2.0 - lambda(xi_KW(k, w)) * (pow(alpha_K(k), 2) - pow(xi_KW(k, w), 2)) - log(1.0 + exp(xi_KW(k, w)));
         }
 
-        int w_dn = W[d][n];
-        double E2 = 
+        string w_dn = W[d][n];
+        double E2 = rho_m(k, word2idx[w_dn]) + alpha_K(k) * (V / 2.0 - 1.0) + temp;
+        z[d](n, k) = exp(E1 + E2);
     }
-    return false;
+    z[d].row(n) = normalise(z[d].row(n), 1);
+
+    for (int k = 0; k < K; k++) {
+        if (abs(z[d](n, k) - z_dn_old(k)) / abs(z_dn_old(k)) > EPS) {
+            converge = false;
+            break;
+        }
+    }
+
+    return converge;
 }
 
 /* TODO update auxiliary */
+void UpdateAuxiliary(int idx, vec& alpha, mat& xi, mat& mean, mat& sd, int sum_idx) {
+    double temp1 = 0;
+    double temp2 = 0;
+
+    for (int i = 0; i < sum_idx; i++) {
+        temp2 += lambda(xi(idx, i));
+        temp1 += lambda(xi(idx, i)) * mean(idx, i);
+        xi(idx, i) = sqrt(sd(idx, i) + pow(mean(idx, i), 2) - 2 * alpha(idx) * mean(idx, i) + pow(alpha(idx), 2));
+    }
+    alpha(idx) = (0.5 * (sum_idx / 2.0 - 1.0) + temp1) / temp2;
+    return;
+}
 
 /* update eta */
 bool UpdateEta(int d, mat& eta_m, mat& eta_s, mat& xi_DK, vec& alpha_D, mat& u_m, mat& a_m, vector<mat>& z, double gamma, vector<int>& N, int K, double EPS){
@@ -103,7 +125,7 @@ bool UpdateA(int d, mat& a_m, mat& a_s, mat& u_m, mat& u_s, mat& eta_m, double c
 }
 
 /* update rho */
-bool UpdateRho(int k, mat& rho_m, mat& rho_s, vector<mat>& z, mat& up_m, vec& alpha_K, mat& xi_KW, mat& word_embedding, vector<vector<string> >& W, map<int, string>& idx2word, double beta, int D, int N, int V, double EPS){
+bool UpdateRho(int k, mat& rho_m, mat& rho_s, vector<mat>& z, mat& up_m, vec& alpha_K, mat& xi_KW, mat& word_embedding, vector<vector<string> >& W, map<int, string>& idx2word, double beta, int D, vector<int>& N, int V, double EPS){
     bool converge = true;
     double c_kw, m_k;
 
@@ -116,9 +138,9 @@ bool UpdateRho(int k, mat& rho_m, mat& rho_s, vector<mat>& z, mat& up_m, vec& al
         for(int d = 0; d < D; d++){
             for(int n = 0; n < N[d]; n++){
                 if(!W[d][n].compare(idx2word[w])){
-                    c_kw += (Z[d])(n, k);
+                    c_kw += (z[d])(n, k);
                 }
-                m_k += (Z[d])(n, k);
+                m_k += (z[d])(n, k);
             }
         }
         rho_s(k, w) = 1.0 / (beta + 2 * m_k * lambda(xi_KW(k, w)));
