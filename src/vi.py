@@ -104,6 +104,10 @@ def load_documents(word_emb_file, corpus_file):
     word_emb = np.asarray(word_emb) # convert to numpy array
     return word_emb, word2idx, idx2word, W, N
 
+def compute_elbo():
+    res = 0.0
+    return res
+
 def run():
 #   W:                  Words in each documents, W[d][n] is the n-th word in the d-th doc
 #   N:                  A list where N[d] = Number of words in document d
@@ -153,7 +157,7 @@ def run():
     # print "ni zai"
 
     iteration = 0
-    MAX_ITER = 100
+    MAX_ITER = 3
     while iteration < MAX_ITER:
         print "iteration # " + str(iteration)
         # VI step to update variational parameters
@@ -173,15 +177,22 @@ def run():
                 for n in range(N[d]):
                     cvg = update.update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V, eps)
                     if not cvg:
+                        # print "z not converge"
                         has_converge = False
+                    else:
+                        print "z converge"
                 # update Eta
                 cvg = update.update_eta(d, Eta, Xi_DK, Alpha_D, U, A, Z, gamma, N, K, eps)
                 if not cvg:
                     has_converge = False
+                else:
+                    print "eta converge"
                 # update A
                 cvg = update.update_a(d, A, U, Eta, c, gamma, doc_dim, K, eps)
                 if not cvg:
                     has_converge = False
+                else:
+                    print "a converge"
                 update.update_auxiliary(d, Alpha_D, Xi_DK, Eta, K)  # update the auxiliary vars using in q(eta)
             # update global distributions
             print "Updating global distribution for topics"
@@ -190,20 +201,27 @@ def run():
                 cvg = update.update_rho(k, Rho, Z, U_prime, Alpha_K, Xi_KW, word_emb, W, idx2word, beta, D, N, V, eps)
                 if not cvg:
                     has_converge = False
+                else:
+                    print "rho converge"
                 # update U
                 cvg = update.update_u(k, U, A, Eta, kappa, gamma, doc_dim, D, eps)
                 if not cvg:
                     has_converge = False
+                else:
+                    print "u converge"
                 # update U_prime
                 cvg = update.update_u_prime(k, U_prime, Rho, word_emb, beta, V, eps)
                 if not cvg:
                     has_converge = False
+                else:
+                    print "u\' converge"
                 update.update_auxiliary(k, Alpha_K, Xi_KW, Rho, V)  # update the auxiliary vars using in q(z_dn) and q(rho)
 
             if has_converge:
                 break
 
         # Update parameters in the original distribution p
+        print "Updating hyperparameters in the original distribution"
         l = update.update_l(U_prime, word_dim, K)
         kappa = update.update_kappa(U, doc_dim, K)
         c = update.update_c(A, doc_dim, D)
