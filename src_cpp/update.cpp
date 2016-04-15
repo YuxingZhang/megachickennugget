@@ -94,3 +94,38 @@ bool UpdateA(int d, mat& a_m, mat& a_s, mat& u_m, mat& u_s, mat& eta_m, double c
     }
     return converge;
 }
+
+/* update rho */
+bool UpdateRho(int k, mat& rho_m, mat& rho_s, vector<mat>& z, mat& up_m, vec& alpha_K, mat& xi_KW, mat& word_embedding, vector<vector<string> >& W, map<int, string>& idx2word, double beta, int D, int N, int V, double EPS){
+    bool converge = true;
+    vec mu_old, sigma_old;
+    double c_kw, m_k;
+
+    mu_old = rho_m.row(k);
+    sigma_old = rho_s.row(k);
+
+    for(int w = 0; w < V; w++){
+        c_kw = 0;
+        m_k = 0;
+        for(int d = 0; d < D; d++){
+            for(int n = 0; n < N[d]; n++){
+                if(!W[d][n].compare(idx2word[w])){
+                    c_kw += (Z[d])(n, k);
+                }
+                m_k += (Z[d])(n, k);
+            }
+        }
+        rho_s(k, w) = 1.0 / (beta + 2 * m_k * lambda(xi_KW(k, w)));
+        rho_m(k, w) = beta * dot(word_embedding.row(w), up_m.row(k)) + c_kw - m_k * (0.5 - 2 * alpha_K(k) * lambda(xi_KW(k, w)));
+        rho_m(k, w) *= rho_s(k, w);
+    }
+
+    for(int w = 0; w < V; w++){
+        if(max(abs(rho_m(k, w) - mu_old(w)) / abs(mu_old(w)), abs(rho_s(k, w) - sigma_old(w)) / abs(sigma_old(w))) > EPS){
+            converge = false;
+            break;
+        }
+    }
+    return converge;
+}
+
