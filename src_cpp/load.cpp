@@ -1,4 +1,4 @@
-void load_files(string embedding, string corpus, double** word_embd, map<string, int>& word2idx, map<int, string>& idx2word, vector<vector<string> >& W, vector<int>& N) {
+mat load_files(string embedding, string corpus, map<string, int>& word2idx, map<int, string>& idx2word, vector<vector<string> >& W, vector<int>& N) {
     /* param:
      * embedding: file containing the word embedding results
      * corpus: file containing the original corpus
@@ -22,10 +22,8 @@ void load_files(string embedding, string corpus, double** word_embd, map<string,
 	    embd_file >> val;
 	    embedding_dim = stoi(val);
 
-	    word_embd = new double*[vocabulary_size];
-	    for(i = 0; i < vocabulary_size; i++){
-	    	word_embd[i] = new double[embedding_dim];
-	    }
+	    
+	    mat word_embd(vocabulary_size, embedding_dim);
 	    index = 0;
 	    /* store the word embedding results */
 	    while(embd_file >> val){
@@ -33,7 +31,7 @@ void load_files(string embedding, string corpus, double** word_embd, map<string,
 			idx2word[index] = val;
 	    	for(i = 0; i < embedding_dim; i++){
 	    		embd_file >> val;
-	    		word_embd[index][i] = stod(val);
+	    		word_embd(index, i) = stod(val);
 	    	}
 	    	index++;
 	    }
@@ -59,5 +57,5 @@ void load_files(string embedding, string corpus, double** word_embd, map<string,
 			}
 		}
 	}
-    return;
+    return word_embd;
 }
