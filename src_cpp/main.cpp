@@ -17,12 +17,11 @@ int main() {
     string emb_file = "../vectors.txt";
     string corpus_file = "../new_corpus.txt";
 
-    double** word_embedding;    // V * dim, each line is a vector of double
     map<string, int> word2idx;  // V
     map<int, string> idx2word;  // V
     vector< vector<string> > W; // W[d][n] is w_dn
     vector<int> N; // N[d] is the length of document d
-    load_files(emb_file, corpus_file, word_embedding, word2idx, idx2word, W, N);
+    mat word_embedding = load_files(emb_file, corpus_file, word_embedding, word2idx, idx2word, W, N); // V * dim, each line is a vector of double
 
     // some parameters
     const int V = idx2word.size(); // vocabulary size
@@ -85,7 +84,7 @@ int main() {
         iteration++;
 
         while (true) {
-            //ComputeUpSigma(up_s, word_embedding, beta, l, WORD_DIM, V);
+            ComputeUpSigma(up_s, word_embedding, beta, l, WORD_DIM, V);
 
             bool has_converge = true;
             cur_batch--;
@@ -93,7 +92,6 @@ int main() {
                 cur_batch += num_of_batch;
             }
 
-            /*
             // create a batch index set
             set<int> idx_set;
             for (int i = cur_batch * BATCH_SIZE; i < (cur_batch + 1) * BATCH_SIZE && i < random_index.size(); i++) {
@@ -105,8 +103,13 @@ int main() {
                     if (!UpdateZ(*d, n, z, eta_m)) { has_converge = false; }
                 }
                 if (!UpdateEta(*d, eta_m, eta_s, xi_DK, alpha_D, u_m, a_m, z, gamma, N, K, EPS)) { has_converge = false; }
+                if (!UpdateA(*d, a_m, a_s, u_m, u_s, eta_m, c, gamma, DOC_DIM, K, EPS)) { has_converge = false; }
+                UpdateAuxiliary(*d, alpha_D, xi_DK, eta_m, eta_s, K);
             }
-            */
+
+            for (int k = 0; k < K; k++) {
+                if (!UpdateRho(k, rho_m, rho_s, z, up_m, ))
+            }
         }
     }
     return 0;
