@@ -9,8 +9,9 @@
 using namespace std;
 using namespace arma;
 #include "load.cpp"
+#include "update.cpp"
 
-void load_files(string embedding, string corpus, double** word_embd, map<string, int>& word2idx, map<int, string>& idx2word, vector<vector<string> >& W, vector<int>& N);
+void load_files(string embedding, string corpus, mat word_embd, map<string, int>& word2idx, map<int, string>& idx2word, vector<vector<string> >& W, vector<int>& N);
 
 int main() {
     // Reading input files, including the corpus and the embedding
@@ -21,7 +22,7 @@ int main() {
     map<int, string> idx2word;  // V
     vector< vector<string> > W; // W[d][n] is w_dn
     vector<int> N; // N[d] is the length of document d
-    mat word_embedding = load_files(emb_file, corpus_file, word_embedding, word2idx, idx2word, W, N); // V * dim, each line is a vector of double
+    mat word_embedding = load_files(emb_file, corpus_file, word2idx, idx2word, W, N); // V * dim, each line is a vector of double
 
     // some parameters
     const int V = idx2word.size(); // vocabulary size
@@ -109,9 +110,18 @@ int main() {
 
             for (int k = 0; k < K; k++) {
                 if (!UpdateRho(k, rho_m, rho_s, z, up_m, alpha_K, xi_KW, word_embedding, W, idx2word, beta, D, N, V, EPS)) { has_converge = false; }
-                if (!UpdateU(k, rho_m, rho_s, z, up_m, alpha_K, xi_KW, word_embedding, W, idx2word, beta, D, N, V, EPS)) { has_converge = false; }
+                if (!UpdateU(k, u_m, u_s, a_m, a_s, eta_m, kappa, gamma, DOC_DIM, D, EPS)) { has_converge = false; }
+                if (!UpdateUp(k, up_m, up_s, rho_m, word_embedding, beta, V, EPS)) { has_converge = false; }
+                UpdateAuxiliary(k, alpha_K, xi_KW, rho_m, rho_s, V);
             }
+            if (has_converge) { break; }
         }
+
+        l = UpdateL(up_m, up_s, WORD_DIM, K);
+        kappa = UpdateKappa(u_m, u_s, DOC_DIM, K);
+        c = UpdateC(a_m, a_s, DOC_DIM, D);
+        beta = UpdateBeta(up_m, up_s, word_embedding, rho_m, rho_s, V, K);
+        gamma = UpdateGamma(eta_m, eta_s, a_m, a_s, u_m, u_s, D, K);
     }
     return 0;
 }
