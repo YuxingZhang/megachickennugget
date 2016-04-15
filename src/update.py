@@ -218,7 +218,7 @@ def compute_u_prime_sigma(U_prime, word_emb, beta, l, word_dim, V):
     # Update U'['Sigma'] only at the start of VI by Eq. (6)
     tmp = 0.0
     for w in range(V):
-        tmp += np.dot(word_emb[w], word_emb[w].transpose())
+        tmp += np.outer(word_emb[w], word_emb[w].transpose())
     U_prime['Sigma'] = inv(l * np.identity(word_dim) + beta * tmp)
 
 def update_l(U_prime, word_dim, K):
