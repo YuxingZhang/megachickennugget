@@ -208,11 +208,25 @@ double UpdateC(mat& a_m, mat& a_s, int DOC_DIM, int D){
 }
 
 /* update beta */
-double UpdateBeta(mat& up_m, mat& up_s, mat& word_embedding, mat& rho_m, mat& rho_s, V, K){
+double UpdateBeta(mat& up_m, mat& up_s, mat& word_embedding, mat& rho_m, mat& rho_s, int V, int K){
+    double temp = 0;
 
+    for(int k = 0; k < K; k++){
+        for(int w = 0; w < V; w++){
+            temp += (trace((up_m.row(k).t() * up_m.row(k) + up_s) * (word_embedding.row(w).t() * word_embedding.row(w))) + pow(rho_m(k, w), 2) + rho_s(k, w) - 2 * dot(word_embedding.row(w), up_m.row(k)) * rho_m(k, w));
+        }
+    }
+    return K * V / temp;
 }
     
 /* update gamma */
-double UpdateGamma(eta_m, eta_s, a_m, a_s, u_m, u_s, D, K){
-
+double UpdateGamma(mat& eta_m, mat& eta_s, mat& a_m, mat& a_s, mat& u_m, mat& u_s, int D, int K){
+    double temp = 0;
+    for(int d = 0; d < D; d++){
+        for(int k = 0; k < K; k++){
+            temp += (pow(eta_m(d, k), 2) + eta_s(d, k) - 2 * eta_m(d, k) * dot(u_m.row(k), a_m.row(d)) + trace((a_m.row(d).t() * a_m.row(d) + a_s) * (u_m.row(k).t() * u_m.row(k) + u_s)));
+        }
+    }
+   return D * K / temp;
 }
+
