@@ -150,7 +150,41 @@ bool UpdateUp(int k, mat& up_m, mat& up_s, mat& rho_m, mat& word_embedding, doub
 }
 
 /* update l */
-void UpdateL(up_m, up_s, WORD_DIM, K){
+double UpdateL(mat& up_m, mat& up_s, int WORD_DIM, int K){
+    double temp = 0;
 
+    for(int k = 0; k < K; k++){
+        temp += dot(up_m.row(k), up_m.row(k));
+    }
+    return K * WORD_DIM / (temp + K * trace(up_s));
 }
 
+/* update kappa */
+double UpdateKappa(mat& u_m, mat& u_s, int DOC_DIM, int K){
+    double temp = 0;
+
+    for(int k = 0; k < K; k++){
+        temp += dot(u_m.row(k), u_m.row(k));
+    }
+    return K * DOC_DIM / (temp + K * trace(u_s));
+}
+
+/* update c */
+double UpdateC(mat& a_m, mat& a_s, int DOC_DIM, int D){
+    double temp = 0;
+
+    for(int d = 0; d < D; d++){
+        temp += dot(a_m.row(d), a_m.row(d));
+    }
+    return D * DOC_DIM / (temp + D * trace(a_s));
+}
+
+/* update beta */
+double UpdateBeta(mat& up_m, mat& up_s, mat& word_embedding, mat& rho_m, mat& rho_s, V, K){
+
+}
+    
+/* update gamma */
+double UpdateGamma(eta_m, eta_s, a_m, a_s, u_m, u_s, D, K){
+
+}
