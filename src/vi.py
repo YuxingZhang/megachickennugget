@@ -164,6 +164,7 @@ def run():
         while True: # while not converge
             # TODO precompute Sigma^{(u')*} by Eq. 9
             update.compute_u_prime_sigma(U_prime, word_emb, beta, l, word_dim, V)
+            print "current_iteration = " + str(iteration)
             print "current_batch = " + str(current_batch)
             has_converge = True
             # randomly sample a batch of document B
@@ -229,6 +230,28 @@ def run():
         gamma = update.update_gamma(Eta, A, U, D, K)
 
         iteration += 1
+        # print_topwords(Rho, K, idx2word)
+
+    # nothiscannothappen = 0;
+    print_topwords(Rho, K, idx2word)
+    print_toptopics(Eta, D)
+
+
+def print_topwords(Rho, K, idx2word):
+    for k in range(K):
+        print "Top words in topic " + str(k) + ":\n"
+        l = Rho['mu'][k]
+        top_list = l.argsort()[0:4]
+        for idx in top_list:
+            print idx2word[idx] + "\n"
+
+def print_toptopics(Eta, D):
+    for d in range(D):
+        print "Top topics in document " + str(d) + ":\n"
+        l = Eta['mu'][d]
+        top_list = l.argsort()[0:2]
+        for idx in top_list:
+            print "Topic index " + str[idx] + "\n"
 
 if __name__ == "__main__":
     warnings.filterwarnings("ignore", category=DeprecationWarning)
