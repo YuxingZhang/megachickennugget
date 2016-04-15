@@ -15,29 +15,29 @@ mat load_files(string embedding, string corpus, map<string, int>& word2idx, map<
 
     /* read in the word embedding file */
     embd_file.open(embedding.c_str());
-    if(embd_file.is_open()){
-    	/* record the vocabulary size and embedding dimension */
-    	embd_file >> val;
-	    vocabulary_size = stoi(val);
-	    embd_file >> val;
-	    embedding_dim = stoi(val);
-
-	    
-	    mat word_embd(vocabulary_size, embedding_dim);
-	    index = 0;
-	    /* store the word embedding results */
-	    while(embd_file >> val){
-			word2idx[val] = index;
-			idx2word[index] = val;
-	    	for(i = 0; i < embedding_dim; i++){
-	    		embd_file >> val;
-	    		word_embd(index, i) = stod(val);
-	    	}
-	    	index++;
+    if(!embd_file.is_open()){
+    	return mat(1, 1);
+    }
+    /* record the vocabulary size and embedding dimension */
+   	embd_file >> val;
+	vocabulary_size = stoi(val);
+	embd_file >> val;
+	embedding_dim = stoi(val);
+ 
+	mat word_embd(vocabulary_size, embedding_dim);
+	index = 0;
+	/* store the word embedding results */
+	while(embd_file >> val){
+		word2idx[val] = index;
+		idx2word[index] = val;
+	    for(i = 0; i < embedding_dim; i++){
+	    	embd_file >> val;
+	    	word_embd(index, i) = stod(val);
 	    }
-	    embd_file.close();
+	    index++;
 	}
-
+	embd_file.close();
+	
 	ifstream corpus_file;
 	corpus_file.open(corpus.c_str());
 	
