@@ -16,7 +16,7 @@ void ComputeUpSigma(mat& up_s, mat& word_embedding, double& beta, double& l, int
 
 
 /* update eta */
-bool UpdateEta(int d, mat& eta_m, mat& eta_s, mat& xi_DK, vec& alpha_D, mat& u_m, mat& a_m, vector<mat>& z, double& gamma, vector<int> N, int K, double EPS){
+bool UpdateEta(int d, mat& eta_m, mat& eta_s, mat& xi_DK, vec& alpha_D, mat& u_m, mat& a_m, vector<mat>& z, double gamma, vector<int>& N, int K, double EPS){
     bool converge = true;
     double temp;
 
@@ -44,3 +44,7 @@ bool UpdateEta(int d, mat& eta_m, mat& eta_s, mat& xi_DK, vec& alpha_D, mat& u_m
     return converge;
 }
 
+/* update a */
+bool UpdateA(int d, mat& a_m, mat& a_s, mat& u_m, mat& u_s, mat& eta_m, double c, double gamma, int DOC_DIM, int K, double EPS){
+
+}
