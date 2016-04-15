@@ -47,9 +47,8 @@ int main() {
         z.push_back(tmp);
     }
 
-    // flag is diagonal or not
     mat eta_m(D, K, fill::randu); // mean of eta
-    mat eta_s(D, K); // sigma of eta
+    mat eta_s(D, K, fill::randu); // sigma of eta
 
     mat a_m(D, DOC_DIM, fill::randu);
     mat a_s = diagmat(vec(DOC_DIM, fill::randu)); // all a_d share the same matrix
