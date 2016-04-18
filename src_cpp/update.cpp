@@ -4,6 +4,7 @@ double lambda(double xi){
 
 /* update U' sigma */
 void ComputeUpSigma(mat& up_s, mat& word_embedding, double& beta, double& l, int WORD_DIM, int V){
+    //cout << "ComputeUpSigma" << endl;
     mat temp(WORD_DIM, WORD_DIM, fill::zeros);
     for(int i = 0; i < V; i++){
         temp += (word_embedding.row(i).t() * word_embedding.row(i));
@@ -15,8 +16,10 @@ void ComputeUpSigma(mat& up_s, mat& word_embedding, double& beta, double& l, int
 /* TODO update z_dn */
 bool UpdateZ(int d, int n, vector<mat>& z, mat& eta_m, mat& rho_m, mat& rho_s, mat& xi_KW, mat& alpha_K,
         vector< vector<string> >& W, map<string, int>& word2idx, int K, int V, double EPS) {
+    //cout << "UpdateZ" << endl;
     bool converge = true;
-    vec z_dn_old = z[d].row(n);
+    vec z_dn_old = z[d].row(n).t();
+    //cout << "UpdateZ1" << endl;
 
     double temp = 0.0;
     for (int k = 0; k < K; k++) {
@@ -30,7 +33,9 @@ bool UpdateZ(int d, int n, vector<mat>& z, mat& eta_m, mat& rho_m, mat& rho_s, m
         double E2 = rho_m(k, word2idx[w_dn]) + alpha_K(k) * (V / 2.0 - 1.0) + temp;
         z[d](n, k) = exp(E1 + E2);
     }
+    //cout << "UpdateZ2" << endl;
     z[d].row(n) = normalise(z[d].row(n), 1);
+    //cout << "UpdateZ3" << endl;
 
     for (int k = 0; k < K; k++) {
         if (abs(z[d](n, k) - z_dn_old(k)) / abs(z_dn_old(k)) > EPS) {
@@ -38,12 +43,12 @@ bool UpdateZ(int d, int n, vector<mat>& z, mat& eta_m, mat& rho_m, mat& rho_s, m
             break;
         }
     }
-
     return converge;
 }
 
 /* TODO update auxiliary */
 void UpdateAuxiliary(int idx, vec& alpha, mat& xi, mat& mean, mat& sd, int sum_idx) {
+    //cout << "UpdateAuxiliary" << endl;
     double temp1 = 0;
     double temp2 = 0;
 
@@ -58,11 +63,12 @@ void UpdateAuxiliary(int idx, vec& alpha, mat& xi, mat& mean, mat& sd, int sum_i
 
 /* update eta */
 bool UpdateEta(int d, mat& eta_m, mat& eta_s, mat& xi_DK, vec& alpha_D, mat& u_m, mat& a_m, vector<mat>& z, double gamma, vector<int>& N, int K, double EPS){
+    //cout << "UpdateEta" << endl;
     bool converge = true;
     double temp;
 
-    vec mu_old = eta_m.row(d);
-    vec sigma_old = eta_s.row(d);
+    vec mu_old = eta_m.row(d).t();
+    vec sigma_old = eta_s.row(d).t();
 
     for(int k = 0; k < K; k++){
         eta_s(d, k) = 1.0 / (gamma + 2 * N[d] * lambda(xi_DK(d, k)));
@@ -80,57 +86,59 @@ bool UpdateEta(int d, mat& eta_m, mat& eta_s, mat& xi_DK, vec& alpha_D, mat& u_m
             break;
         }
     }
-
     return converge;
 }
 
 /* update a */
 bool UpdateA(int d, mat& a_m, mat& a_s, mat& u_m, mat& u_s, mat& eta_m, double c, double gamma, int DOC_DIM, int K, double EPS){
+    //cout << "UpdateA" << endl;
     bool converge = true;
     mat temp1(DOC_DIM, DOC_DIM, fill::zeros);
     vec temp2(DOC_DIM, fill::zeros);
 
-    vec mu_old = a_m.row(d);
+    //cout << "UpdateA1" << endl;
+    vec mu_old = a_m.row(d).t();
+    //cout << "UpdateA2" << endl;
     mat sigma_old = a_s;
+    //cout << "UpdateA3" << endl;
 
-    if(d == 0){
-        for(int k = 0; k < K; k++){
+    if(d == 0) {
+        for(int k = 0; k < K; k++) {
             temp1 += (u_m.row(k).t() * u_m.row(k));
             temp2 += (eta_m(d, k) * u_m.row(k).t());
         }
         a_s = (gamma * temp1 + gamma * K * u_s + c * eye(DOC_DIM, DOC_DIM)).i();
-        a_m.row(d) = gamma * (a_s * temp2);
-    }
-    else{
-        for(int k = 0; k < K; k++){
+        a_m.row(d) = gamma * (a_s * temp2).t();
+    } else {
+        for(int k = 0; k < K; k++) {
             temp2 += (eta_m(d, k) * u_m.row(k).t());
         }
-        a_m.row(d) = gamma * (a_s * temp2);
+        a_m.row(d) = gamma * (a_s * temp2).t();
     }
 
-    for(int k = 0; k < K; k++){
-        if(abs(a_m(d, k) - mu_old(k)) / abs(mu_old(k)) > EPS){
+    for(int k = 0; k < K; k++) {
+        if(abs(a_m(d, k) - mu_old(k)) / abs(mu_old(k)) > EPS) {
             converge = false;
             break;
         }
     }
-    if(converge){
-        /*
-        if((abs(a_s - sigma_old) / abs(sigma_old)).max() > EPS){
-        }
-        */
+    if (converge) {
+        mat dif = abs(a_s - sigma_old) / abs(sigma_old);
+        if(dif.max() > EPS) {
             converge = false;
+        }
     }
     return converge;
 }
 
 /* update rho */
 bool UpdateRho(int k, mat& rho_m, mat& rho_s, vector<mat>& z, mat& up_m, vec& alpha_K, mat& xi_KW, mat& word_embedding, vector<vector<string> >& W, map<int, string>& idx2word, double beta, int D, vector<int>& N, int V, double EPS){
+    //cout << "UpdateRho" << endl;
     bool converge = true;
     double c_kw, m_k;
 
-    vec mu_old = rho_m.row(k);
-    vec sigma_old = rho_s.row(k);
+    vec mu_old = rho_m.row(k).t();
+    vec sigma_old = rho_s.row(k).t();
 
     for(int w = 0; w < V; w++){
         c_kw = 0;
@@ -149,7 +157,7 @@ bool UpdateRho(int k, mat& rho_m, mat& rho_s, vector<mat>& z, mat& up_m, vec& al
     }
 
     for(int w = 0; w < V; w++){
-        if(max(abs(rho_m(k, w) - mu_old(w)) / abs(mu_old(w)), abs(rho_s(k, w) - sigma_old(w)) / abs(sigma_old(w))) > EPS){
+        if(std::max(abs(rho_m(k, w) - mu_old(w)) / abs(mu_old(w)), abs(rho_s(k, w) - sigma_old(w)) / abs(sigma_old(w))) > EPS){
             converge = false;
             break;
         }
@@ -157,16 +165,54 @@ bool UpdateRho(int k, mat& rho_m, mat& rho_s, vector<mat>& z, mat& up_m, vec& al
     return converge;
 }
 
+/* update u */
+bool UpdateU(int k, mat& u_m, mat& u_s, mat& a_m, mat& a_s, mat& eta_m, double kappa, double gamma, int DOC_DIM, int D, int EPS) {
+    //cout << "UpdateU" << endl;
+    bool converge = true;
+
+    vec mu_old = u_m.row(k).t();
+    mat sigma_old = u_s;
+
+    if (k == 0) {
+        mat temp1(DOC_DIM, DOC_DIM, fill::zeros);
+        for (int d = 0; d < D; d++) {
+            temp1 += a_m.row(d).t() * a_m.row(d);
+        }
+        u_s = (kappa * mat(DOC_DIM, DOC_DIM, fill::eye) + gamma * D * a_s + gamma * temp1).i();
+    }
+    vec temp2(DOC_DIM, fill::zeros);
+    for (int d = 0; d < D; d++) {
+        temp2 += eta_m(d, k) * a_m.row(d).t(); // col vec
+    }
+    u_m.row(k) = gamma * (u_s * temp2).t();
+
+    for (int d = 0; d < D; d++) {
+        if (abs(u_m(k, d) - mu_old(d)) / abs(mu_old(d)) > EPS) {
+            converge = false;
+            break;
+        }
+    }
+
+    if (converge) {
+        mat dif = abs(u_s - sigma_old) / abs(sigma_old);
+        if (dif.max() > EPS) {
+            converge = false;
+        }
+    }
+    return converge;
+}
+
 /* update u_prime */
 bool UpdateUp(int k, mat& up_m, mat& up_s, mat& rho_m, mat& word_embedding, double beta, int WORD_DIM, int V, double EPS){
+    //cout << "UpdateUp" << endl;
     bool converge = true;
    
-    vec mu_old = up_m.row(k);
+    vec mu_old = up_m.row(k).t();
     vec temp(WORD_DIM, fill::zeros);
     for(int w = 0; w < V; w++){
-        temp += word_embedding.row(w) * rho_m(k, w);
+        temp += (word_embedding.row(w) * rho_m(k, w)).t();
     }
-    up_m.row(k) = beta * (up_s * temp);
+    up_m.row(k) = beta * (up_s * temp).t();
 
     for(int w = 0; w < V; w++){
         if(abs(up_m(k, w) - mu_old(w)) / abs(mu_old(w)) > EPS){
@@ -179,6 +225,7 @@ bool UpdateUp(int k, mat& up_m, mat& up_s, mat& rho_m, mat& word_embedding, doub
 
 /* update l */
 double UpdateL(mat& up_m, mat& up_s, int WORD_DIM, int K){
+    //cout << "UpdateL" << endl;
     double temp = 0;
 
     for(int k = 0; k < K; k++){
@@ -189,6 +236,7 @@ double UpdateL(mat& up_m, mat& up_s, int WORD_DIM, int K){
 
 /* update kappa */
 double UpdateKappa(mat& u_m, mat& u_s, int DOC_DIM, int K){
+    //cout << "UpdateKappa" << endl;
     double temp = 0;
 
     for(int k = 0; k < K; k++){
@@ -199,6 +247,7 @@ double UpdateKappa(mat& u_m, mat& u_s, int DOC_DIM, int K){
 
 /* update c */
 double UpdateC(mat& a_m, mat& a_s, int DOC_DIM, int D){
+    //cout << "UpdateC" << endl;
     double temp = 0;
 
     for(int d = 0; d < D; d++){
@@ -209,6 +258,7 @@ double UpdateC(mat& a_m, mat& a_s, int DOC_DIM, int D){
 
 /* update beta */
 double UpdateBeta(mat& up_m, mat& up_s, mat& word_embedding, mat& rho_m, mat& rho_s, int V, int K){
+    //cout << "UpdateBeta" << endl;
     double temp = 0;
 
     for(int k = 0; k < K; k++){
@@ -221,6 +271,7 @@ double UpdateBeta(mat& up_m, mat& up_s, mat& word_embedding, mat& rho_m, mat& rh
     
 /* update gamma */
 double UpdateGamma(mat& eta_m, mat& eta_s, mat& a_m, mat& a_s, mat& u_m, mat& u_s, int D, int K){
+    //cout << "UpdateGamma" << endl;
     double temp = 0;
     for(int d = 0; d < D; d++){
         for(int k = 0; k < K; k++){

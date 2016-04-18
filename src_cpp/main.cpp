@@ -68,10 +68,9 @@ int main() {
     mat xi_DK(D, K, fill::randu); // used in lower bound of eta_d
     vec alpha_D(D, fill::randu);
 
-
     // train for each batch
     vector<int> random_index;
-    for (int i = 0; i < W.size(); i++) {
+    for (size_t i = 0; i < W.size(); i++) {
         random_index.push_back(i);
     }
     random_shuffle(random_index.begin(), random_index.end());
@@ -96,7 +95,7 @@ int main() {
 
             // create a batch index set
             set<int> idx_set;
-            for (int i = cur_batch * BATCH_SIZE; i < (cur_batch + 1) * BATCH_SIZE && i < random_index.size(); i++) {
+            for (int i = cur_batch * BATCH_SIZE; i < (cur_batch + 1) * BATCH_SIZE && i < (int)random_index.size(); i++) {
                 idx_set.insert(random_index[i]);
             }
 
