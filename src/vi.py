@@ -4,6 +4,7 @@ import update
 from sklearn.preprocessing import normalize
 import warnings
 
+
 # Input: 
 #   Documents {B_1,...,B_D}
 # Output:
@@ -177,6 +178,7 @@ def run():
             for d in B:
                 for n in range(N[d]):
                     cvg = update.update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V, eps)
+                    print "z update"
                     if not cvg:
                         # print "z not converge"
                         has_converge = False
