@@ -131,8 +131,8 @@ def run():
     K = 10 # number of topics
     V = 0 # 
     D = 0 #
-    word_dim = 200
-    doc_dim = 100 # embedding space dimension of document
+    word_dim = 50
+    doc_dim = 50 # embedding space dimension of document
 
     print "hello"
 
