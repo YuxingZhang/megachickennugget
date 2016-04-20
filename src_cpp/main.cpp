@@ -28,9 +28,9 @@ int main() {
     // some parameters
     const int V = idx2word.size(); // vocabulary size
     const int D = W.size(); // number of documents
-    const int K = 10; // number of topics
-    const int WORD_DIM = 200; // dimension of word embedding
-    const int DOC_DIM = 100;// dimension of document embedding
+    const int K = 50; // number of topics
+    const int WORD_DIM = 20; // dimension of word embedding
+    const int DOC_DIM = 10;// dimension of document embedding
 
     // model parameters, changed in the M step
     double l = 1.0; 
@@ -75,7 +75,7 @@ int main() {
     }
     random_shuffle(random_index.begin(), random_index.end());
     const int BATCH_SIZE = 20;
-    const double EPS = 0.01;
+    const double EPS = 0.1;
     int num_of_batch = (int)((random_index.size() + BATCH_SIZE 
             - 1) / BATCH_SIZE);
     int cur_batch = num_of_batch;
@@ -84,7 +84,11 @@ int main() {
     while (true) {
         iteration++;
 
+        int inner_iteration = 0;
+
         while (true) {
+            inner_iteration++;
+            cout << inner_iteration << endl;
             ComputeUpSigma(up_s, word_embedding, beta, l, WORD_DIM, V);
 
             bool has_converge = true;

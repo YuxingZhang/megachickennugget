@@ -13,7 +13,7 @@ void ComputeUpSigma(mat& up_s, mat& word_embedding, double& beta, double& l, int
     return;
 }
 
-/* TODO update z_dn */
+/* update z_dn */
 bool UpdateZ(int d, int n, vector<mat>& z, mat& eta_m, mat& rho_m, mat& rho_s, mat& xi_KW, mat& alpha_K,
         vector< vector<string> >& W, map<string, int>& word2idx, int K, int V, double EPS) {
     //cout << "UpdateZ" << endl;
@@ -43,19 +43,22 @@ bool UpdateZ(int d, int n, vector<mat>& z, mat& eta_m, mat& rho_m, mat& rho_s, m
             break;
         }
     }
+    if (converge) { cout << "==== Z converge ==================" << endl; }
     return converge;
 }
 
-/* TODO update auxiliary */
-void UpdateAuxiliary(int idx, vec& alpha, mat& xi, mat& mean, mat& sd, int sum_idx) {
+/* update auxiliary */
+void UpdateAuxiliary(int idx, vec& alpha, mat& xi, mat& mu, mat& sd, int sum_idx) {
     //cout << "UpdateAuxiliary" << endl;
     double temp1 = 0;
     double temp2 = 0;
 
     for (int i = 0; i < sum_idx; i++) {
-        temp2 += lambda(xi(idx, i));
-        temp1 += lambda(xi(idx, i)) * mean(idx, i);
-        xi(idx, i) = sqrt(sd(idx, i) + pow(mean(idx, i), 2) - 2 * alpha(idx) * mean(idx, i) + pow(alpha(idx), 2));
+        double temp = lambda(xi(idx, i));
+        double temp_mu = mu(idx, i);
+        temp2 += temp;
+        temp1 += temp * temp_mu;
+        xi(idx, i) = sqrt(sd(idx, i) + pow(temp_mu, 2) - 2 * alpha(idx) * temp_mu + pow(alpha(idx), 2));
     }
     alpha(idx) = (0.5 * (sum_idx / 2.0 - 1.0) + temp1) / temp2;
     return;
@@ -71,12 +74,13 @@ bool UpdateEta(int d, mat& eta_m, mat& eta_s, mat& xi_DK, vec& alpha_D, mat& u_m
     vec sigma_old = eta_s.row(d).t();
 
     for(int k = 0; k < K; k++){
-        eta_s(d, k) = 1.0 / (gamma + 2 * N[d] * lambda(xi_DK(d, k)));
-        temp = 0;
+        double lambda_xi = lambda(xi_DK(d, k));
+        eta_s(d, k) = 1.0 / (gamma + 2 * N[d] * lambda_xi);
+        temp = 0; // sum of z_dn_k
         for(int n = 0; n < N[d]; n++){
             temp += (z[d])(n, k);
         }
-        eta_m(d, k) = gamma * dot(u_m.row(k), a_m.row(d)) + N[d] * (2 * alpha_D(d) * lambda(xi_DK(d, k)) - 0.5) + temp;
+        eta_m(d, k) = gamma * dot(u_m.row(k), a_m.row(d)) + N[d] * (2 * alpha_D(d) * lambda_xi - 0.5) + temp;
         eta_m(d, k) *= eta_s(d, k);
     }
 
@@ -86,6 +90,7 @@ bool UpdateEta(int d, mat& eta_m, mat& eta_s, mat& xi_DK, vec& alpha_D, mat& u_m
             break;
         }
     }
+    if (converge) { cout << "============ Eta converge ==================" << endl; }
     return converge;
 }
 
@@ -116,7 +121,7 @@ bool UpdateA(int d, mat& a_m, mat& a_s, mat& u_m, mat& u_s, mat& eta_m, double c
         a_m.row(d) = gamma * (a_s * temp2).t();
     }
 
-    for(int k = 0; k < K; k++) {
+    for(int k = 0; k < DOC_DIM; k++) {
         if(abs(a_m(d, k) - mu_old(k)) / abs(mu_old(k)) > EPS) {
             converge = false;
             break;
@@ -128,6 +133,7 @@ bool UpdateA(int d, mat& a_m, mat& a_s, mat& u_m, mat& u_s, mat& eta_m, double c
             converge = false;
         }
     }
+    if (converge) { cout << "================ A converge ==================" << endl; }
     return converge;
 }
 
@@ -151,8 +157,9 @@ bool UpdateRho(int k, mat& rho_m, mat& rho_s, vector<mat>& z, mat& up_m, vec& al
                 m_k += (z[d])(n, k);
             }
         }
-        rho_s(k, w) = 1.0 / (beta + 2 * m_k * lambda(xi_KW(k, w)));
-        rho_m(k, w) = beta * dot(word_embedding.row(w), up_m.row(k)) + c_kw - m_k * (0.5 - 2 * alpha_K(k) * lambda(xi_KW(k, w)));
+        double lambda_xi = lambda(xi_KW(k, w));
+        rho_s(k, w) = 1.0 / (beta + 2 * m_k * lambda_xi);
+        rho_m(k, w) = beta * dot(word_embedding.row(w), up_m.row(k)) + c_kw - m_k * (0.5 - 2 * alpha_K(k) * lambda_xi);
         rho_m(k, w) *= rho_s(k, w);
     }
 
@@ -162,6 +169,7 @@ bool UpdateRho(int k, mat& rho_m, mat& rho_s, vector<mat>& z, mat& up_m, vec& al
             break;
         }
     }
+    if (converge) { cout << "===================== Rho converge ==================" << endl; }
     return converge;
 }
 
@@ -186,7 +194,7 @@ bool UpdateU(int k, mat& u_m, mat& u_s, mat& a_m, mat& a_s, mat& eta_m, double k
     }
     u_m.row(k) = gamma * (u_s * temp2).t();
 
-    for (int d = 0; d < D; d++) {
+    for (int d = 0; d < DOC_DIM; d++) {
         if (abs(u_m(k, d) - mu_old(d)) / abs(mu_old(d)) > EPS) {
             converge = false;
             break;
@@ -199,6 +207,7 @@ bool UpdateU(int k, mat& u_m, mat& u_s, mat& a_m, mat& a_s, mat& eta_m, double k
             converge = false;
         }
     }
+    if (converge) { cout << "================================= U converge ==================" << endl; }
     return converge;
 }
 
@@ -214,12 +223,13 @@ bool UpdateUp(int k, mat& up_m, mat& up_s, mat& rho_m, mat& word_embedding, doub
     }
     up_m.row(k) = beta * (up_s * temp).t();
 
-    for(int w = 0; w < V; w++){
+    for(int w = 0; w < WORD_DIM; w++){
         if(abs(up_m(k, w) - mu_old(w)) / abs(mu_old(w)) > EPS){
             converge = false;
             break;
         }
     }
+    if (converge) { cout << "============================================ Up converge ==================" << endl; }
     return converge;
 }
 
@@ -262,8 +272,9 @@ double UpdateBeta(mat& up_m, mat& up_s, mat& word_embedding, mat& rho_m, mat& rh
     double temp = 0;
 
     for(int k = 0; k < K; k++){
+        mat cov = up_m.row(k).t() * up_m.row(k) + up_s;
         for(int w = 0; w < V; w++){
-            temp += (trace((up_m.row(k).t() * up_m.row(k) + up_s) * (word_embedding.row(w).t() * word_embedding.row(w))) + pow(rho_m(k, w), 2) + rho_s(k, w) - 2 * dot(word_embedding.row(w), up_m.row(k)) * rho_m(k, w));
+            temp += (trace(cov * (word_embedding.row(w).t() * word_embedding.row(w))) + pow(rho_m(k, w), 2) + rho_s(k, w) - 2 * dot(word_embedding.row(w), up_m.row(k)) * rho_m(k, w));
         }
     }
     return K * V / temp;
@@ -274,8 +285,9 @@ double UpdateGamma(mat& eta_m, mat& eta_s, mat& a_m, mat& a_s, mat& u_m, mat& u_
     //cout << "UpdateGamma" << endl;
     double temp = 0;
     for(int d = 0; d < D; d++){
+        mat cov = a_m.row(d).t() * a_m.row(d) + a_s;
         for(int k = 0; k < K; k++){
-            temp += (pow(eta_m(d, k), 2) + eta_s(d, k) - 2 * eta_m(d, k) * dot(u_m.row(k), a_m.row(d)) + trace((a_m.row(d).t() * a_m.row(d) + a_s) * (u_m.row(k).t() * u_m.row(k) + u_s)));
+            temp += (pow(eta_m(d, k), 2) + eta_s(d, k) - 2 * eta_m(d, k) * dot(u_m.row(k), a_m.row(d)) + trace(cov * (u_m.row(k).t() * u_m.row(k) + u_s)));
         }
     }
    return D * K / temp;
