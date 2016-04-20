@@ -131,13 +131,13 @@ def run():
     K = 10 # number of topics
     V = 0 # 
     D = 0 #
-    word_dim = 50
-    doc_dim = 50 # embedding space dimension of document
+    word_dim = 20
+    doc_dim = 10 # embedding space dimension of document
 
-    print "hello"
+    print "Starting..."
 
-    word_emb_input = '../vectors.txt' # TODO
-    corpus_input = '../new_corpus.txt' # TODO
+    word_emb_input = '../vectors_bloomberg.txt' # TODO
+    corpus_input = '../corpus_bloomberg.txt' # TODO
     (word_emb, word2idx, idx2word, W, N) = load_documents(word_emb_input, corpus_input)
 
     # setting the vocabulary size
@@ -150,8 +150,8 @@ def run():
     # print "kan wo"
 
     random_idx = np.random.permutation(len(W))
-    batch_size = 20
-    eps = 0.01
+    batch_size = 5
+    eps = 0.1
     number_of_batch = int((len(random_idx) + batch_size - 1) / batch_size)
     current_batch = number_of_batch
 
@@ -162,11 +162,14 @@ def run():
     while iteration < MAX_ITER:
         print "iteration # " + str(iteration)
         # VI step to update variational parameters
+        inner_iter = 0
         while True: # while not converge
             # TODO precompute Sigma^{(u')*} by Eq. 9
             update.compute_u_prime_sigma(U_prime, word_emb, beta, l, word_dim, V)
             print "current_iteration = " + str(iteration)
             print "current_batch = " + str(current_batch)
+            print "inner_iter = " + str(inner_iter)
+            inner_iter += 1
             has_converge = True
             # randomly sample a batch of document B
             current_batch -= 1
@@ -178,7 +181,7 @@ def run():
             for d in B:
                 for n in range(N[d]):
                     cvg = update.update_z(d, n, Z, Eta, Rho, Xi_KW, Alpha_K, W, word2idx, K, V, eps)
-                    print "z update"
+                    # print "z update"
                     if not cvg:
                         # print "z not converge"
                         has_converge = False

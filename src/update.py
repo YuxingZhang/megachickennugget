@@ -123,8 +123,8 @@ def update_a(d, A, U, Eta, c, gamma, doc_dim, K, eps):
             tmp2 += Eta['mu'][d][k] * U['mu'][k]
         A['mu'][d] = gamma * np.dot(A['Sigma'], tmp2)
 
-    for k in range(K):
-        if abs(A['mu'][d][k] - mu_old[k]) / abs(mu_old[k]) > eps:
+    for i in range(doc_dim):
+        if abs(A['mu'][d][i] - mu_old[i]) / abs(mu_old[i]) > eps:
             converge = False
             break
     if converge:
@@ -172,8 +172,8 @@ def update_u_prime(k, U_prime, Rho, word_emb, beta, V, eps):
         tmp += word_emb[w] * Rho['mu'][k][w]
     U_prime['mu'][k] = beta * np.dot(U_prime['Sigma'], tmp)
 
-    for w in range(V):
-        if abs(U_prime['mu'][k][w] - mu_old[w]) / abs(mu_old[w]) > eps:
+    for i in range(len(word_emb[0])):
+        if abs(U_prime['mu'][k][i] - mu_old[i]) / abs(mu_old[i]) > eps:
             converge = False
             break
     return converge
@@ -200,8 +200,8 @@ def update_u(k, U, A, Eta, kappa, gamma, doc_dim, D, eps):
             tmp2 += Eta['mu'][d][k] * A['mu'][d]
         U['mu'][k] = gamma * np.dot(U['Sigma'], tmp2)
 
-    for d in range(D):
-        if abs(U['mu'][k][d] - mu_old[d]) / abs(mu_old[d]) > eps:
+    for i in range(doc_dim):
+        if abs(U['mu'][k][i] - mu_old[i]) / abs(mu_old[i]) > eps:
             converge = False
             break
     if converge:
