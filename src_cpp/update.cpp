@@ -145,13 +145,6 @@ bool UpdateA(int d, mat& a_m, mat& a_s, mat& u_m, mat& u_s, mat& eta_m, double c
         }
     }
 
-    // if (converge) {
-    //     mat dif = abs(a_s - sigma_old) / abs(sigma_old);
-    //     if(dif.max() > EPS) {
-    //         converge = false;
-    //     }
-    // }
-
     if (converge) { cout << "================ A converge ==================" << endl; }
     return converge;
 }
@@ -198,7 +191,7 @@ bool UpdateRho(int k, mat& rho_m, mat& rho_s, vector<mat>& z, mat& up_m, vec& al
 }
 
 /* update u */
-bool UpdateU(int k, mat& u_m, mat& u_s, mat& a_m, mat& a_s, mat& eta_m, double kappa, double gamma, int DOC_DIM, int D, int EPS) {
+bool UpdateU(int k, mat& u_m, mat& u_s, mat& a_m, mat& a_s, mat& eta_m, double kappa, double gamma, int DOC_DIM, int D, double EPS) {
     //cout << "UpdateU" << endl;
     bool converge = true;
 
@@ -239,12 +232,6 @@ bool UpdateU(int k, mat& u_m, mat& u_s, mat& a_m, mat& a_s, mat& eta_m, double k
         }
     }
 
-    // if (converge) {
-    //     mat dif = abs(u_s - sigma_old) / abs(sigma_old);
-    //     if (dif.max() > EPS) {
-    //         converge = false;
-    //     }
-    // }
     if (converge) { cout << "================================= U converge ==================" << endl; }
     return converge;
 }

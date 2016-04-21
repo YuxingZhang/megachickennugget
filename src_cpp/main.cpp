@@ -81,7 +81,8 @@ int main() {
     int cur_batch = num_of_batch;
 
     int iteration = 0;
-    while (true) {
+    int MAX_ITER = 5;
+    while (iteration < MAX_ITER) {
         iteration++;
         ComputeUpSigma(up_s, word_embedding, beta, l, WORD_DIM, V);
 
@@ -126,5 +127,7 @@ int main() {
         beta = UpdateBeta(up_m, up_s, word_embedding, rho_m, rho_s, V, K);
         gamma = UpdateGamma(eta_m, eta_s, a_m, a_s, u_m, u_s, D, K);
     }
+
+    // TODO: Evaluate
     return 0;
 }
