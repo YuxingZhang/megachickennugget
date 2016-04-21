@@ -129,13 +129,13 @@ int main() {
     }
 
     // TODO: Evaluate
-    mat phi = exp(row_m);
+    mat phi = exp(rho_m);
     for(int k = 0; k < K; k++){
         phi.row(k) = normalise(phi.row(k), 1);
         vec indx = sort_index(phi.row(k), "descend");
         cout << "topic " << k << endl;
         for(int i = 0; i < 5; i++){
-            cout << idx2word(indx(i)) << endl;
+            cout << idx2word[indx(i)] << endl;
         }
         cout << endl;
     }
