@@ -114,6 +114,16 @@ bool UpdateA(int d, mat& a_m, mat& a_s, mat& u_m, mat& u_s, mat& eta_m, double c
         }
         a_s = (gamma * temp1 + gamma * K * u_s + c * eye(DOC_DIM, DOC_DIM)).i();
         a_m.row(d) = gamma * (a_s * temp2).t();
+
+        /* Check if covariance matrix is symmetric */
+        for(int k1 = 0; k1 < K; k1++){
+            for(int k2 = k1; k2 < K; k2++){
+                if(a_s(k1, k2) != a_s(k2, k1)){
+                    cout << "CAUTION: Covariance matrix should be symmetric (A)!!" << endl;
+                }
+            }
+        }
+
     } else {
         for(int k = 0; k < K; k++) {
             temp2 += (eta_m(d, k) * u_m.row(k).t());
@@ -121,18 +131,27 @@ bool UpdateA(int d, mat& a_m, mat& a_s, mat& u_m, mat& u_s, mat& eta_m, double c
         a_m.row(d) = gamma * (a_s * temp2).t();
     }
 
-    for(int k = 0; k < DOC_DIM; k++) {
-        if(abs(a_m(d, k) - mu_old(k)) / abs(mu_old(k)) > EPS) {
-            converge = false;
-            break;
+    mat dif = abs(a_s - sigma_old) / abs(sigma_old);
+    if(dif.max() > EPS) {
+        converge = false;
+        cout << "Covariance of (A) does not converege." << endl;
+    }
+    else{   
+        for(int k = 0; k < DOC_DIM; k++) {
+            if(abs(a_m(d, k) - mu_old(k)) / abs(mu_old(k)) > EPS) {
+                converge = false;
+                break;
+            }
         }
     }
-    if (converge) {
-        mat dif = abs(a_s - sigma_old) / abs(sigma_old);
-        if(dif.max() > EPS) {
-            converge = false;
-        }
-    }
+
+    // if (converge) {
+    //     mat dif = abs(a_s - sigma_old) / abs(sigma_old);
+    //     if(dif.max() > EPS) {
+    //         converge = false;
+    //     }
+    // }
+
     if (converge) { cout << "================ A converge ==================" << endl; }
     return converge;
 }
@@ -146,15 +165,20 @@ bool UpdateRho(int k, mat& rho_m, mat& rho_s, vector<mat>& z, mat& up_m, vec& al
     vec mu_old = rho_m.row(k).t();
     vec sigma_old = rho_s.row(k).t();
 
+    m_k = 0.0;
+    for(int d = 0; d < D; d++){
+        for(int n = 0; n < N[d]; n++){
+            m_k += (z[d])(n, k);
+        }
+    }
+
     for(int w = 0; w < V; w++){
-        c_kw = 0;
-        m_k = 0;
+        c_kw = 0.0;
         for(int d = 0; d < D; d++){
             for(int n = 0; n < N[d]; n++){
                 if(!W[d][n].compare(idx2word[w])){
                     c_kw += (z[d])(n, k);
                 }
-                m_k += (z[d])(n, k);
             }
         }
         double lambda_xi = lambda(xi_KW(k, w));
