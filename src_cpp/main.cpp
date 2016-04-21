@@ -110,6 +110,7 @@ int main() {
                 }
                 cout << "----------------------------- after -------------------------------" << endl;
                 */
+                UpdateAuxiliary(*d, alpha_D, xi_DK, eta_m, eta_s, K);
                 for (int n = 0; n < N[*d]; n++) {
                     if (!UpdateZ(*d, n, z, eta_m, rho_m, rho_s, xi_KW, alpha_K, W, word2idx, K, V, EPS)) { has_converge = false; }
                     cout << "============================= z_dn "  << *d << "   " << n<< "=============================" << endl;
@@ -117,9 +118,7 @@ int main() {
                 }
                 if (!UpdateEta(*d, eta_m, eta_s, xi_DK, alpha_D, u_m, a_m, z, gamma, N, K, EPS)) { has_converge = false; }
                 if (!UpdateA(*d, a_m, a_s, u_m, u_s, eta_m, c, gamma, DOC_DIM, K, EPS)) { has_converge = false; }
-                UpdateAuxiliary(*d, alpha_D, xi_DK, eta_m, eta_s, K);
             }
-
 
             for (int k = 0; k < K; k++) {
                 if (!UpdateRho(k, rho_m, rho_s, z, up_m, alpha_K, xi_KW, word_embedding, W, idx2word, beta, D, N, V, EPS)) { has_converge = false; }

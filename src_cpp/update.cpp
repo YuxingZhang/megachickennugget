@@ -25,12 +25,16 @@ bool UpdateZ(int d, int n, vector<mat>& z, mat& eta_m, mat& rho_m, mat& rho_s, m
         double temp = 0.0;
         double E1 = eta_m(d, k);
         for (int w = 0; w < V; w++) {
-            temp += - lambda(xi_KW(k, w)) * (rho_s(k, w) + pow(rho_m(k, w), 2)) - (0.5 - 2.0 * alpha_K(k) * lambda(xi_KW(k, w)) * rho_m(k, w))
-                + xi_KW(k, w) / 2.0 - lambda(xi_KW(k, w)) * (pow(alpha_K(k), 2) - pow(xi_KW(k, w), 2)) - log(1.0 + exp(xi_KW(k, w)));
+            temp += - lambda(xi_KW(k, w)) * (rho_s(k, w) + pow(rho_m(k, w), 2))
+                - (0.5 - 2.0 * alpha_K(k) * lambda(xi_KW(k, w)) * rho_m(k, w))
+                + xi_KW(k, w) / 2.0
+                - lambda(xi_KW(k, w)) * (pow(alpha_K(k), 2) - pow(xi_KW(k, w), 2))
+                - log(1.0 + exp(xi_KW(k, w)));
         }
 
         string w_dn = W[d][n];
         double E2 = rho_m(k, word2idx[w_dn]) + alpha_K(k) * (V / 2.0 - 1.0) + temp;
+        cout << "E1 = " << E1 << " , E2 = " << E2 << endl;
         z[d](n, k) = exp(E1 + E2);
     }
     //cout << "UpdateZ2" << endl;
