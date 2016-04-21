@@ -208,14 +208,14 @@ bool UpdateU(int k, mat& u_m, mat& u_s, mat& a_m, mat& a_s, mat& eta_m, double k
     if (k == 0) {
         mat temp1(DOC_DIM, DOC_DIM, fill::zeros);
         for (int d = 0; d < D; d++) {
-            temp1 += a_m.row(d).t() * a_m.row(d);
+            temp1 += (a_m.row(d).t() * a_m.row(d));
         }
         u_s = (kappa * mat(DOC_DIM, DOC_DIM, fill::eye) + gamma * D * a_s + gamma * temp1).i();
 
     }
     vec temp2(DOC_DIM, fill::zeros);
     for (int d = 0; d < D; d++) {
-        temp2 += eta_m(d, k) * a_m.row(d).t(); // col vec
+        temp2 += (eta_m(d, k) * a_m.row(d).t()); // col vec
     }
     u_m.row(k) = gamma * (u_s * temp2).t();
 
