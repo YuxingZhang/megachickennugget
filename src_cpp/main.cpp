@@ -83,14 +83,13 @@ int main() {
     int iteration = 0;
     while (true) {
         iteration++;
+        ComputeUpSigma(up_s, word_embedding, beta, l, WORD_DIM, V);
 
         int inner_iteration = 0;
 
         while (true) {
             inner_iteration++;
             cout << inner_iteration << endl;
-            ComputeUpSigma(up_s, word_embedding, beta, l, WORD_DIM, V);
-
             bool has_converge = true;
             cur_batch--;
             if (cur_batch < 0) {
