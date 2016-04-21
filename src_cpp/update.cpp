@@ -225,19 +225,26 @@ bool UpdateU(int k, mat& u_m, mat& u_s, mat& a_m, mat& a_s, mat& eta_m, double k
     }
     u_m.row(k) = gamma * (u_s * temp2).t();
 
-    for (int d = 0; d < DOC_DIM; d++) {
-        if (abs(u_m(k, d) - mu_old(d)) / abs(mu_old(d)) > EPS) {
-            converge = false;
-            break;
+    mat dif = abs(u_s - sigma_old) / abs(sigma_old);
+    if (dif.max() > EPS) {
+        converge = false;
+        cout << "Covariance of (U) does not converge" << endl;
+    }
+    else{
+        for (int d = 0; d < DOC_DIM; d++) {
+            if (abs(u_m(k, d) - mu_old(d)) / abs(mu_old(d)) > EPS) {
+                converge = false;
+                break;
+            }
         }
     }
 
-    if (converge) {
-        mat dif = abs(u_s - sigma_old) / abs(sigma_old);
-        if (dif.max() > EPS) {
-            converge = false;
-        }
-    }
+    // if (converge) {
+    //     mat dif = abs(u_s - sigma_old) / abs(sigma_old);
+    //     if (dif.max() > EPS) {
+    //         converge = false;
+    //     }
+    // }
     if (converge) { cout << "================================= U converge ==================" << endl; }
     return converge;
 }
