@@ -151,7 +151,7 @@ bool UpdateA(int d, mat& a_m, mat& a_s, mat& u_m, mat& u_s, mat& eta_m, double c
     //         converge = false;
     //     }
     // }
-    
+
     if (converge) { cout << "================ A converge ==================" << endl; }
     return converge;
 }
@@ -165,15 +165,20 @@ bool UpdateRho(int k, mat& rho_m, mat& rho_s, vector<mat>& z, mat& up_m, vec& al
     vec mu_old = rho_m.row(k).t();
     vec sigma_old = rho_s.row(k).t();
 
+    m_k = 0.0;
+    for(int d = 0; d < D; d++){
+        for(int n = 0; n < N[d]; n++){
+            m_k += (z[d])(n, k);
+        }
+    }
+
     for(int w = 0; w < V; w++){
-        c_kw = 0;
-        m_k = 0;
+        c_kw = 0.0;
         for(int d = 0; d < D; d++){
             for(int n = 0; n < N[d]; n++){
                 if(!W[d][n].compare(idx2word[w])){
                     c_kw += (z[d])(n, k);
                 }
-                m_k += (z[d])(n, k);
             }
         }
         double lambda_xi = lambda(xi_KW(k, w));
