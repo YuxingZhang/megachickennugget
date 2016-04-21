@@ -43,7 +43,7 @@ int main() {
     vector<mat> z; // each element is a n_d * K matrix 
     for (int i = 0; i < D; i++) {
         mat tmp(N[i], K, fill::randu);
-        normalise(tmp, 1, 1);
+        tmp = normalise(tmp, 1, 1);
         z.push_back(tmp);
     }
 
@@ -129,5 +129,16 @@ int main() {
     }
 
     // TODO: Evaluate
+    mat phi = exp(row_m);
+    for(int k = 0; k < K; k++){
+        phi.row(k) = normalise(phi.row(k), 1);
+        vec indx = sort_index(phi.row(k), "descend");
+        cout << "topic " << k << endl;
+        for(int i = 0; i < 5; i++){
+            cout << idx2word(indx(i)) << endl;
+        }
+        cout << endl;
+    }
+
     return 0;
 }

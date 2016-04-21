@@ -43,7 +43,7 @@ bool UpdateZ(int d, int n, vector<mat>& z, mat& eta_m, mat& rho_m, mat& rho_s, m
             break;
         }
     }
-    if (converge) { cout << "==== Z converge ==================" << endl; }
+    //if (converge) { cout << "==== Z converge ==================" << endl; }
     return converge;
 }
 
@@ -90,7 +90,7 @@ bool UpdateEta(int d, mat& eta_m, mat& eta_s, mat& xi_DK, vec& alpha_D, mat& u_m
             break;
         }
     }
-    if (converge) { cout << "============ Eta converge ==================" << endl; }
+    //if (converge) { cout << "============ Eta converge ==================" << endl; }
     return converge;
 }
 
@@ -145,7 +145,7 @@ bool UpdateA(int d, mat& a_m, mat& a_s, mat& u_m, mat& u_s, mat& eta_m, double c
         }
     }
 
-    if (converge) { cout << "================ A converge ==================" << endl; }
+    //if (converge) { cout << "================ A converge ==================" << endl; }
     return converge;
 }
 
@@ -186,7 +186,7 @@ bool UpdateRho(int k, mat& rho_m, mat& rho_s, vector<mat>& z, mat& up_m, vec& al
             break;
         }
     }
-    if (converge) { cout << "===================== Rho converge ==================" << endl; }
+    //if (converge) { cout << "===================== Rho converge ==================" << endl; }
     return converge;
 }
 
@@ -232,7 +232,7 @@ bool UpdateU(int k, mat& u_m, mat& u_s, mat& a_m, mat& a_s, mat& eta_m, double k
         }
     }
 
-    if (converge) { cout << "================================= U converge ==================" << endl; }
+    //if (converge) { cout << "================================= U converge ==================" << endl; }
     return converge;
 }
 
@@ -254,7 +254,7 @@ bool UpdateUp(int k, mat& up_m, mat& up_s, mat& rho_m, mat& word_embedding, doub
             break;
         }
     }
-    if (converge) { cout << "============================================ Up converge ==================" << endl; }
+    //if (converge) { cout << "============================================ Up converge ==================" << endl; }
     return converge;
 }
 
