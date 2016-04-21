@@ -134,7 +134,7 @@ bool UpdateA(int d, mat& a_m, mat& a_s, mat& u_m, mat& u_s, mat& eta_m, double c
     mat dif = abs(a_s - sigma_old) / abs(sigma_old);
     if(dif.max() > EPS) {
         converge = false;
-        cout << "Covariance of (A) does not converege." << endl;
+        //cout << "Covariance of (A) does not converege." << endl;
     }
     else{   
         for(int k = 0; k < DOC_DIM; k++) {
@@ -221,7 +221,7 @@ bool UpdateU(int k, mat& u_m, mat& u_s, mat& a_m, mat& a_s, mat& eta_m, double k
     mat dif = abs(u_s - sigma_old) / abs(sigma_old);
     if (dif.max() > EPS) {
         converge = false;
-        cout << "Covariance of (U) does not converge" << endl;
+        //cout << "Covariance of (U) does not converge" << endl;
     }
     else{
         for (int d = 0; d < DOC_DIM; d++) {
