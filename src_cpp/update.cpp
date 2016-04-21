@@ -34,7 +34,7 @@ bool UpdateZ(int d, int n, vector<mat>& z, mat& eta_m, mat& rho_m, mat& rho_s, m
 
         string w_dn = W[d][n];
         double E2 = rho_m(k, word2idx[w_dn]) + alpha_K(k) * (V / 2.0 - 1.0) + temp;
-        cout << "E1 = " << E1 << " , E2 = " << E2 << endl;
+        ///cout << "E1 = " << E1 << " , E2 = " << E2 << endl;
         z[d](n, k) = exp(E1 + E2);
     }
     //cout << "UpdateZ2" << endl;
@@ -190,7 +190,7 @@ bool UpdateRho(int k, mat& rho_m, mat& rho_s, vector<mat>& z, mat& up_m, vec& al
             break;
         }
     }
-    if (converge) { cout << "===================== Rho converge ==================" << endl; }
+    //if (converge) { cout << "===================== Rho converge ==================" << endl; }
     return converge;
 }
 
