@@ -116,8 +116,8 @@ bool UpdateA(int d, mat& a_m, mat& a_s, mat& u_m, mat& u_s, mat& eta_m, double c
         a_m.row(d) = gamma * (a_s * temp2).t();
 
         /* Check if covariance matrix is symmetric */
-        for(int k1 = 0; k1 < K; k1++){
-            for(int k2 = k1; k2 < K; k2++){
+        for(int k1 = 0; k1 < DOC_DIM; k1++){
+            for(int k2 = k1; k2 < DOC_DIM; k2++){
                 if(a_s(k1, k2) != a_s(k2, k1)){
                     cout << "CAUTION: Covariance matrix should be symmetric (A)!!" << endl;
                 }
@@ -211,6 +211,7 @@ bool UpdateU(int k, mat& u_m, mat& u_s, mat& a_m, mat& a_s, mat& eta_m, double k
             temp1 += a_m.row(d).t() * a_m.row(d);
         }
         u_s = (kappa * mat(DOC_DIM, DOC_DIM, fill::eye) + gamma * D * a_s + gamma * temp1).i();
+
     }
     vec temp2(DOC_DIM, fill::zeros);
     for (int d = 0; d < D; d++) {
