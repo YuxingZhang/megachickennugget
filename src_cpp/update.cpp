@@ -243,6 +243,9 @@ bool UpdateUp(int k, mat& up_m, mat& up_s, mat& rho_m, mat& word_embedding, doub
    
     vec mu_old = up_m.row(k).t();
     vec temp(WORD_DIM, fill::zeros);
+    
+    // Can have improved efficiency!!
+
     for(int w = 0; w < V; w++){
         temp += (word_embedding.row(w) * rho_m(k, w)).t();
     }
