@@ -186,7 +186,7 @@ bool UpdateRho(int k, mat& rho_m, mat& rho_s, vector<mat>& z, mat& up_m, vec& al
             break;
         }
     }
-    //if (converge) { cout << "===================== Rho converge ==================" << endl; }
+    if (converge) { cout << "===================== Rho converge ==================" << endl; }
     return converge;
 }
 

@@ -81,7 +81,7 @@ int main() {
     int cur_batch = num_of_batch;
 
     int iteration = 0;
-    int MAX_ITER = 5;
+    int MAX_ITER = 1;
     while (iteration < MAX_ITER) {
         iteration++;
         ComputeUpSigma(up_s, word_embedding, beta, l, WORD_DIM, V);
@@ -113,6 +113,7 @@ int main() {
             }
 
             for (int k = 0; k < K; k++) {
+		cout << "this is k: " << k << endl;
                 if (!UpdateRho(k, rho_m, rho_s, z, up_m, alpha_K, xi_KW, word_embedding, W, idx2word, beta, D, N, V, EPS)) { has_converge = false; }
                 if (!UpdateU(k, u_m, u_s, a_m, a_s, eta_m, kappa, gamma, DOC_DIM, D, EPS)) { has_converge = false; }
                 if (!UpdateUp(k, up_m, up_s, rho_m, word_embedding, beta, WORD_DIM, V, EPS)) { has_converge = false; }
@@ -133,6 +134,7 @@ int main() {
     for(int k = 0; k < K; k++){
         phi.row(k) = normalise(phi.row(k), 1);
         cout << phi.row(k) << endl;
+	cout << rho_m.row(k) << endl;
         uvec indx = sort_index(phi.row(k).t(), "descend");
         cout << "topic " << k << endl;
         for(int i = 0; i < 5; i++){
