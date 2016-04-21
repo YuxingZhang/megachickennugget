@@ -21,8 +21,8 @@ bool UpdateZ(int d, int n, vector<mat>& z, mat& eta_m, mat& rho_m, mat& rho_s, m
     vec z_dn_old = z[d].row(n).t();
     //cout << "UpdateZ1" << endl;
 
-    double temp = 0.0;
     for (int k = 0; k < K; k++) {
+        double temp = 0.0;
         double E1 = eta_m(d, k);
         for (int w = 0; w < V; w++) {
             temp += - lambda(xi_KW(k, w)) * (rho_s(k, w) + pow(rho_m(k, w), 2)) - (0.5 - 2.0 * alpha_K(k) * lambda(xi_KW(k, w)) * rho_m(k, w))
