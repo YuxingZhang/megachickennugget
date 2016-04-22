@@ -28,7 +28,7 @@ int main() {
     // some parameters
     const int V = idx2word.size(); // vocabulary size
     const int D = W.size(); // number of documents
-    const int K = 5; // number of topics
+    const int K = 4; // number of topics
     const int WORD_DIM = 20; // dimension of word embedding
     const int DOC_DIM = 10;// dimension of document embedding
 
@@ -79,6 +79,8 @@ int main() {
     int num_of_batch = (int)((random_index.size() + BATCH_SIZE - 1) / BATCH_SIZE);
     int cur_batch = num_of_batch;
 
+    cout << "vocabulary size = " << V << endl;
+
     int iteration = 0;
     int MAX_ITER = 10;
     while (iteration < MAX_ITER) {
@@ -110,24 +112,23 @@ int main() {
                 }
                 cout << "----------------------------- after -------------------------------" << endl;
                 */
+                UpdateAuxiliary(*d, alpha_D, xi_DK, eta_m, eta_s, K);
                 for (int n = 0; n < N[*d]; n++) {
                     if (!UpdateZ(*d, n, z, eta_m, rho_m, rho_s, xi_KW, alpha_K, W, word2idx, K, V, EPS)) { has_converge = false; }
-                    cout << "============================= z_dn "  << *d << "   " << n<< "=============================" << endl;
-                    cout << z[*d].row(n) << endl;
+                    //cout << "============================= z_dn "  << *d << "   " << n<< "=============================" << endl;
+                    //cout << z[*d].row(n) << endl;
                 }
                 if (!UpdateEta(*d, eta_m, eta_s, xi_DK, alpha_D, u_m, a_m, z, gamma, N, K, EPS)) { has_converge = false; }
                 if (!UpdateA(*d, a_m, a_s, u_m, u_s, eta_m, c, gamma, DOC_DIM, K, EPS)) { has_converge = false; }
-                UpdateAuxiliary(*d, alpha_D, xi_DK, eta_m, eta_s, K);
             }
 
-
             for (int k = 0; k < K; k++) {
+                UpdateAuxiliary(k, alpha_K, xi_KW, rho_m, rho_s, V);
                 if (!UpdateRho(k, rho_m, rho_s, z, up_m, alpha_K, xi_KW, word_embedding, W, idx2word, beta, D, N, V, EPS)) { has_converge = false; }
                 //cout << "============================= rho_m "  << k << "=============================" << endl;
                 //cout << rho_m.row(k) << endl;
                 if (!UpdateU(k, u_m, u_s, a_m, a_s, eta_m, kappa, gamma, DOC_DIM, D, EPS)) { has_converge = false; }
                 if (!UpdateUp(k, up_m, up_s, rho_m, word_embedding, beta, WORD_DIM, V, EPS)) { has_converge = false; }
-                UpdateAuxiliary(k, alpha_K, xi_KW, rho_m, rho_s, V);
             }
             if (has_converge) { break; }
         }
