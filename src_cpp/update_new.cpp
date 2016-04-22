@@ -2,17 +2,6 @@ double lambda(double xi){
     return 1.0 / (2 * xi) * (1.0 / (1 + exp(-xi)) - 0.5);
 }
 
-/* update U' sigma */
-void ComputeUpSigma(mat& up_s, mat& word_embedding, double& beta, double& l, int WORD_DIM, int V){
-    //cout << "ComputeUpSigma" << endl;
-    mat temp(WORD_DIM, WORD_DIM, fill::zeros);
-    for(int i = 0; i < V; i++){
-        temp += (word_embedding.row(i).t() * word_embedding.row(i));
-    }
-    up_s = (l * eye<mat>(WORD_DIM, WORD_DIM) + beta * temp).i();
-    return;
-}
-
 /* update z_dn */
 bool UpdateZ(int d, int n, vector<mat>& z, mat& eta_m, mat& rho_m, vector< vector<string> >& W, map<string, int>& word2idx, int K, double EPS) {
     //cout << "UpdateZ" << endl;
@@ -216,31 +205,6 @@ bool UpdateU(int k, mat& u_m, mat& u_s, mat& a_m, mat& a_s, mat& eta_m, double k
     }
 
     //if (converge) { cout << "================================= U converge ==================" << endl; }
-    return converge;
-}
-
-/* update u_prime */
-bool UpdateUp(int k, mat& up_m, mat& up_s, mat& rho_m, mat& word_embedding, double beta, int WORD_DIM, int V, double EPS){
-    //cout << "UpdateUp" << endl;
-    bool converge = true;
-   
-    vec mu_old = up_m.row(k).t();
-    vec temp(WORD_DIM, fill::zeros);
-    
-    // Can have improved efficiency!!
-
-    for(int w = 0; w < V; w++){
-        temp += (word_embedding.row(w) * rho_m(k, w)).t();
-    }
-    up_m.row(k) = beta * (up_s * temp).t();
-
-    for(int w = 0; w < WORD_DIM; w++){
-        if(abs(up_m(k, w) - mu_old(w)) / abs(mu_old(w)) > EPS){
-            converge = false;
-            break;
-        }
-    }
-    //if (converge) { cout << "============================================ Up converge ==================" << endl; }
     return converge;
 }
 
