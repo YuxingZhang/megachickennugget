@@ -33,10 +33,10 @@ int main() {
     const int DOC_DIM = 10;// dimension of document embedding
 
     // model parameters, changed in the M step
-    double l = 1.0; 
+    // double l = 1.0; 
     double c = 1.0;
     double kappa = 1.0;
-    double beta = 1.0;
+    // double beta = 1.0;
     double gamma = 1.0;
 
     // initialization
@@ -54,16 +54,17 @@ int main() {
     mat a_s = diagmat(vec(DOC_DIM, fill::randu)); // all a_d share the same matrix
 
     mat rho_m(K, V, fill::randu); // mean of rho
-    mat rho_s(K, V, fill::randu); // sigma of rho
+    vec beta(V, fill::randu);
+    // mat rho_s(K, V, fill::randu); // sigma of rho
 
-    mat up_m(K, WORD_DIM, fill::randu); // mean of u prime
-    mat up_s = diagmat(vec(WORD_DIM, fill::randu)); // sigma of u prime, shared
+    // mat up_m(K, WORD_DIM, fill::randu); // mean of u prime
+    // mat up_s = diagmat(vec(WORD_DIM, fill::randu)); // sigma of u prime, shared
 
     mat u_m(K, DOC_DIM, fill::randu); // mean of u
     mat u_s = diagmat(vec(DOC_DIM, fill::randu)); // sigma of u, shared
 
-    mat xi_KW(K, V, fill::randu); // used in lower bound of z_dn and rho
-    vec alpha_K(K, fill::randu);
+    // mat xi_KW(K, V, fill::randu); // used in lower bound of z_dn and rho
+    // vec alpha_K(K, fill::randu);
 
     mat xi_DK(D, K, fill::randu); // used in lower bound of eta_d
     vec alpha_D(D, fill::randu);
@@ -85,7 +86,7 @@ int main() {
     int MAX_ITER = 10;
     while (iteration < MAX_ITER) {
         iteration++;
-        ComputeUpSigma(up_s, word_embedding, beta, l, WORD_DIM, V);
+        // ComputeUpSigma(up_s, word_embedding, beta, l, WORD_DIM, V);
 
         int inner_iteration = 0;
 
@@ -114,7 +115,10 @@ int main() {
                 */
                 UpdateAuxiliary(*d, alpha_D, xi_DK, eta_m, eta_s, K);
                 for (int n = 0; n < N[*d]; n++) {
+
+                    // TODO: GAI!!!!!
                     if (!UpdateZ(*d, n, z, eta_m, rho_m, rho_s, xi_KW, alpha_K, W, word2idx, K, V, EPS)) { has_converge = false; }
+                    
                     //cout << "============================= z_dn "  << *d << "   " << n<< "=============================" << endl;
                     //cout << z[*d].row(n) << endl;
                 }
@@ -124,19 +128,25 @@ int main() {
 
             for (int k = 0; k < K; k++) {
                 UpdateAuxiliary(k, alpha_K, xi_KW, rho_m, rho_s, V);
+                
+                // TODO: GAI!!!!!!
                 if (!UpdateRho(k, rho_m, rho_s, z, up_m, alpha_K, xi_KW, word_embedding, W, idx2word, beta, D, N, V, EPS)) { has_converge = false; }
+
                 //cout << "============================= rho_m "  << k << "=============================" << endl;
                 //cout << rho_m.row(k) << endl;
                 if (!UpdateU(k, u_m, u_s, a_m, a_s, eta_m, kappa, gamma, DOC_DIM, D, EPS)) { has_converge = false; }
-                if (!UpdateUp(k, up_m, up_s, rho_m, word_embedding, beta, WORD_DIM, V, EPS)) { has_converge = false; }
+                // if (!UpdateUp(k, up_m, up_s, rho_m, word_embedding, beta, WORD_DIM, V, EPS)) { has_converge = false; }
             }
             if (has_converge) { break; }
         }
 
-        l = UpdateL(up_m, up_s, WORD_DIM, K);
+        // l = UpdateL(up_m, up_s, WORD_DIM, K);
         kappa = UpdateKappa(u_m, u_s, DOC_DIM, K);
         c = UpdateC(a_m, a_s, DOC_DIM, D);
+        
+        // TODO: GAI!!!!
         beta = UpdateBeta(up_m, up_s, word_embedding, rho_m, rho_s, V, K);
+
         gamma = UpdateGamma(eta_m, eta_s, a_m, a_s, u_m, u_s, D, K);
     }
 
