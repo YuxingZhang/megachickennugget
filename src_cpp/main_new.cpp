@@ -10,7 +10,8 @@
 using namespace std;
 using namespace arma;
 #include "load.cpp"
-#include "update.cpp"
+#include "update_new.cpp"
+#include "digamma.cpp"
 
 void load_files(string embedding, string corpus, mat word_embd, map<string, int>& word2idx, map<int, string>& idx2word, vector<vector<string> >& W, vector<int>& N);
 
@@ -115,10 +116,7 @@ int main() {
                 */
                 UpdateAuxiliary(*d, alpha_D, xi_DK, eta_m, eta_s, K);
                 for (int n = 0; n < N[*d]; n++) {
-
-                    // TODO: GAI!!!!!
-                    if (!UpdateZ(*d, n, z, eta_m, rho_m, rho_s, xi_KW, alpha_K, W, word2idx, K, V, EPS)) { has_converge = false; }
-                    
+                    if (!UpdateZ(*d, n, z, eta_m, rho_m, W, word2idx, K, EPS)) { has_converge = false; }
                     //cout << "============================= z_dn "  << *d << "   " << n<< "=============================" << endl;
                     //cout << z[*d].row(n) << endl;
                 }
@@ -128,10 +126,7 @@ int main() {
 
             for (int k = 0; k < K; k++) {
                 UpdateAuxiliary(k, alpha_K, xi_KW, rho_m, rho_s, V);
-                
-                // TODO: GAI!!!!!!
-                if (!UpdateRho(k, rho_m, rho_s, z, up_m, alpha_K, xi_KW, word_embedding, W, idx2word, beta, D, N, V, EPS)) { has_converge = false; }
-
+                if (!UpdateRho(k, rho_m, z, W, idx2word, beta, D, N, V, EPS)) { has_converge = false; }
                 //cout << "============================= rho_m "  << k << "=============================" << endl;
                 //cout << rho_m.row(k) << endl;
                 if (!UpdateU(k, u_m, u_s, a_m, a_s, eta_m, kappa, gamma, DOC_DIM, D, EPS)) { has_converge = false; }
@@ -146,7 +141,6 @@ int main() {
         
         // TODO: GAI!!!!
         beta = UpdateBeta(up_m, up_s, word_embedding, rho_m, rho_s, V, K);
-
         gamma = UpdateGamma(eta_m, eta_s, a_m, a_s, u_m, u_s, D, K);
     }
 

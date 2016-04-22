@@ -14,26 +14,16 @@ void ComputeUpSigma(mat& up_s, mat& word_embedding, double& beta, double& l, int
 }
 
 /* update z_dn */
-bool UpdateZ(int d, int n, vector<mat>& z, mat& eta_m, mat& rho_m, mat& rho_s, mat& xi_KW, mat& alpha_K,
-        vector< vector<string> >& W, map<string, int>& word2idx, int K, int V, double EPS) {
+bool UpdateZ(int d, int n, vector<mat>& z, mat& eta_m, mat& rho_m, vector< vector<string> >& W, map<string, int>& word2idx, int K, double EPS) {
     //cout << "UpdateZ" << endl;
     bool converge = true;
     vec z_dn_old = z[d].row(n).t();
     //cout << "UpdateZ1" << endl;
+    string w_dn = W[d][n];
 
     for (int k = 0; k < K; k++) {
-        double temp = 0.0;
         double E1 = eta_m(d, k);
-        for (int w = 0; w < V; w++) {
-            temp += - lambda(xi_KW(k, w)) * (rho_s(k, w) + pow(rho_m(k, w), 2))
-                - (0.5 - 2.0 * alpha_K(k) * lambda(xi_KW(k, w)) * rho_m(k, w))
-                + xi_KW(k, w) / 2.0
-                - lambda(xi_KW(k, w)) * (pow(alpha_K(k), 2) - pow(xi_KW(k, w), 2))
-                - log(1.0 + exp(xi_KW(k, w)));
-        }
-
-        string w_dn = W[d][n];
-        double E2 = rho_m(k, word2idx[w_dn]) + alpha_K(k) * (V / 2.0 - 1.0) + temp;
+        double E2 = digammal(rho_m(k, word2idx[w_dn])) - digammal(sum(rho_m.row(k)));
         ///cout << "E1 = " << E1 << " , E2 = " << E2 << endl;
         z[d](n, k) = exp(E1 + E2);
     }
@@ -154,20 +144,12 @@ bool UpdateA(int d, mat& a_m, mat& a_s, mat& u_m, mat& u_s, mat& eta_m, double c
 }
 
 /* update rho */
-bool UpdateRho(int k, mat& rho_m, mat& rho_s, vector<mat>& z, mat& up_m, vec& alpha_K, mat& xi_KW, mat& word_embedding, vector<vector<string> >& W, map<int, string>& idx2word, double beta, int D, vector<int>& N, int V, double EPS){
+bool UpdateRho(int k, mat& rho_m, vector<mat>& z, vector<vector<string> >& W, map<int, string>& idx2word, vec& beta, int D, vector<int>& N, int V, double EPS){
     //cout << "UpdateRho" << endl;
     bool converge = true;
-    double c_kw, m_k;
+    double c_kw;
 
     vec mu_old = rho_m.row(k).t();
-    vec sigma_old = rho_s.row(k).t();
-
-    m_k = 0.0;
-    for(int d = 0; d < D; d++){
-        for(int n = 0; n < N[d]; n++){
-            m_k += (z[d])(n, k);
-        }
-    }
 
     for(int w = 0; w < V; w++){
         c_kw = 0.0;
@@ -177,15 +159,12 @@ bool UpdateRho(int k, mat& rho_m, mat& rho_s, vector<mat>& z, mat& up_m, vec& al
                     c_kw += (z[d])(n, k);
                 }
             }
-        }
-        double lambda_xi = lambda(xi_KW(k, w));
-        rho_s(k, w) = 1.0 / (beta + 2 * m_k * lambda_xi);
-        rho_m(k, w) = beta * dot(word_embedding.row(w), up_m.row(k)) + c_kw - m_k * (0.5 - 2 * alpha_K(k) * lambda_xi);
-        rho_m(k, w) *= rho_s(k, w);
+        } 
+        rho_m(k, w) = max(0, c_kw + beta(w) - 1);
     }
 
     for(int w = 0; w < V; w++){
-        if(std::max(abs(rho_m(k, w) - mu_old(w)) / abs(mu_old(w)), abs(rho_s(k, w) - sigma_old(w)) / abs(sigma_old(w))) > EPS){
+        if(abs(rho_m(k, w) - mu_old(w)) / abs(mu_old(w)) > EPS){
             converge = false;
             break;
         }
