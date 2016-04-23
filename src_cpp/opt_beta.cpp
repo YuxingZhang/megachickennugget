@@ -1,4 +1,4 @@
-vec UpdateBeta(vec& beta, vec& rho_m, int V, int K){
+vec UpdateBeta(vec& beta, mat& rho_m, int V, int K){
 	double NEWTON_THRESH = 0.00001;
 	int MAX_ITER = 1000;
 	vec result = beta;
