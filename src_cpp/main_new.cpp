@@ -115,7 +115,6 @@ int main() {
             }
 
             for (int k = 0; k < K; k++) {
-                UpdateAuxiliary(k, alpha_K, xi_KW, rho_m, rho_s, V);
                 if (!UpdateRho(k, rho_m, z, W, idx2word, beta, D, N, V, EPS)) { has_converge = false; }
                 //cout << "============================= rho_m "  << k << "=============================" << endl;
                 //cout << rho_m.row(k) << endl;

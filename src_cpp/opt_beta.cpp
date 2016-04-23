@@ -1,5 +1,5 @@
 vec UpdateBeta(vec& beta, vec& rho_m, int V, int K){
-	double NETON_THRESH = 0.00001;
+	double NEWTON_THRESH = 0.00001;
 	int MAX_ITER = 1000;
 	vec result = beta;
 
@@ -29,7 +29,7 @@ vec UpdateBeta(vec& beta, vec& rho_m, int V, int K){
 
 	// compute constant terms needed for gradient
 	double c = sum(g / h) / (- 1 / trigamma_beta + sum(1 / h));
-
+	int iter = 0;
 	do{
 		iter++;
 
@@ -38,7 +38,7 @@ vec UpdateBeta(vec& beta, vec& rho_m, int V, int K){
 		}
 		
 		result -= df;
-	} while(iter < MAX_ITER && max(abs(df)) > eps);
+	} while(iter < MAX_ITER && max(abs(df)) > NEWTON_THRESH);
 
 	return result;
 }
