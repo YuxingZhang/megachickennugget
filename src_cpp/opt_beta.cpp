@@ -34,7 +34,7 @@ vec UpdateBeta(vec& beta, vec& rho_m, int V, int K){
 		iter++;
 
 		for(int w = 0; w < V; w++){
-			df(w) = (g(i) - c) / h(i);
+			df(w) = (g(w) - c) / h(w);
 		}
 		
 		result -= df;
