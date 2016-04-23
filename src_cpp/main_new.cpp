@@ -12,6 +12,7 @@ using namespace arma;
 #include "load.cpp"
 #include "update_new.cpp"
 #include "digamma.cpp"
+#include "opt_neta.cpp"
 
 void load_files(string embedding, string corpus, mat word_embd, map<string, int>& word2idx, map<int, string>& idx2word, vector<vector<string> >& W, vector<int>& N);
 
@@ -34,11 +35,10 @@ int main() {
     const int DOC_DIM = 10;// dimension of document embedding
 
     // model parameters, changed in the M step
-    // double l = 1.0; 
     double c = 1.0;
     double kappa = 1.0;
-    // double beta = 1.0;
     double gamma = 1.0;
+    vec beta(V, fill::randu);
 
     // initialization
     vector<mat> z; // each element is a n_d * K matrix 
@@ -55,17 +55,9 @@ int main() {
     mat a_s = diagmat(vec(DOC_DIM, fill::randu)); // all a_d share the same matrix
 
     mat rho_m(K, V, fill::randu); // mean of rho
-    vec beta(V, fill::randu);
-    // mat rho_s(K, V, fill::randu); // sigma of rho
-
-    // mat up_m(K, WORD_DIM, fill::randu); // mean of u prime
-    // mat up_s = diagmat(vec(WORD_DIM, fill::randu)); // sigma of u prime, shared
 
     mat u_m(K, DOC_DIM, fill::randu); // mean of u
     mat u_s = diagmat(vec(DOC_DIM, fill::randu)); // sigma of u, shared
-
-    // mat xi_KW(K, V, fill::randu); // used in lower bound of z_dn and rho
-    // vec alpha_K(K, fill::randu);
 
     mat xi_DK(D, K, fill::randu); // used in lower bound of eta_d
     vec alpha_D(D, fill::randu);
@@ -87,10 +79,8 @@ int main() {
     int MAX_ITER = 10;
     while (iteration < MAX_ITER) {
         iteration++;
-        // ComputeUpSigma(up_s, word_embedding, beta, l, WORD_DIM, V);
 
         int inner_iteration = 0;
-
         while (true) {
             inner_iteration++;
             cout << inner_iteration << endl;
@@ -130,17 +120,13 @@ int main() {
                 //cout << "============================= rho_m "  << k << "=============================" << endl;
                 //cout << rho_m.row(k) << endl;
                 if (!UpdateU(k, u_m, u_s, a_m, a_s, eta_m, kappa, gamma, DOC_DIM, D, EPS)) { has_converge = false; }
-                // if (!UpdateUp(k, up_m, up_s, rho_m, word_embedding, beta, WORD_DIM, V, EPS)) { has_converge = false; }
-            }
+                           }
             if (has_converge) { break; }
         }
 
-        // l = UpdateL(up_m, up_s, WORD_DIM, K);
         kappa = UpdateKappa(u_m, u_s, DOC_DIM, K);
         c = UpdateC(a_m, a_s, DOC_DIM, D);
-        
-        // TODO: GAI!!!!
-        beta = UpdateBeta(up_m, up_s, word_embedding, rho_m, rho_s, V, K);
+        beta = UpdateBeta(beta, rho_m, V, K);
         gamma = UpdateGamma(eta_m, eta_s, a_m, a_s, u_m, u_s, D, K);
     }
 

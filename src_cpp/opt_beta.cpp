@@ -1,6 +1,7 @@
-void UpdateBeta(vec& beta, vec& rho_m, int K, int V){
+vec UpdateBeta(vec& beta, vec& rho_m, int V, int K){
 	double NETON_THRESH = 0.00001;
 	int MAX_ITER = 1000;
+	vec result = beta;
 
 	vec df(V, fill::zeros);
 	vec g(V, fill::zeros);
@@ -36,8 +37,8 @@ void UpdateBeta(vec& beta, vec& rho_m, int K, int V){
 			df(w) = (g(i) - c) / h(i);
 		}
 		
-		beta -= df;
+		result -= df;
 	} while(iter < MAX_ITER && max(abs(df)) > eps);
 
-	return;
+	return result;
 }
