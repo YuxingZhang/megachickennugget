@@ -208,17 +208,6 @@ bool UpdateU(int k, mat& u_m, mat& u_s, mat& a_m, mat& a_s, mat& eta_m, double k
     return converge;
 }
 
-/* update l */
-double UpdateL(mat& up_m, mat& up_s, int WORD_DIM, int K){
-    //cout << "UpdateL" << endl;
-    double temp = 0;
-
-    for(int k = 0; k < K; k++){
-        temp += dot(up_m.row(k), up_m.row(k));
-    }
-    return K * WORD_DIM / (temp + K * trace(up_s));
-}
-
 /* update kappa */
 double UpdateKappa(mat& u_m, mat& u_s, int DOC_DIM, int K){
     //cout << "UpdateKappa" << endl;
@@ -239,20 +228,6 @@ double UpdateC(mat& a_m, mat& a_s, int DOC_DIM, int D){
         temp += dot(a_m.row(d), a_m.row(d));
     }
     return D * DOC_DIM / (temp + D * trace(a_s));
-}
-
-/* update beta */
-double UpdateBeta(mat& up_m, mat& up_s, mat& word_embedding, mat& rho_m, mat& rho_s, int V, int K){
-    //cout << "UpdateBeta" << endl;
-    double temp = 0;
-
-    for(int k = 0; k < K; k++){
-        mat cov = up_m.row(k).t() * up_m.row(k) + up_s;
-        for(int w = 0; w < V; w++){
-            temp += (trace(cov * (word_embedding.row(w).t() * word_embedding.row(w))) + pow(rho_m(k, w), 2) + rho_s(k, w) - 2 * dot(word_embedding.row(w), up_m.row(k)) * rho_m(k, w));
-        }
-    }
-    return K * V / temp;
 }
     
 /* update gamma */
