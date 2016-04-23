@@ -149,7 +149,7 @@ bool UpdateRho(int k, mat& rho_m, vector<mat>& z, vector<vector<string> >& W, ma
                 }
             }
         } 
-        rho_m(k, w) = max(0.0, c_kw + beta(w) - 1);
+        rho_m(k, w) = c_kw + beta(w);
     }
 
     for(int w = 0; w < V; w++){
