@@ -125,7 +125,7 @@ int main() {
 
         kappa = UpdateKappa(u_m, u_s, DOC_DIM, K);
         c = UpdateC(a_m, a_s, DOC_DIM, D);
-        beta = UpdateBeta(beta, rho_m, V, K);
+        UpdateBeta(beta, rho_m, V, K);
         gamma = UpdateGamma(eta_m, eta_s, a_m, a_s, u_m, u_s, D, K);
     }
 
