@@ -39,5 +39,5 @@ void UpdateBeta(vec& beta, mat& rho_m, int V, int K){
 
 	} while(iter < MAX_ITER && max(abs(df)) > NEWTON_THRESH);
 
-	return beta;
+	return;
 }
