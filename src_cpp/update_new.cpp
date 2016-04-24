@@ -12,7 +12,7 @@ bool UpdateZ(int d, int n, vector<mat>& z, mat& eta_m, mat& rho_m, vector< vecto
 
     for (int k = 0; k < K; k++) {
         double E1 = eta_m(d, k);
-        double E2 = digamma(rho_m(k, word2idx[w_dn])) - digamma(sum(rho_m.row(k)));
+        double E2 = digammal(rho_m(k, word2idx[w_dn])) - digammal(sum(rho_m.row(k)));
         ///cout << "E1 = " << E1 << " , E2 = " << E2 << endl;
         z[d](n, k) = exp(E1 + E2);
     }
