@@ -11,7 +11,7 @@ using namespace std;
 using namespace arma;
 #include "digamma.cpp"
 #include "load.cpp"
-#include "update_new.cpp"
+#include "update.cpp"
 #include "opt_beta.cpp"
 
 void load_files(string embedding, string corpus, mat word_embd, map<string, int>& word2idx, map<int, string>& idx2word, vector<vector<string> >& W, vector<int>& N);
