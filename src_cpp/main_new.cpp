@@ -20,7 +20,7 @@ int main() {
     // Reading input files, including the corpus and the embedding
     string emb_file = "../vectors.txt";
     string corpus_file = "../new_corpus.txt";
-
+	arma_rng::set_seed_random();
     map<string, int> word2idx;  // V
     map<int, string> idx2word;  // V
     vector< vector<string> > W; // W[d][n] is w_dn
@@ -30,7 +30,7 @@ int main() {
     // some parameters
     const int V = idx2word.size(); // vocabulary size
     const int D = W.size(); // number of documents
-    const int K = 4; // number of topics
+    const int K = 11; // number of topics
     const int WORD_DIM = 20; // dimension of word embedding
     const int DOC_DIM = 10;// dimension of document embedding
 
@@ -38,7 +38,8 @@ int main() {
     double c = 1.0;
     double kappa = 1.0;
     double gamma = 1.0;
-    vec beta(V, fill::randu);
+    vec beta(V, fill::zeros);
+	beta += 1;
 
     // initialization
     vector<mat> z; // each element is a n_d * K matrix 
@@ -77,6 +78,7 @@ int main() {
 
     int iteration = 0;
     int MAX_ITER = 10;
+    int aux_iter = 10;
     while (iteration < MAX_ITER) {
         iteration++;
 
@@ -104,28 +106,39 @@ int main() {
                 }
                 cout << "----------------------------- after -------------------------------" << endl;
                 */
-                UpdateAuxiliary(*d, alpha_D, xi_DK, eta_m, eta_s, K);
+                
                 for (int n = 0; n < N[*d]; n++) {
                     if (!UpdateZ(*d, n, z, eta_m, rho_m, W, word2idx, K, EPS)) { has_converge = false; }
-                    //cout << "============================= z_dn "  << *d << "   " << n<< "=============================" << endl;
-                    //cout << z[*d].row(n) << endl;
                 }
-                if (!UpdateEta(*d, eta_m, eta_s, xi_DK, alpha_D, u_m, a_m, z, gamma, N, K, EPS)) { has_converge = false; }
-                if (!UpdateA(*d, a_m, a_s, u_m, u_s, eta_m, c, gamma, DOC_DIM, K, EPS)) { has_converge = false; }
+		for (int n = 0; n < aux_iter; n++) {
+			UpdateAuxiliary(*d, alpha_D, xi_DK, eta_m, eta_s, K);
+               		if (!UpdateEta(*d, eta_m, eta_s, xi_DK, alpha_D, u_m, a_m, z, gamma, N, K, EPS)) { has_converge = false; }//cout << "eta does not converge" << endl;}
+			//cout << eta_m.row(*d) << endl;
+		}
+//		cout << "this is eta" << endl;
+//		cout << eta_m.row(*d) << endl;
+                if (!UpdateA(*d, a_m, a_s, u_m, u_s, eta_m, c, gamma, DOC_DIM, K, EPS)) { has_converge = false;}// cout << "a does not converge" << endl;}
+	//	cout << "this is a" << endl;
+	//	cout << a_m.row(*d) << endl;
             }
 
             for (int k = 0; k < K; k++) {
-                if (!UpdateRho(k, rho_m, z, W, idx2word, beta, D, N, V, EPS)) { has_converge = false; }
+                if (!UpdateRho(k, rho_m, z, W, idx2word, beta, D, N, V, EPS)) { has_converge = false; }//cout << "rho does not converge" << endl;}
                 //cout << "============================= rho_m "  << k << "=============================" << endl;
                 //cout << rho_m.row(k) << endl;
-                if (!UpdateU(k, u_m, u_s, a_m, a_s, eta_m, kappa, gamma, DOC_DIM, D, EPS)) { has_converge = false; }
+                if (!UpdateU(k, u_m, u_s, a_m, a_s, eta_m, kappa, gamma, DOC_DIM, D, EPS)) { has_converge = false; }//cout << "u does not converge" << endl;}
+
                            }
             if (has_converge) { break; }
         }
 
         kappa = UpdateKappa(u_m, u_s, DOC_DIM, K);
         c = UpdateC(a_m, a_s, DOC_DIM, D);
-        UpdateBeta(beta, rho_m, V, K);
+//	cout << beta.t() << endl;
+	//cin.get();
+	//cout << "after ==========================" << endl;
+        //UpdateBeta(beta, rho_m, V, K);
+	//cout << beta.t() << endl;
         gamma = UpdateGamma(eta_m, eta_s, a_m, a_s, u_m, u_s, D, K);
     }
 
