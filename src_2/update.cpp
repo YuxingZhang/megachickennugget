@@ -4,21 +4,16 @@ double lambda(double xi){
 
 /* update z_dn */
 bool UpdateZ(int d, int n, vector<mat>& z, mat& eta_m, mat& rho_m, vector< vector<string> >& W, map<string, int>& word2idx, int K, double EPS) {
-    //cout << "UpdateZ" << endl;
     bool converge = true;
     vec z_dn_old = z[d].row(n).t();
-    //cout << "UpdateZ1" << endl;
     string w_dn = W[d][n];
 
     for (int k = 0; k < K; k++) {
         double E1 = eta_m(d, k);
         double E2 = digammal(rho_m(k, word2idx[w_dn])) - digammal(sum(rho_m.row(k)));
-        ///cout << "E1 = " << E1 << " , E2 = " << E2 << endl;
         z[d](n, k) = exp(E1 + E2);
     }
-    //cout << "UpdateZ2" << endl;
     z[d].row(n) = normalise(z[d].row(n), 1);
-    //cout << "UpdateZ3" << endl;
 
     for (int k = 0; k < K; k++) {
         if (abs(z[d](n, k) - z_dn_old(k)) / abs(z_dn_old(k)) > EPS) {
@@ -26,13 +21,11 @@ bool UpdateZ(int d, int n, vector<mat>& z, mat& eta_m, mat& rho_m, vector< vecto
             break;
         }
     }
-    //if (converge) { cout << "==== Z converge ==================" << endl; }
     return converge;
 }
 
 /* update auxiliary */
 void UpdateAuxiliary(int idx, vec& alpha, mat& xi, mat& mu, mat& sd, int sum_idx) {
-    //cout << "UpdateAuxiliary" << endl;
     double temp1 = 0;
     double temp2 = 0;
 
@@ -49,18 +42,17 @@ void UpdateAuxiliary(int idx, vec& alpha, mat& xi, mat& mu, mat& sd, int sum_idx
 
 /* update eta */
 bool UpdateEta(int d, mat& eta_m, mat& eta_s, mat& xi_DK, vec& alpha_D, mat& u_m, mat& a_m, vector<mat>& z, double gamma, vector<int>& N, int K, double EPS){
-    //cout << "UpdateEta" << endl;
     bool converge = true;
     double temp;
 
     vec mu_old = eta_m.row(d).t();
     vec sigma_old = eta_s.row(d).t();
 
-    for(int k = 0; k < K; k++){
+    for(int k = 0; k < K; k++) {
         double lambda_xi = lambda(xi_DK(d, k));
         eta_s(d, k) = 1.0 / (gamma + 2 * N[d] * lambda_xi);
         temp = 0; // sum of z_dn_k
-        for(int n = 0; n < N[d]; n++){
+        for(int n = 0; n < N[d]; n++) {
             temp += (z[d])(n, k);
         }
         eta_m(d, k) = gamma * dot(u_m.row(k), a_m.row(d)) + N[d] * (2 * alpha_D(d) * lambda_xi - 0.5) + temp;
@@ -73,22 +65,17 @@ bool UpdateEta(int d, mat& eta_m, mat& eta_s, mat& xi_DK, vec& alpha_D, mat& u_m
             break;
         }
     }
-    //if (converge) { cout << "============ Eta converge ==================" << endl; }
     return converge;
 }
 
 /* update a */
 bool UpdateA(int d, mat& a_m, mat& a_s, mat& u_m, mat& u_s, mat& eta_m, double c, double gamma, int DOC_DIM, int K, double EPS){
-    //cout << "UpdateA" << endl;
     bool converge = true;
     mat temp1(DOC_DIM, DOC_DIM, fill::zeros);
     vec temp2(DOC_DIM, fill::zeros);
 
-    //cout << "UpdateA1" << endl;
     vec mu_old = a_m.row(d).t();
-    //cout << "UpdateA2" << endl;
     mat sigma_old = a_s;
-    //cout << "UpdateA3" << endl;
 
     if(d == 0) {
         for(int k = 0; k < K; k++) {
@@ -99,9 +86,9 @@ bool UpdateA(int d, mat& a_m, mat& a_s, mat& u_m, mat& u_s, mat& eta_m, double c
         a_m.row(d) = gamma * (a_s * temp2).t();
 
         /* Check if covariance matrix is symmetric */
-        for(int k1 = 0; k1 < DOC_DIM; k1++){
-            for(int k2 = k1; k2 < DOC_DIM; k2++){
-                if(abs(a_s(k1, k2) - a_s(k2, k1)) > 0.000001){
+        for(int k1 = 0; k1 < DOC_DIM; k1++) {
+            for(int k2 = k1; k2 < DOC_DIM; k2++) {
+                if (abs(a_s(k1, k2) - a_s(k2, k1)) > 0.000001) {
                     cout << "CAUTION: Covariance matrix should be symmetric (A)!!" << endl;
                 }
             }
@@ -117,9 +104,7 @@ bool UpdateA(int d, mat& a_m, mat& a_s, mat& u_m, mat& u_s, mat& eta_m, double c
     mat dif = abs(a_s - sigma_old) / abs(sigma_old);
     if(dif.max() > EPS) {
         converge = false;
-        //cout << "Covariance of (A) does not converege." << endl;
-    }
-    else{   
+    } else {   
         for(int k = 0; k < DOC_DIM; k++) {
             if(abs(a_m(d, k) - mu_old(k)) / abs(mu_old(k)) > EPS) {
                 converge = false;
@@ -128,13 +113,11 @@ bool UpdateA(int d, mat& a_m, mat& a_s, mat& u_m, mat& u_s, mat& eta_m, double c
         }
     }
 
-    //if (converge) { cout << "================ A converge ==================" << endl; }
     return converge;
 }
 
 /* update rho */
 bool UpdateRho(int k, mat& rho_m, vector<mat>& z, vector<vector<string> >& W, map<int, string>& idx2word, vec& beta, int D, vector<int>& N, int V, double EPS){
-    //cout << "UpdateRho" << endl;
     bool converge = true;
     double c_kw;
 
@@ -158,13 +141,11 @@ bool UpdateRho(int k, mat& rho_m, vector<mat>& z, vector<vector<string> >& W, ma
             break;
         }
     }
-    //if (converge) { cout << "===================== Rho converge ==================" << endl; }
     return converge;
 }
 
 /* update u */
 bool UpdateU(int k, mat& u_m, mat& u_s, mat& a_m, mat& a_s, mat& eta_m, double kappa, double gamma, int DOC_DIM, int D, double EPS) {
-    //cout << "UpdateU" << endl;
     bool converge = true;
 
     vec mu_old = u_m.row(k).t();
@@ -193,7 +174,6 @@ bool UpdateU(int k, mat& u_m, mat& u_s, mat& a_m, mat& a_s, mat& eta_m, double k
     mat dif = abs(u_s - sigma_old) / abs(sigma_old);
     if (dif.max() > EPS) {
         converge = false;
-        //cout << "Covariance of (U) does not converge" << endl;
     }
     else{
         for (int d = 0; d < DOC_DIM; d++) {
@@ -204,13 +184,11 @@ bool UpdateU(int k, mat& u_m, mat& u_s, mat& a_m, mat& a_s, mat& eta_m, double k
         }
     }
 
-    //if (converge) { cout << "================================= U converge ==================" << endl; }
     return converge;
 }
 
 /* update kappa */
 double UpdateKappa(mat& u_m, mat& u_s, int DOC_DIM, int K){
-    //cout << "UpdateKappa" << endl;
     double temp = 0;
 
     for(int k = 0; k < K; k++){
@@ -221,7 +199,6 @@ double UpdateKappa(mat& u_m, mat& u_s, int DOC_DIM, int K){
 
 /* update c */
 double UpdateC(mat& a_m, mat& a_s, int DOC_DIM, int D){
-    //cout << "UpdateC" << endl;
     double temp = 0;
 
     for(int d = 0; d < D; d++){
@@ -232,7 +209,6 @@ double UpdateC(mat& a_m, mat& a_s, int DOC_DIM, int D){
     
 /* update gamma */
 double UpdateGamma(mat& eta_m, mat& eta_s, mat& a_m, mat& a_s, mat& u_m, mat& u_s, int D, int K){
-    //cout << "UpdateGamma" << endl;
     double temp = 0;
     for(int d = 0; d < D; d++){
         mat cov = a_m.row(d).t() * a_m.row(d) + a_s;

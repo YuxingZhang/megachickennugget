@@ -1,7 +1,7 @@
-mat load_files(string embedding, string corpus, map<string, int>& word2idx, map<int, string>& idx2word, vector<vector<string> >& W, vector<int>& N) {
+void load_files(string embedding, string corpus, map<string, int>& word2idx, map<int, string>& idx2word, vector<vector<string> >& W, vector<int>& N) {
     /* param:
-     * embedding: file containing the word embedding results
-     * corpus: file containing the original corpus
+     * embedding: the file name of word embedding
+     * corpus: file name of the original corpus
      * word_embd: store the word embedding vectors
      * word2idx: word in the vocabulary to its index in the word_embd vector
      * indx2word: index in the word_embd vector to word in the vocabulary
@@ -16,7 +16,8 @@ mat load_files(string embedding, string corpus, map<string, int>& word2idx, map<
     /* read in the word embedding file */
     embd_file.open(embedding.c_str());
     if(!embd_file.is_open()){
-    	return mat(1, 1);
+        cout << "Embedding file does not exist!" << endl;
+    	return;
     }
     /* record the vocabulary size and embedding dimension */
    	embd_file >> val;
@@ -24,7 +25,6 @@ mat load_files(string embedding, string corpus, map<string, int>& word2idx, map<
 	embd_file >> val;
 	embedding_dim = stoi(val);
  
-	mat word_embd(vocabulary_size, embedding_dim);
 	index = 0;
 	/* store the word embedding results */
 	while(embd_file >> val){
@@ -32,7 +32,6 @@ mat load_files(string embedding, string corpus, map<string, int>& word2idx, map<
 		idx2word[index] = val;
 	    for(i = 0; i < embedding_dim; i++){
 	    	embd_file >> val;
-	    	word_embd(index, i) = stod(val);
 	    }
 	    index++;
 	}
@@ -57,5 +56,5 @@ mat load_files(string embedding, string corpus, map<string, int>& word2idx, map<
 			}
 		}
 	}
-    return word_embd;
+    return;
 }
