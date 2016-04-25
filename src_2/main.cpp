@@ -99,52 +99,31 @@ int main() {
             }
 
             for (set<int>::iterator d = idx_set.begin(); d != idx_set.end(); d++) {
-                /*
-                for (int n = 0; n < N[*d]; n++) {
-                    cout << "============================= z_dn "  << *d << "   " << n<< "=============================" << endl;
-                    cout << z[*d].row(n) << endl;
-                }
-                cout << "----------------------------- after -------------------------------" << endl;
-                */
-                
                 for (int n = 0; n < N[*d]; n++) {
                     if (!UpdateZ(*d, n, z, eta_m, rho_m, W, word2idx, K, EPS)) { has_converge = false; }
                 }
-		for (int n = 0; n < aux_iter; n++) {
-			UpdateAuxiliary(*d, alpha_D, xi_DK, eta_m, eta_s, K);
-               		if (!UpdateEta(*d, eta_m, eta_s, xi_DK, alpha_D, u_m, a_m, z, gamma, N, K, EPS)) { has_converge = false; }//cout << "eta does not converge" << endl;}
-			//cout << eta_m.row(*d) << endl;
-		}
-//		cout << "this is eta" << endl;
-//		cout << eta_m.row(*d) << endl;
-                if (!UpdateA(*d, a_m, a_s, u_m, u_s, eta_m, c, gamma, DOC_DIM, K, EPS)) { has_converge = false;}// cout << "a does not converge" << endl;}
-	//	cout << "this is a" << endl;
-	//	cout << a_m.row(*d) << endl;
+                for (int n = 0; n < aux_iter; n++) {
+                    UpdateAuxiliary(*d, alpha_D, xi_DK, eta_m, eta_s, K);
+                    if (!UpdateEta(*d, eta_m, eta_s, xi_DK, alpha_D, u_m, a_m, z, gamma, N, K, EPS)) { has_converge = false; }
+                }
+                if (!UpdateA(*d, a_m, a_s, u_m, u_s, eta_m, c, gamma, DOC_DIM, K, EPS)) { has_converge = false;}
             }
 
             for (int k = 0; k < K; k++) {
-                if (!UpdateRho(k, rho_m, z, W, idx2word, beta, D, N, V, EPS)) { has_converge = false; }//cout << "rho does not converge" << endl;}
-                //cout << "============================= rho_m "  << k << "=============================" << endl;
-                //cout << rho_m.row(k) << endl;
-                if (!UpdateU(k, u_m, u_s, a_m, a_s, eta_m, kappa, gamma, DOC_DIM, D, EPS)) { has_converge = false; }//cout << "u does not converge" << endl;}
-
-                           }
+                if (!UpdateRho(k, rho_m, z, W, idx2word, beta, D, N, V, EPS)) { has_converge = false; }
+                if (!UpdateU(k, u_m, u_s, a_m, a_s, eta_m, kappa, gamma, DOC_DIM, D, EPS)) { has_converge = false; }
+            }
             if (has_converge) { break; }
         }
 
         kappa = UpdateKappa(u_m, u_s, DOC_DIM, K);
         c = UpdateC(a_m, a_s, DOC_DIM, D);
-//	cout << beta.t() << endl;
-	//cin.get();
-	//cout << "after ==========================" << endl;
-        //UpdateBeta(beta, rho_m, V, K);
-	//cout << beta.t() << endl;
         gamma = UpdateGamma(eta_m, eta_s, a_m, a_s, u_m, u_s, D, K);
     }
 
     // TODO: Evaluate
     for(int k = 0; k < K; k++){
-    	cout << rho_m.row(k) << endl;
+        cout << rho_m.row(k) << endl;
         uvec indx = sort_index(rho_m.row(k).t(), "descend");
         cout << "topic " << k << endl;
         for(int i = 0; i < 5; i++){
