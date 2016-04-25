@@ -9,7 +9,8 @@ void ComputeUpSigma(mat& up_s, mat& word_embedding, double& beta, double& l, int
     for(int i = 0; i < V; i++){
         temp += (word_embedding.row(i).t() * word_embedding.row(i));
     }
-    up_s = (l * eye<mat>(WORD_DIM, WORD_DIM) + beta * temp).i();
+    
+    up_s = l * eye<mat>(WORD_DIM, WORD_DIM) + beta * temp;
     return;
 }
 

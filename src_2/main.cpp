@@ -11,7 +11,7 @@ using namespace std;
 using namespace arma;
 #include "digamma.cpp"
 #include "load.cpp"
-#include "update_new.cpp"
+#include "update.cpp"
 #include "opt_beta.cpp"
 
 void load_files(string embedding, string corpus, mat word_embd, map<string, int>& word2idx, map<int, string>& idx2word, vector<vector<string> >& W, vector<int>& N);
@@ -127,9 +127,6 @@ int main() {
                 //cout << "============================= rho_m "  << k << "=============================" << endl;
                 //cout << rho_m.row(k) << endl;
                 if (!UpdateU(k, u_m, u_s, a_m, a_s, eta_m, kappa, gamma, DOC_DIM, D, EPS)) { has_converge = false; }//cout << "u does not converge" << endl;}
-
-                           }
-            if (has_converge) { break; }
         }
 
         kappa = UpdateKappa(u_m, u_s, DOC_DIM, K);
