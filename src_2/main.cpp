@@ -18,20 +18,19 @@ void load_files(string embedding, string corpus, mat word_embd, map<string, int>
 
 int main() {
     // Reading input files, including the corpus and the embedding
-    string emb_file = "../vectors.txt";
+    string emb_file = "../vectors.txt"; // now only used to get the vocabulary
     string corpus_file = "../new_corpus.txt";
 
     map<string, int> word2idx;  // V
     map<int, string> idx2word;  // V
     vector< vector<string> > W; // W[d][n] is w_dn
     vector<int> N; // N[d] is the length of document d
-    mat word_embedding = load_files(emb_file, corpus_file, word2idx, idx2word, W, N); // V * dim, each line is a vector of double
+    load_files(emb_file, corpus_file, word2idx, idx2word, W, N); // V * dim, each line is a vector of double
 
     // some parameters
     const int V = idx2word.size(); // vocabulary size
     const int D = W.size(); // number of documents
     const int K = 4; // number of topics
-    const int WORD_DIM = 20; // dimension of word embedding
     const int DOC_DIM = 10;// dimension of document embedding
 
     // model parameters, changed in the M step
