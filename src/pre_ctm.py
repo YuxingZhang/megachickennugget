@@ -9,7 +9,7 @@ if __name__ == '__main__':
 		'how', 'no', 'since', 'very', 'however', 'any', 'just', 'only', 'also'])
 
 	path = '/Users/Lidan/Documents/CMU Yr1 Sem2/10-708/Project/nipsdata/'
-	input_file = 'a_result/test.txt'
+	input_file = 'a_result/abstracts.txt'
 	# new_corpus_file gives the processed corpus file without 'remove' words
 	new_corpus_file = 'a_result/new_corpus.txt'
 	output_file = 'a_result/wordcount.dat'
@@ -59,7 +59,9 @@ if __name__ == '__main__':
 		words = l.split(' ')
 		for w in words:
 			if vocab_hm.has_key(w):
-				fout_corpus.write(w + ' ')
+				if len(d) > 0:
+					fout_corpus.write(' ');
+				fout_corpus.write(w)
 				if d.has_key(w):
 					d[w] += 1
 				else:
@@ -68,8 +70,9 @@ if __name__ == '__main__':
 		for i in range(len(vocab)):
 			if d.has_key(vocab[i]):
 				f_out.write(' ' + str(i) + ':' + str(d[vocab[i]]))
-		f_out.write('\n')
-		fout_corpus.write('\n')
+		if len(d) > 0:
+			f_out.write('\n')
+			fout_corpus.write('\n')
 	f.close()
 	f_out.close()
 	fout_corpus.close()
