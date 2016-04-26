@@ -110,7 +110,7 @@ int main() {
             }
 
             for (int k = 0; k < K; k++) {
-                if (!UpdateRho(k, rho_m, z, W, idx2word, beta, D, N, V, EPS)) { has_converge = false; }
+                if (!UpdateRho(k, rho_m, z, W, word2idx, beta, D, N, V, EPS)) { has_converge = false; }
                 if (!UpdateU(k, u_m, u_s, a_m, a_s, eta_m, kappa, gamma, DOC_DIM, D, EPS)) { has_converge = false; }
             }
             if (has_converge) { break; }
