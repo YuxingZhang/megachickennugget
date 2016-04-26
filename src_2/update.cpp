@@ -117,22 +117,35 @@ bool UpdateA(int d, mat& a_m, mat& a_s, mat& u_m, mat& u_s, mat& eta_m, double c
 }
 
 /* update rho */
-bool UpdateRho(int k, mat& rho_m, vector<mat>& z, vector<vector<string> >& W, map<int, string>& idx2word, vec& beta, int D, vector<int>& N, int V, double EPS){
+// bool UpdateRho(int k, mat& rho_m, vector<mat>& z, vector<vector<string> >& W, map<int, string>& idx2word, vec& beta, int D, vector<int>& N, int V, double EPS){
+bool UpdateRho(int k, mat& rho_m, vector<mat>& z, vector<vector<string> >& W, map<string, int>& word2idx, vec& beta, int D, vector<int>& N, int V, double EPS){
     bool converge = true;
     double c_kw;
 
     vec mu_old = rho_m.row(k).t();
 
-    for(int w = 0; w < V; w++){
-        c_kw = 0.0;
-        for(int d = 0; d < D; d++){
-            for(int n = 0; n < N[d]; n++){
-                if(!W[d][n].compare(idx2word[w])){
-                    c_kw += (z[d])(n, k);
-                }
-            }
-        } 
-        rho_m(k, w) = c_kw + beta(w);
+    vec c_k(V, fill::zeros);
+
+    for (int d = 0; d < D; d++){
+        for (int n = 0; n < N[d]; n++){
+            c_k(word2idx[W[d][n]]) += z[d](n, k);
+        }
+    }
+
+    // for(int w = 0; w < V; w++){
+    //     c_kw = 0.0;
+    //     for(int d = 0; d < D; d++){
+    //         for(int n = 0; n < N[d]; n++){
+    //             if(!W[d][n].compare(idx2word[w])){
+    //                 c_kw += (z[d])(n, k);
+    //             }
+    //         }
+    //     } 
+    //     rho_m(k, w) = c_kw + beta(w);
+    // }
+
+    for (int w = 0; w < V; w++){
+        rho_m(k, w) = c_k(w) + beta(w);
     }
 
     for(int w = 0; w < V; w++){
