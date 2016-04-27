@@ -136,11 +136,12 @@ bool UpdateRho(int k, mat& rho_m, vector<mat>& z, vector<vector<string> >& W, ma
 
     vec mu_old = rho_m.row(k).t();
 
-    vec c_k(V, fill::zeros);
+    double c_k[V];
+    memset(c_k, 0, V);
 
     for (int d = 0; d < D; d++){
         for (int n = 0; n < N[d]; n++){
-            c_k(word2idx[W[d][n]]) += z[d](n, k);
+            c_k[word2idx[W[d][n]]] += z[d](n, k);
         }
     }
 
@@ -157,7 +158,7 @@ bool UpdateRho(int k, mat& rho_m, vector<mat>& z, vector<vector<string> >& W, ma
     // }
 
     for (int w = 0; w < V; w++){
-        rho_m(k, w) = c_k(w) + beta(w);
+        rho_m(k, w) = c_k[w] + beta(w);
     }
 
     for(int w = 0; w < V; w++){
