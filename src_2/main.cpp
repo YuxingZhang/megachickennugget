@@ -98,11 +98,9 @@ int main() {
                 idx_set.insert(random_index[i]);
             }
 
+            cout << "upday Z" << endl;
+            if (!UpdateZ(idx_set, N, z, eta_m, rho_m, W, word2idx, K, EPS)) { has_converge = false; }
             for (set<int>::iterator d = idx_set.begin(); d != idx_set.end(); d++) {
-                cout << "upday Z" << endl;
-                for (int n = 0; n < N[*d]; n++) {
-                    if (!UpdateZ(*d, n, z, eta_m, rho_m, W, word2idx, K, EPS)) { has_converge = false; }
-                }
                 cout << "upday Eta" << endl;
                 for (int n = 0; n < aux_iter; n++) {
                     UpdateAuxiliary(*d, alpha_D, xi_DK, eta_m, eta_s, K);
