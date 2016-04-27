@@ -29,6 +29,7 @@ void SampleEta(int d, vec& eta_m, vec& u_m, vec& a_m, vector<mat>& z, int N, int
 			if(prob > accept) new_eta = old_eta;
 
 			eta_sample += new_eta;
+			old_eta = new_eta;
 		}
 		eta_m(k) = eta_sample / 1000;
 	}
