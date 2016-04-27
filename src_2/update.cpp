@@ -6,8 +6,9 @@ double lambda(double xi){
 bool UpdateZ(set<int>& idx_set, vector<int>& N, vector<mat>& z, mat& eta_m, mat& rho_m, vector< vector<string> >& W, map<string, int>& word2idx, int K, double EPS) {
     bool converge = true;
     double E22[K];
+
     for (int k = 0; k < K; k++) {
-        E22[k] = digammal(sum(rho_m.row(k)));
+        E22[k] = digamma(sum(rho_m.row(k)));
     }
     for (set<int>::iterator iter = idx_set.begin(); iter != idx_set.end(); iter++) {
         int d = *iter;
@@ -20,7 +21,9 @@ bool UpdateZ(set<int>& idx_set, vector<int>& N, vector<mat>& z, mat& eta_m, mat&
             string w_dn = W[d][n];
 
             for (int k = 0; k < K; k++) {
-                double E2 = digammal(rho_m(k, word2idx[w_dn])) - E22[k];
+                //cout << "digamma ============== start" << endl;
+                double E2 = digamma(rho_m(k, word2idx[w_dn])) - E22[k];
+                //cout << "digamma =========================== finished" << endl;
                 z[d](n, k) = exp(E1[k] + E2);
             }
             z[d].row(n) = normalise(z[d].row(n), 1);

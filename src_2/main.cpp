@@ -7,6 +7,7 @@
 #include <armadillo>
 #include <algorithm>
 #include <cmath>
+#include <ctime>
 using namespace std;
 using namespace arma;
 #include "digamma.cpp"
@@ -30,7 +31,7 @@ int main() {
     // some parameters
     const int V = idx2word.size(); // vocabulary size
     const int D = W.size(); // number of documents
-    const int K = 5; // number of topics
+    const int K = 1000; // number of topics
     const int WORD_DIM = 20; // dimension of word embedding
     const int DOC_DIM = 10;// dimension of document embedding
 
@@ -83,7 +84,8 @@ int main() {
         iteration++;
 
         int inner_iteration = 0;
-        while (true) {
+        while (inner_iteration < 3) {
+            clock_t begin = clock();
             inner_iteration++;
             cout << inner_iteration << endl;
             bool has_converge = true;
@@ -97,26 +99,32 @@ int main() {
             for (int i = cur_batch * BATCH_SIZE; i < (cur_batch + 1) * BATCH_SIZE && i < (int)random_index.size(); i++) {
                 idx_set.insert(random_index[i]);
             }
+            //cout << idx_set.size() << endl;
 
-            cout << "upday Z" << endl;
+            //cout << "upday Z" << endl;
+
             if (!UpdateZ(idx_set, N, z, eta_m, rho_m, W, word2idx, K, EPS)) { has_converge = false; }
+            //cout << "upday Z time = " << elapsed_secs << endl;
             for (set<int>::iterator d = idx_set.begin(); d != idx_set.end(); d++) {
-                cout << "upday Eta" << endl;
+                //cout << "upday Eta" << endl;
                 for (int n = 0; n < aux_iter; n++) {
                     UpdateAuxiliary(*d, alpha_D, xi_DK, eta_m, eta_s, K);
                     if (!UpdateEta(*d, eta_m, eta_s, xi_DK, alpha_D, u_m, a_m, z, gamma, N, K, EPS)) { has_converge = false; }
                 }
-                cout << "upday A" << endl;
+                //cout << "upday A" << endl;
                 if (!UpdateA(*d, a_m, a_s, u_m, u_s, eta_m, c, gamma, DOC_DIM, K, EPS)) { has_converge = false;}
             }
 
             for (int k = 0; k < K; k++) {
-                cout << "upday Rho" << endl;
+                //cout << "upday Rho" << endl;
                 if (!UpdateRho(k, rho_m, z, W, word2idx, beta, D, N, V, EPS)) { has_converge = false; }
-                cout << "upday U" << endl;
+                //cout << "upday U" << endl;
                 if (!UpdateU(k, u_m, u_s, a_m, a_s, eta_m, kappa, gamma, DOC_DIM, D, EPS)) { has_converge = false; }
             }
             if (has_converge) { break; }
+            clock_t end = clock();
+            double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+            cout << "time = " << elapsed_secs << endl;
         }
 
         kappa = UpdateKappa(u_m, u_s, DOC_DIM, K);
