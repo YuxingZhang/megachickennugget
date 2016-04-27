@@ -137,7 +137,7 @@ bool UpdateRho(int k, mat& rho_m, vector<mat>& z, vector<vector<string> >& W, ma
     vec mu_old = rho_m.row(k).t();
 
     double c_k[V];
-    memset(c_k, 0, V);
+    memset(c_k, 0, sizeof(c_k));
 
     for (int d = 0; d < D; d++){
         for (int n = 0; n < N[d]; n++){

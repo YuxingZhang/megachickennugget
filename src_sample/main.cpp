@@ -60,9 +60,6 @@ int main() {
     mat u_m(K, DOC_DIM, fill::randu); // mean of u
     mat u_s = diagmat(vec(DOC_DIM, fill::randu)); // sigma of u, shared
 
-    mat xi_DK(D, K, fill::randu); // used in lower bound of eta_d
-    vec alpha_D(D, fill::randu);
-
     // train for each batch
     vector<int> random_index;
     for (size_t i = 0; i < W.size(); i++) {
@@ -103,8 +100,7 @@ int main() {
             for (set<int>::iterator d = idx_set.begin(); d != idx_set.end(); d++) {
                 cout << "upday Eta" << endl;
                 for (int n = 0; n < aux_iter; n++) {
-                    UpdateAuxiliary(*d, alpha_D, xi_DK, eta_m, eta_s, K);
-                    if (!UpdateEta(*d, eta_m, eta_s, xi_DK, alpha_D, u_m, a_m, z, gamma, N, K, EPS)) { has_converge = false; }
+                    if (!SampleEta(*d, eta_m, eta_s, xi_DK, alpha_D, u_m, a_m, z, gamma, N, K, EPS)) { has_converge = false; }
                 }
                 cout << "upday A" << endl;
                 if (!UpdateA(*d, a_m, a_s, u_m, u_s, eta_m, c, gamma, DOC_DIM, K, EPS)) { has_converge = false;}
@@ -121,7 +117,6 @@ int main() {
 
         kappa = UpdateKappa(u_m, u_s, DOC_DIM, K);
         c = UpdateC(a_m, a_s, DOC_DIM, D);
-        gamma = UpdateGamma(eta_m, eta_s, a_m, a_s, u_m, u_s, D, K);
     }
 
     // TODO: Evaluate
