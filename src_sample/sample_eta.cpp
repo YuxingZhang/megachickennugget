@@ -35,9 +35,10 @@ void SampleEta(int d, mat& eta_m, mat& u_m, mat& a_m, vector<mat>& z, double gam
             // get the new sample
             uniform_real_distribution<double> u_distribution(0.0, 1.0);
             double prob = u_distribution(generator);
-            if(prob > accept) new_eta = prev_eta(k);
-
-            if(i > iterations - num_sample){
+            if (prob > accept) { // reject the sample
+            	new_eta = prev_eta(k);
+            }
+            if(i > iterations - num_sample) { // If after burn-in period
                 eta_sample_sum(k) += new_eta;
             }
             sum_eta = sum_eta - exp(prev_eta(k)) + exp(new_eta);
