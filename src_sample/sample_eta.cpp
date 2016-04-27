@@ -18,6 +18,7 @@ void SampleEta(int d, mat& eta_m, mat& u_m, mat& a_m, vector<mat>& z, double gam
 	// Gibbs sampling
     for (int i = 0; i < iterations; i++){
         for (int k = 0; k < K; k++) {
+            C = sum(prev_eta) - prev_eta(k);
             normal_distribution<double> distribution(proposal_mu, proposal_sigma);
             // propose from the normal distribution
             new_eta = distribution(generator);
