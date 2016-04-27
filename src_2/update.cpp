@@ -3,22 +3,34 @@ double lambda(double xi){
 }
 
 /* update z_dn */
-bool UpdateZ(int d, int n, vector<mat>& z, mat& eta_m, mat& rho_m, vector< vector<string> >& W, map<string, int>& word2idx, int K, double EPS) {
+bool UpdateZ(set<int>& idx_set, vector<int>& N, vector<mat>& z, mat& eta_m, mat& rho_m, vector< vector<string> >& W, map<string, int>& word2idx, int K, double EPS) {
     bool converge = true;
-    vec z_dn_old = z[d].row(n).t();
-    string w_dn = W[d][n];
-
+    double E22[K];
     for (int k = 0; k < K; k++) {
-        double E1 = eta_m(d, k);
-        double E2 = digammal(rho_m(k, word2idx[w_dn])) - digammal(sum(rho_m.row(k)));
-        z[d](n, k) = exp(E1 + E2);
+        E22[k] = digammal(sum(rho_m.row(k)));
     }
-    z[d].row(n) = normalise(z[d].row(n), 1);
+    for (set<int>::iterator iter = idx_set.begin(); iter != idx_set.end(); iter++) {
+        int d = *iter;
+        double E1[K];
+        for (int k = 0; k < K; k++) {
+            E1[k] = eta_m(d, k);
+        }
+        for (int n = 0; n < N[d]; n++) {
+            vec z_dn_old = z[d].row(n).t();
+            string w_dn = W[d][n];
 
-    for (int k = 0; k < K; k++) {
-        if (abs(z[d](n, k) - z_dn_old(k)) / abs(z_dn_old(k)) > EPS) {
-            converge = false;
-            break;
+            for (int k = 0; k < K; k++) {
+                double E2 = digammal(rho_m(k, word2idx[w_dn])) - E22[k];
+                z[d](n, k) = exp(E1[k] + E2);
+            }
+            z[d].row(n) = normalise(z[d].row(n), 1);
+
+            for (int k = 0; k < K; k++) {
+                if (abs(z[d](n, k) - z_dn_old(k)) / abs(z_dn_old(k)) > EPS) {
+                    converge = false;
+                    break;
+                }
+            }
         }
     }
     return converge;
