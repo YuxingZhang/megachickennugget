@@ -99,18 +99,23 @@ int main() {
             }
 
             for (set<int>::iterator d = idx_set.begin(); d != idx_set.end(); d++) {
+                cout << "upday Z" << endl;
                 for (int n = 0; n < N[*d]; n++) {
                     if (!UpdateZ(*d, n, z, eta_m, rho_m, W, word2idx, K, EPS)) { has_converge = false; }
                 }
+                cout << "upday Eta" << endl;
                 for (int n = 0; n < aux_iter; n++) {
                     UpdateAuxiliary(*d, alpha_D, xi_DK, eta_m, eta_s, K);
                     if (!UpdateEta(*d, eta_m, eta_s, xi_DK, alpha_D, u_m, a_m, z, gamma, N, K, EPS)) { has_converge = false; }
                 }
+                cout << "upday A" << endl;
                 if (!UpdateA(*d, a_m, a_s, u_m, u_s, eta_m, c, gamma, DOC_DIM, K, EPS)) { has_converge = false;}
             }
 
             for (int k = 0; k < K; k++) {
+                cout << "upday Rho" << endl;
                 if (!UpdateRho(k, rho_m, z, W, word2idx, beta, D, N, V, EPS)) { has_converge = false; }
+                cout << "upday U" << endl;
                 if (!UpdateU(k, u_m, u_s, a_m, a_s, eta_m, kappa, gamma, DOC_DIM, D, EPS)) { has_converge = false; }
             }
             if (has_converge) { break; }
