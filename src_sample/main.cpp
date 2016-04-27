@@ -13,6 +13,7 @@ using namespace arma;
 #include "load.cpp"
 #include "update.cpp"
 #include "opt_beta.cpp"
+#include "sample_eta.cpp"
 
 void load_files(string embedding, string corpus, map<string, int>& word2idx, map<int, string>& idx2word, vector<vector<string> >& W, vector<int>& N);
 

@@ -24,7 +24,7 @@ void SampleEta(int d, vec& eta_m, vec& u_m, vec& a_m, vector<mat>& z, int N, int
   			accept = min((C + exp(new_eta)) / (C + exp(old_eta)), 1);
 
 			// get the new sample
-			uniform_real_distribution<double> distribution(0.0,1.0);
+			uniform_real_distribution<double> distribution(0.0, 1.0);
 			double prob = distribution(generator);
 			if(prob > accept) new_eta = old_eta;
 
