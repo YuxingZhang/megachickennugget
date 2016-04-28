@@ -16,9 +16,10 @@ void SampleEta(int d, mat& eta_m, mat& u_m, mat& a_m, vector<mat>& z, double gam
             tmp += z[d](n, k); 
         }
         proposal_mu[k] = dot(u_m.row(k), a_m.row(d)) + tmp / gamma;
-        cout << proposal_mu[k] << " ";
+        //cout << "dot, tmp / gamma = " << dot(u_m.row(k), a_m.row(d)) << " " << tmp / gamma << endl;
+        //cout << proposal_mu[k] << " ";
     }
-    cout << endl;
+    //cout << endl;
     double proposal_sigma = 1 / gamma;
 
     // Gibbs sampling
@@ -44,11 +45,11 @@ void SampleEta(int d, mat& eta_m, mat& u_m, mat& a_m, vector<mat>& z, double gam
             prev_eta(k) = new_eta;
         }
     }
-    cout << "before" << endl;
-    cout << eta_m.row(d);
+    //cout << "before" << endl;
+    //cout << eta_m.row(d);
     eta_m.row(d) = eta_sample_sum.t() / num_sample;
-    cout << "after" << endl;
-    cout << eta_m.row(d);
+    //cout << "after" << endl;
+    //cout << eta_m.row(d);
 
     return;
 }

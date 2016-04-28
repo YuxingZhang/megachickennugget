@@ -47,37 +47,6 @@ long double digammal(long double x)
 		return 0.5L*(digammal(x/2.0L)+digammal((x+1.0L)/2.0L))+M_LN2l ;
 	else
 	{
-		/* Just for your information, the following lines contain
-		* the Maple source code to re-generate the table that is
-		* eventually becoming the Kncoe[] array below
-		* interface(prettyprint=0) :
-		* Digits := 63 :
-		* r := 0 :
-		* 
-		* for l from 1 to 60 do
-		* 	d := binomial(-1/2,l) :
-		* 	r := r+d*(-1)^l*(Zeta(2*l+1) -1) ;
-		* 	evalf(r) ;
-		* 	print(%,evalf(1+Psi(1)-r)) ;
-		*o d :
-		* 
-		* for N from 1 to 28 do
-		* 	r := 0 :
-		* 	n := N-1 :
-		*
- 		*	for l from iquo(n+3,2) to 70 do
-		*		d := 0 :
- 		*		for s from 0 to n+1 do
- 		*		 d := d+(-1)^s*binomial(n+1,s)*binomial((s-1)/2,l) :
- 		*		od :
- 		*		if 2*l-n > 1 then
- 		*		r := r+d*(-1)^l*(Zeta(2*l-n) -1) :
- 		*		fi :
- 		*	od :
- 		*	print(evalf((-1)^n*2*r)) ;
- 		*od :
- 		*quit :
-		*/
 		static long double Kncoe[] = { .30459198558715155634315638246624251L,
 		.72037977439182833573548891941219706L, -.12454959243861367729528855995001087L,
 		.27769457331927827002810119567456810e-1L, -.67762371439822456447373550186163070e-2L,

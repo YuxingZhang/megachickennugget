@@ -21,7 +21,7 @@ int main() {
     // Reading input files, including the corpus and the embedding
     string emb_file = "../abs_vectors.txt";
     string corpus_file = "../abs_corpus.txt";
-    arma_rng::set_seed_random();
+    //arma_rng::set_seed_random();
     map<string, int> word2idx;  // V
     map<int, string> idx2word;  // V
     vector< vector<string> > W; // W[d][n] is w_dn
@@ -67,7 +67,7 @@ int main() {
         random_index.push_back(i);
     }
     random_shuffle(random_index.begin(), random_index.end());
-    const int BATCH_SIZE = 20;
+    const int BATCH_SIZE = 87;
     const double EPS = 0.1;
     int num_of_batch = (int)((random_index.size() + BATCH_SIZE - 1) / BATCH_SIZE);
     int cur_batch = num_of_batch;
@@ -102,6 +102,21 @@ int main() {
                 has_converge = false; 
                 //cout << "Z -------------> NOT CONVERGE" << endl;
             }
+            for (int d = 0; d < D; d++) {
+                if (!z[d].is_finite()) {
+                    cout << "Z_dnk nan" << endl;
+                    for (int n = 0; n < N[d]; n++) {
+                        for (int k = 0; k < K; k++) {
+                            if (std::isnan(z[d](n, k))) {
+                                cout << "nan index d, n, k === " << d << " " << n << " " << k << endl;
+                            }
+                        }
+                    }
+                    for (int n = 0; n < N[d]; n++) {
+                        cout << W[d][n] << " ";
+                    }
+                }
+            }
             for (set<int>::iterator d = idx_set.begin(); d != idx_set.end(); d++) {
                 //cout << "sample Eta" << endl;
                 SampleEta(*d, eta_m, u_m, a_m, z, gamma, N, K);
@@ -111,7 +126,13 @@ int main() {
                     //cout << "A -------------> NOT CONVERGE" << endl;
                 }
             }
-            cout << eta_m.row(0) << endl;
+            if (!eta_m.is_finite()) {
+                cout << "eta_m nan" << endl;
+            }
+            if (!a_m.is_finite()) {
+                cout << "a_m nan" << endl;
+            }
+            //cout << eta_m.row(0) << endl;
 
             for (int k = 0; k < K; k++) {
                 //cout << "upday Rho" << endl;
@@ -125,6 +146,16 @@ int main() {
                     //cout << "U -------------> NOT CONVERGE" << endl;
                 }
             }
+            if (!rho_m.is_finite()) {
+                cout << "rho_m nan" << endl;
+            }
+            if (!u_m.is_finite()) {
+                cout << "u_m nan" << endl;
+            }
+            if (!u_s.is_finite()) {
+                cout << "u_s nan" << endl;
+            }
+            cout << "iteration finished" << endl;
             if (has_converge) { break; }
         }
 
