@@ -11,7 +11,7 @@ bool UpdateZ(set<int>& idx_set, vector<int>& N, vector<mat>& z, mat& eta_m, mat&
         if (digamma_input == 0) {
             cout << "digamma 1 input = 0" << endl;
         }
-        E22[k] = digamma(digamma_input);
+        E22[k] = digammal(digamma_input);
     }
     for (set<int>::iterator iter = idx_set.begin(); iter != idx_set.end(); iter++) {
         int d = *iter;
@@ -29,8 +29,9 @@ bool UpdateZ(set<int>& idx_set, vector<int>& N, vector<mat>& z, mat& eta_m, mat&
                 if (digamma_input == 0) {
                     cout << "digamma 2 input = 0" << endl;
                 }
-                double E2 = digamma(digamma_input) - E22[k];
+                double E2 = digammal(digamma_input) - E22[k];
                 z[d](n, k) = E1[k] + E2;
+                cout << "E1, E2 = " << E1[k] << " " << E2 << " " << d << " " << n << " " << k << endl;
                 sum += z[d](n, k);
             }
             sum = sum / K;

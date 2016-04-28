@@ -1,5 +1,2 @@
-main: main.cpp
-	g++ -std=c++11 main.cpp -g -o  main -O2 -larmadillo
-
-aged: main.cpp
-	g++ -std=c++11 main.cpp -o main -O3 -Wl,-Bstatic -larmadillo
+main: main.cpp sample_eta.cpp update.cpp opt_beta.cpp
+	g++ -std=c++11 main.cpp -o main -O3 -larmadillo
