@@ -102,21 +102,6 @@ int main() {
                 has_converge = false; 
                 //cout << "Z -------------> NOT CONVERGE" << endl;
             }
-            for (int d = 0; d < D; d++) {
-                if (!z[d].is_finite()) {
-                    cout << "Z_dnk nan" << endl;
-                    for (int n = 0; n < N[d]; n++) {
-                        for (int k = 0; k < K; k++) {
-                            if (std::isnan(z[d](n, k))) {
-                                cout << "nan index d, n, k === " << d << " " << n << " " << k << endl;
-                            }
-                        }
-                    }
-                    for (int n = 0; n < N[d]; n++) {
-                        cout << W[d][n] << " ";
-                    }
-                }
-            }
             for (set<int>::iterator d = idx_set.begin(); d != idx_set.end(); d++) {
                 //cout << "sample Eta" << endl;
                 SampleEta(*d, eta_m, u_m, a_m, z, gamma, N, K);
@@ -125,12 +110,6 @@ int main() {
                     has_converge = false;
                     //cout << "A -------------> NOT CONVERGE" << endl;
                 }
-            }
-            if (!eta_m.is_finite()) {
-                cout << "eta_m nan" << endl;
-            }
-            if (!a_m.is_finite()) {
-                cout << "a_m nan" << endl;
             }
             //cout << eta_m.row(0) << endl;
 
@@ -145,15 +124,6 @@ int main() {
                     has_converge = false; 
                     //cout << "U -------------> NOT CONVERGE" << endl;
                 }
-            }
-            if (!rho_m.is_finite()) {
-                cout << "rho_m nan" << endl;
-            }
-            if (!u_m.is_finite()) {
-                cout << "u_m nan" << endl;
-            }
-            if (!u_s.is_finite()) {
-                cout << "u_s nan" << endl;
             }
             cout << "iteration finished" << endl;
             if (has_converge) { break; }

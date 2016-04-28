@@ -31,7 +31,6 @@ bool UpdateZ(set<int>& idx_set, vector<int>& N, vector<mat>& z, mat& eta_m, mat&
                 }
                 double E2 = digammal(digamma_input) - E22[k];
                 z[d](n, k) = E1[k] + E2;
-                cout << "E1, E2 = " << E1[k] << " " << E2 << " " << d << " " << n << " " << k << endl;
                 sum += z[d](n, k);
             }
             sum = sum / K;
