@@ -82,7 +82,7 @@ int main() {
         iteration++;
 
         int inner_iteration = 0;
-        while (true) {
+        while (inner_iteration < 2 * MAX_ITER) {
             inner_iteration++;
             cout << inner_iteration << endl;
             bool has_converge = true;
@@ -134,8 +134,9 @@ int main() {
     }
 
     // TODO: Evaluate
+    cout << "eta_m =" << eta_m << endl;
     for(int k = 0; k < K; k++){
-        cout << rho_m.row(k) << endl;
+        //cout << rho_m.row(k) << endl;
         uvec indx = sort_index(rho_m.row(k).t(), "descend");
         cout << "topic " << k << endl;
         for(int i = 0; i < 5; i++){

@@ -23,7 +23,7 @@ bool UpdateZ(set<int>& idx_set, vector<int>& N, vector<mat>& z, mat& eta_m, mat&
             vec z_dn_old = z[d].row(n).t();
             string w_dn = W[d][n];
 
-            double sum = 0.0;
+            double max_p = -100000.0;
             for (int k = 0; k < K; k++) {
                 double digamma_input = rho_m(k, word2idx[w_dn]);
                 if (digamma_input == 0) {
@@ -31,11 +31,12 @@ bool UpdateZ(set<int>& idx_set, vector<int>& N, vector<mat>& z, mat& eta_m, mat&
                 }
                 double E2 = digammal(digamma_input) - E22[k];
                 z[d](n, k) = E1[k] + E2;
-                sum += z[d](n, k);
+                if (z[d](n, k) > max_p) {
+                    max_p = z[d](n, k);
+                }
             }
-            sum = sum / K;
             for (int k = 0; k < K; k++) {
-                z[d](n, k) = exp(z[d](n, k) - sum);
+                z[d](n, k) = exp(z[d](n, k) - max_p);
             }
             z[d].row(n) = normalise(z[d].row(n), 1);
 
