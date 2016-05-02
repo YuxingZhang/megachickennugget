@@ -75,7 +75,7 @@ int main() {
     cout << "vocabulary size = " << V << endl;
 
     int iteration = 0;
-    int MAX_ITER = 10;
+    int MAX_ITER = 5;
     int aux_iter = 10;
     cout << eta_m.row(0) << endl;
     while (iteration < MAX_ITER) {
@@ -134,7 +134,14 @@ int main() {
     }
 
     // TODO: Evaluate
-    cout << "eta_m =" << eta_m << endl;
+    cout << "z_0n = " << endl;
+    cout << z[0] << endl;
+    cout << "z_1n = " << endl;
+    cout << z[1] << endl;
+    cout << "z_2n = " << endl;
+    cout << z[2] << endl;
+    cout << "z_3n = " << endl;
+    cout << z[3] << endl;
     for(int k = 0; k < K; k++){
         //cout << rho_m.row(k) << endl;
         uvec indx = sort_index(rho_m.row(k).t(), "descend");
