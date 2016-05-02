@@ -80,14 +80,16 @@ int main() {
     int MAX_ITER = 10;
     int aux_iter = 10;
     cout << eta_m.row(0) << endl;
-
+    double elbo, prev_elbo;
 
     while (iteration < MAX_ITER) {
         iteration++;
 
         int inner_iteration = 0;
+        // E-step: Variational Inference
         while (inner_iteration < 2 * MAX_ITER) {
-            double elbo = 0.0;
+            prev_elbo = elbo;
+            elbo = 0.0;
             inner_iteration++;
             cout << inner_iteration << endl;
             bool has_converge = true;
@@ -102,40 +104,49 @@ int main() {
                 idx_set.insert(random_index[i]);
             }
 
-            //cout << "upday Z" << endl;
-            if (!UpdateZ(idx_set, N, z, eta_m, rho_m, W, word2idx, K, EPS)) { 
-                has_converge = false; 
-                //cout << "Z -------------> NOT CONVERGE" << endl;
-            }
+            // update Z
+            elbo += UpdateZ(idx_set, N, z, eta_m, rho_m, W, word2idx, K);
+            // if (!UpdateZ(idx_set, N, z, eta_m, rho_m, W, word2idx, K, EPS)) { 
+            //     has_converge = false; 
+            //     //cout << "Z -------------> NOT CONVERGE" << endl;
+            // }
+
+            // update_Eta            
             for (set<int>::iterator d = idx_set.begin(); d != idx_set.end(); d++) {
-                //cout << "sample Eta" << endl;
-                SampleEta(*d, eta_m, u_m, a_m, z, gamma, N, K);
+                elbo += UpdateEta(*d, eta_m, z, gamma, alpha, N, K);
                 //cout << "upday A" << endl;
-                if (!UpdateA(*d, a_m, a_s, u_m, u_s, eta_m, c, gamma, DOC_DIM, K, EPS)) {
-                    has_converge = false;
+                // if (!UpdateA(*d, a_m, a_s, u_m, u_s, eta_m, c, gamma, DOC_DIM, K, EPS)) {
+                //     has_converge = false;
                     //cout << "A -------------> NOT CONVERGE" << endl;
-                }
+                // }
             }
             //cout << eta_m.row(0) << endl;
 
+            // Update rho
             for (int k = 0; k < K; k++) {
-                //cout << "upday Rho" << endl;
-                if (!UpdateRho(k, rho_m, z, W, word2idx, beta, D, N, V, EPS)) {
-                    has_converge = false; 
-                    //cout << "撸 -------------> NOT CONVERGE" << endl;
-                }
-                //cout << "upday U" << endl;
-                if (!UpdateU(k, u_m, u_s, a_m, a_s, eta_m, kappa, gamma, DOC_DIM, D, EPS)) {
-                    has_converge = false; 
-                    //cout << "U -------------> NOT CONVERGE" << endl;
-                }
+                elbo += UpdateRho(k, rho_m, z, W, word2idx, beta, D, N, V);
+
+                // //cout << "upday Rho" << endl;
+                // if (!UpdateRho(k, rho_m, z, W, word2idx, beta, D, N, V, EPS)) {
+                //     has_converge = false; 
+                //     //cout << "撸 -------------> NOT CONVERGE" << endl;
+                // }
+                // //cout << "upday U" << endl;
+                // if (!UpdateU(k, u_m, u_s, a_m, a_s, eta_m, kappa, gamma, DOC_DIM, D, EPS)) {
+                //     has_converge = false; 
+                //     //cout << "U -------------> NOT CONVERGE" << endl;
+                // }
             }
+
             cout << "iteration finished" << endl;
-            if (has_converge) { break; }
+            if (abs(prev_elbo - elbo) / abs(prev_elbo) < EPS) { /* Converge */ break; }
         }
 
-        kappa = UpdateKappa(u_m, u_s, DOC_DIM, K);
-        c = UpdateC(a_m, a_s, DOC_DIM, D);
+        // M-Step: Update model parameters
+        UpdateBeta();
+        UpdateAlpha();
+        // kappa = UpdateKappa(u_m, u_s, DOC_DIM, K);
+        // c = UpdateC(a_m, a_s, DOC_DIM, D);
     }
 
     // TODO: Evaluate
