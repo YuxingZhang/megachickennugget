@@ -32,15 +32,17 @@ int main() {
     const int V = idx2word.size(); // vocabulary size
     const int D = W.size(); // number of documents
     const int K = 5; // number of topics
-    const int WORD_DIM = 20; // dimension of word embedding
-    const int DOC_DIM = 10;// dimension of document embedding
+    // const int WORD_DIM = 20; // dimension of word embedding
+    // const int DOC_DIM = 10;// dimension of document embedding
 
     // model parameters, changed in the M step
-    double c = 1.0;
-    double kappa = 1.0;
-    double gamma = 1.0;
+    // double c = 1.0;
+    // double kappa = 1.0;
+    // double gamma = 1.0;
     vec beta(V, fill::zeros);
+    vec alpha(K, fill:zeros);
     beta += 1;
+    alpha += 1;
 
     // initialization
     vector<mat> z; // each element is a n_d * K matrix 
@@ -51,15 +53,15 @@ int main() {
     }
 
     mat eta_m(D, K, fill::randu); // mean of eta
-    mat eta_s(D, K, fill::randu); // sigma of eta
+    // mat eta_s(D, K, fill::randu); // sigma of eta
 
-    mat a_m(D, DOC_DIM, fill::randu);
-    mat a_s = diagmat(vec(DOC_DIM, fill::randu)); // all a_d share the same matrix
+    // mat a_m(D, DOC_DIM, fill::randu);
+    // mat a_s = diagmat(vec(DOC_DIM, fill::randu)); // all a_d share the same matrix
 
     mat rho_m(K, V, fill::randu); // mean of rho
 
-    mat u_m(K, DOC_DIM, fill::randu); // mean of u
-    mat u_s = diagmat(vec(DOC_DIM, fill::randu)); // sigma of u, shared
+    // mat u_m(K, DOC_DIM, fill::randu); // mean of u
+    // mat u_s = diagmat(vec(DOC_DIM, fill::randu)); // sigma of u, shared
 
     // train for each batch
     vector<int> random_index;
@@ -78,11 +80,14 @@ int main() {
     int MAX_ITER = 10;
     int aux_iter = 10;
     cout << eta_m.row(0) << endl;
+
+
     while (iteration < MAX_ITER) {
         iteration++;
 
         int inner_iteration = 0;
         while (inner_iteration < 2 * MAX_ITER) {
+            double elbo = 0.0;
             inner_iteration++;
             cout << inner_iteration << endl;
             bool has_converge = true;
