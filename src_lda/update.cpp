@@ -111,9 +111,12 @@ void UpdateAlpha(vec& alpha, mat& gamma, int K, int D) {
 
     double c = 0.0;
     double z = 0.0;
-    double g [K] = { };
-    double h [K] = { };
-    double update [K] = { };
+    double g[K];
+    memset(g, 0, sizeof(g));
+    double h[K];
+    memset(h, 0, sizeof(h));
+    double update[K];
+    memset(update, 0, sizeof(update));
     
     double sum_gamma [D] = { };
     for (int d = 0; d < D; d++){
