@@ -114,7 +114,7 @@ int main() {
         uvec indx = sort_index(lambda.row(k).t(), "descend");
         cout << "topic " << k << endl;
         for(int i = 0; i < 5; i++){
-            cout << idx2word[indx(i)] << endl;
+            cout << idx2word[indx(i)] << ' ' << lambda(k, indx(i)) << endl;
         }
         cout << endl;
     }
