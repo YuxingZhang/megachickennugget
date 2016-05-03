@@ -103,6 +103,14 @@ void UpdateBeta() {
     return;
 }
 
+void UpdateAlpha_gradient(vec& alpha, mat& gamma, int K, int D){
+    double NEWTON_THREASH = 0.00001;
+    int MAX_ITER = 1000;
+    double step_size = 0.01;
+    double max_df = 0.0;
+}
+
+
 void UpdateAlpha(vec& alpha, mat& gamma, int K, int D) {
     double NEWTON_THRESH = 0.00001;
     int MAX_ITER = 1000;
