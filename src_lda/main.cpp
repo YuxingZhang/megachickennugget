@@ -52,7 +52,7 @@ int main() {
         random_index.push_back(i);
     }
     random_shuffle(random_index.begin(), random_index.end());
-    const int BATCH_SIZE = 100;
+    const int BATCH_SIZE = 1000;
     const double EPS = 0.1;
     int num_of_batch = (int)((random_index.size() + BATCH_SIZE - 1) / BATCH_SIZE);
     int cur_batch = num_of_batch;
@@ -98,10 +98,10 @@ int main() {
             // update_Gamma            
             //cout << gamma.row(0) << endl;
             for (set<int>::iterator d = idx_set.begin(); d != idx_set.end(); d++) {
-                double gamma_elbo = ElboGamma(*d, gamma, z, N, K, alpha);
+                //double gamma_elbo = ElboGamma(*d, gamma, z, N, K, alpha);
                 //cout << "gamma_elbo before = " << gamma_elbo << endl;
                 UpdateGamma(*d, gamma, z, N, K, alpha);
-                gamma_elbo = ElboGamma(*d, gamma, z, N, K, alpha);
+                double gamma_elbo = ElboGamma(*d, gamma, z, N, K, alpha);
                 elbo += gamma_elbo;
                 //cout << "gamma_elbo after = " << gamma_elbo << endl;
                 //cout << "=================================================" << endl;
@@ -111,7 +111,12 @@ int main() {
 
             // Update lambda
             for (int k = 0; k < K; k++) {
-                double lambda_elbo = UpdateLambda(k, lambda, z, W, word2idx, beta, D, N, V);
+                //double lambda_elbo = ElboLambda(k, lambda, z, W, word2idx, beta, D, N, V);
+                //cout << "lambda_elbo before = " << lambda_elbo << endl;
+                UpdateLambda(k, lambda, z, W, word2idx, beta, D, N, V);
+                double lambda_elbo = ElboLambda(k, lambda, z, W, word2idx, beta, D, N, V);
+                //cout << "lambda_elbo after = " << lambda_elbo << endl;
+                //cout << "=================================================" << endl;
                 elbo += lambda_elbo;
             }
 
@@ -121,7 +126,7 @@ int main() {
         }
 
         // M-Step: Update model parameters
-        UpdateBeta(beta, lambda, V, K);
+        UpdateBeta();
         UpdateAlpha();
     }
 
