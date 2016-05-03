@@ -12,7 +12,6 @@ using namespace arma;
 #include "digamma.cpp"
 #include "load.cpp"
 #include "update.cpp"
-#include "opt_beta.cpp"
 #include "sample_eta.cpp"
 
 void load_files(string embedding, string corpus, map<string, int>& word2idx, map<int, string>& idx2word, vector<vector<string> >& W, vector<int>& N);
@@ -122,7 +121,7 @@ int main() {
 
             cout << elbo << endl;
             cout << "iteration finished" << endl;
-            if (abs(prev_elbo - elbo) / abs(prev_elbo) < EPS) { /* Converge */ break; }
+            //if (abs(prev_elbo - elbo) / abs(prev_elbo) < EPS) { /* Converge */ break; }
         }
 
         // M-Step: Update model parameters
