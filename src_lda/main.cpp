@@ -34,7 +34,7 @@ int main() {
     const int K = 5; // number of topics
 
     vec beta(V, fill::ones);
-    vec alpha(K, fill:ones);
+    vec alpha(K, fill::ones);
 
     // initialization
     vector<mat> z; // each element is a n_d * K matrix 
@@ -87,11 +87,11 @@ int main() {
             }
 
             // update Z
-            elbo += UpdateZ(idx_set, N, z, gamma, lambda, W, word2idx, K);
+            elbo += UpdateZ(idx_set, N, z, gamma, lambda, W, word2idx, K, V);
 
             // update_Gamma            
             for (set<int>::iterator d = idx_set.begin(); d != idx_set.end(); d++) {
-                elbo += UpdateGamma(*d, gamma, z, N, K);
+                elbo += UpdateGamma(*d, gamma, z, N, K, alpha);
             }
 
             // Update lambda
@@ -104,11 +104,12 @@ int main() {
         }
 
         // M-Step: Update model parameters
-        UpdateBeta();
+        UpdateBeta(beta, lambda, V, K);
         UpdateAlpha();
     }
 
     // TODO: Evaluate
+    cout << lambda << endl;
     for(int k = 0; k < K; k++){
         uvec indx = sort_index(lambda.row(k).t(), "descend");
         cout << "topic " << k << endl;

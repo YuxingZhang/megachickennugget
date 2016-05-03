@@ -1,5 +1,5 @@
 /* update z_dn */
-double UpdateZ(set<int>& idx_set, vector<int>& N, vector<mat>& z, mat& gamma, mat& lambda, vector< vector<string> >& W, map<string, int>& word2idx, int K) {
+double UpdateZ(set<int>& idx_set, vector<int>& N, vector<mat>& z, mat& gamma, mat& lambda, vector< vector<string> >& W, map<string, int>& word2idx, int K, int V) {
     for (set<int>::iterator iter = idx_set.begin(); iter != idx_set.end(); iter++) {
         int d = *iter;
         for (int n = 0; n < N[d]; n++) {
@@ -10,7 +10,7 @@ double UpdateZ(set<int>& idx_set, vector<int>& N, vector<mat>& z, mat& gamma, ma
                 for (int w = 0; w < V; w++) {
                     temp1 += lambda(k, w);
                 }
-                for (int l = 0; l < V; l++) {
+                for (int l = 0; l < K; l++) {
                     temp2 += gamma(d, l);
                 }
                 double res = exp(digamma(lambda(k, word2idx[W[d][n]])) - digamma(temp1)
@@ -27,7 +27,7 @@ double UpdateZ(set<int>& idx_set, vector<int>& N, vector<mat>& z, mat& gamma, ma
 }
 
 /* update Gamma */
-double UpdateGamma(int d, mat& gamma, vector<mat>& z, vector<int>& N, int K){
+double UpdateGamma(int d, mat& gamma, vector<mat>& z, vector<int>& N, int K, mat& alpha){
     for(int k = 0; k < K; k++) {
         double temp = 0.0;
         for(int n = 0; n < N[d]; n++) {
@@ -56,9 +56,11 @@ double UpdateLambda(int k, mat& lambda, vector<mat>& z, vector<vector<string> >&
     return 0.0;
 }
 
+/*
 void UpdateBeta() {
     return;
 }
+*/
 
 void UpdateAlpha() {
     return;

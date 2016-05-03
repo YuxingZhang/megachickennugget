@@ -1,4 +1,4 @@
-void UpdateBeta(vec& beta, mat& rho_m, int V, int K){
+void UpdateBeta(vec& beta, mat& lambda, int V, int K){
 	double NEWTON_THRESH = 0.00001;
 	int MAX_ITER = 1000;
 	double gamma = 0.001;
@@ -12,12 +12,12 @@ void UpdateBeta(vec& beta, mat& rho_m, int V, int K){
 		double digamma_beta = digamma(sum(beta));
 		double digamma_theta = 0;
 		for(int k = 0; k < K; k++){
-			digamma_theta += digamma(sum(rho_m.row(k)));
+			digamma_theta += digamma(sum(lambda.row(k)));
 		}
 		for(int w = 0; w < V; w++){
 			double temp = 0;
 			for(int k = 0; k < K; k++){
-				temp += digamma(rho_m(k, w));
+				temp += digamma(lambda(k, w));
 			}
 			g(w) = K * (digamma_beta - digamma(beta(w))) + temp - digamma_theta;
 		}
