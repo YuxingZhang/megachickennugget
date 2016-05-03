@@ -21,6 +21,7 @@ double UpdateZ(set<int>& idx_set, vector<int>& N, vector<mat>& z, mat& gamma, ma
                 z[d](n, k) = exponent;
             }
             z[d].row(n) -= max_z;
+            z[d].row(n) = exp(z[d].row(n));
             z[d].row(n) = normalise(z[d].row(n), 1);
         }
     }
