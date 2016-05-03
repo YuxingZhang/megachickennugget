@@ -5,8 +5,6 @@ double ElboZ(set<int>& idx_set, vector<int>& N, vector<mat>& z, mat& gamma, mat&
         for (int n = 0; n < N[d]; n++) {
             for (int k = 0; k < K; k++) {
                 double elbo = 0;
-                //elbo += z[d](n, k) * (digamma(lambda(k, word2idx[W[d][n]])) - digamma(sum(lambda.row(k)))
-                //        + digamma(gamma(d, k)) - digamma(sum(gamma.row(d))) - log(z[d](n, k)));
                 elbo += digamma(lambda(k, word2idx[W[d][n]]));
                 elbo -= digamma(sum(lambda.row(k)));
                 elbo += digamma(gamma(d, k));
@@ -14,14 +12,7 @@ double ElboZ(set<int>& idx_set, vector<int>& N, vector<mat>& z, mat& gamma, mat&
                 elbo -= log(z[d](n, k));
                 elbo *= z[d](n, k);
                 total += elbo;
-                /*
-                if (std::isnan(elbo)) {
-                    cout << "nan elbo " << d << " " << n << " " << k << " " << z[d](n, k) << endl;
-                }
-                */
             }
-            //cout << "======================== d = " << d << " =========================" << endl;
-            //cout << "======================== " << total << " =========================" << endl;
         }
     }
     return total;
@@ -113,12 +104,6 @@ double UpdateLambda(int k, mat& lambda, vector<mat>& z, vector<vector<string> >&
     }
     return 0.0;
 }
-
-/*
-void UpdateBeta() {
-    return;
-}
-*/
 
 void UpdateAlpha() {
     return;
