@@ -226,3 +226,34 @@ void UpdateBeta(vec& beta, mat& lambda, int V, int K){
 
     return;
 }
+
+void upBeta(vec& beta, mat& lambda, int V, int K){
+    double NEWTON_THRESH = 0.00001;
+    int MAX_ITER = 1000;
+    double step_size = 0.01;
+    
+    vec df(V, fill::zeros);
+    vec g(V, fill::zeros);
+    vec h(V, fill::zeros);
+    int iter = 0;
+    do{
+        // compute the first derivative
+        double digamma_beta = digamma(sum(beta));
+        double digamma_theta = 0;
+        for(int k = 0; k < K; k++){
+            digamma_theta += digamma(sum(lambda.row(k)));
+        }
+        for(int w = 0; w < V; w++){
+            double temp = 0;
+            for(int k = 0; k < K; k++){
+                temp += digamma(lambda(k, w));
+            }
+            g(w) = K * (digamma_beta - digamma(beta(w))) + temp - digamma_theta;
+        }
+        
+        beta -= g * step_size;
+        iter++;
+    } while(iter < MAX_ITER && max(abs(df)) > NEWTON_THRESH);
+
+    return;
+}
