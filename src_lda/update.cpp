@@ -16,7 +16,7 @@ double UpdateZ(set<int>& idx_set, vector<int>& N, vector<mat>& z, mat& gamma, ma
     for (set<int>::iterator iter = idx_set.begin(); iter != idx_set.end(); iter++) {
         int d = *iter;
         for (int n = 0; n < N[d]; n++) {
-            double max_z = 0.0;
+            double max_z = -100000.0;
             for (int k = 0; k < K; k++) {
                 double temp1 = 0.0;
                 double temp2 = 0.0;
@@ -26,14 +26,16 @@ double UpdateZ(set<int>& idx_set, vector<int>& N, vector<mat>& z, mat& gamma, ma
                 for (int l = 0; l < K; l++) {
                     temp2 += gamma(d, l);
                 }
-                double res = exp(digamma(lambda(k, word2idx[W[d][n]])) - digamma(temp1)
-                        + digamma(gamma(d, k)) - digamma(temp2));
-                z[d](n, k) = res;
-                if (res > max_z) {
-                    max_z = res;
+                double exponent = digamma(lambda(k, word2idx[W[d][n]])) - digamma(temp1)
+                        + digamma(gamma(d, k)) - digamma(temp2);
+                if (exponent > max_z) {
+                    max_z = exponent;
                 }
+                z[d](n, k) = exponent;
             }
-            z[d].row(n) = z[d].row(n) / max_z;
+            z[d].row(n) -= max_z;
+            z[d].row(n) = exp(z[d].row(n));
+            z[d].row(n) = normalise(z[d].row(n), 1);
         }
     }
     return 0.0;
