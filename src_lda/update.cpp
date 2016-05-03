@@ -104,63 +104,75 @@ void UpdateBeta() {
 }
 
 void UpdateAlpha(vec& alpha, mat& gamma, int K, int D) {
-    double c = 0.0;
-    double z = 0.0;
+    double NEWTON_THRESH = 0.00001;
+    int MAX_ITER = 1000;
+    double gamma = 0.001;
+
     double g [K] = { };
     double h [K] = { };
     double update [K] = { };
+    int iter = 0;
 
-    double elbo_old = 0.0;
-    double elbo_new = 0.0;
+    do{
+        double c = 0.0;
+        double z = 0.0;
 
-    double sum_alpha = sum(alpha);
-    double sum_gamma [D] = { };
+        double elbo_old = 0.0;
+        double elbo_new = 0.0;
 
-    for (int d = 0; d < D; d++){
-        sum_gamma [d] = sum(gamma.row(d));
-    }
+        double sum_alpha = sum(alpha);
+        double sum_gamma [D] = { };
+        double max_df = 0.0;
 
-    for (int i = 0; i < K; i++){
-        double tmp = 0.0;
         for (int d = 0; d < D; d++){
-            tmp += digamma(gamma(d, i)) - digamma(sum_gamma[d]);
+            sum_gamma [d] = sum(gamma.row(d));
         }
-        g [i] = D * (digamma(sum_alpha) - digamma(alpha(i))) + tmp;
-        h [i] = D * trigamma(alpha(i));
-    }
 
-    z = - trigamma(sum_alpha);
-
-    double tmp2 = 0.0;
-    double tmp3 = 0.0;
-    for (int i = 0; i < K; i++){
-        tmp2 += g[i] / h[i];
-        tmp3 += 1 / h[i];
-    }
-    c = tmp2 / ((1 / z) + tmp3);
-
-    for (int d = 0; d < D; d++){
-        double tmp4 = 0.0;
-        for (int k = 1; k < K; k++){
-            tmp4 = - lgamma(alpha(k)) + (alpha(k) - 1) * (digamma(gamma(d, k)) - digamma(sum_gamma[d]));
+        for (int i = 0; i < K; i++){
+            double tmp = 0.0;
+            for (int d = 0; d < D; d++){
+                tmp += digamma(gamma(d, i)) - digamma(sum_gamma[d]);
+            }
+            g [i] = D * (digamma(sum_alpha) - digamma(alpha(i))) + tmp;
+            h [i] = D * trigamma(alpha(i));
         }
-        elbo_old += lgamma(sum_alpha) + tmp4;
-    }
-    cout << "elbo before alpha update: " << elbo_old << endl;
 
-    for (int i = 0; i < K; i++){
-        update[i] = (g[i] - c) / h[i];
-        alpha(i) -= update[i];
-    }
+        z = - trigamma(sum_alpha);
 
-    for (int d = 0; d < D; d++){
-        double tmp5 = 0.0;
-        for (int k = 1; k < K; k++){
-            tmp5 = - lgamma(alpha(k)) + (alpha(k) - 1) * (digamma(gamma(d, k)) - digamma(sum_gamma[d]));
+        double tmp2 = 0.0;
+        double tmp3 = 0.0;
+        for (int i = 0; i < K; i++){
+            tmp2 += g[i] / h[i];
+            tmp3 += 1 / h[i];
         }
-        elbo_new += lgamma(sum_alpha) + tmp5;
-    }    
-    cout << "elbo after alpha update: " << elbo_new << endl;
+        c = tmp2 / ((1 / z) + tmp3);
+
+        for (int d = 0; d < D; d++){
+            double tmp4 = 0.0;
+            for (int k = 1; k < K; k++){
+                tmp4 = - lgamma(alpha(k)) + (alpha(k) - 1) * (digamma(gamma(d, k)) - digamma(sum_gamma[d]));
+            }
+            elbo_old += lgamma(sum_alpha) + tmp4;
+        }
+        cout << "elbo before alpha update: " << elbo_old << endl;
+
+        for (int i = 0; i < K; i++){
+            update[i] = (g[i] - c) / h[i];
+            alpha(i) -= update[i];
+            if (abs(update[i]) > max_df){
+                max_df = abs(update[i]);
+            }
+        }
+
+        for (int d = 0; d < D; d++){
+            double tmp5 = 0.0;
+            for (int k = 1; k < K; k++){
+                tmp5 = - lgamma(alpha(k)) + (alpha(k) - 1) * (digamma(gamma(d, k)) - digamma(sum_gamma[d]));
+            }
+            elbo_new += lgamma(sum_alpha) + tmp5;
+        }    
+        cout << "elbo after alpha update: " << elbo_new << endl;
+    } while (iter < MAX_ITER && max_df > NEWTON_THRESH);
 
     return;
 }
