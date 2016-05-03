@@ -126,8 +126,8 @@ int main() {
         }
 
         // M-Step: Update model parameters
-        UpdateBeta();
-        UpdateAlpha();
+        UpdateBeta(beta, lambda, V, K);
+        UpdateAlpha(alpha, gamma, K, D);
     }
 
     // TODO: Evaluate
