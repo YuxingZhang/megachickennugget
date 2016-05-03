@@ -87,22 +87,27 @@ int main() {
             }
 
             // update Z
-            double z_elbo = UpdateZ(idx_set, N, z, gamma, lambda, W, word2idx, K, V);
+
+            double z_elbo = ElboZ(idx_set, N, z, gamma, lambda, W, word2idx, K, V);
+            //cout << "z_elbo before = " << z_elbo << endl;
+            UpdateZ(idx_set, N, z, gamma, lambda, W, word2idx, K, V);
+            z_elbo = ElboZ(idx_set, N, z, gamma, lambda, W, word2idx, K, V);
+            //cout << "z_elbo after = " << z_elbo << endl;
             elbo += z_elbo;
 
             // update_Gamma            
-            cout << gamma.row(0) << endl;
+            //cout << gamma.row(0) << endl;
             for (set<int>::iterator d = idx_set.begin(); d != idx_set.end(); d++) {
                 double gamma_elbo = ElboGamma(*d, gamma, z, N, K, alpha);
-                cout << "gamma_elbo before = " << gamma_elbo << endl;
+                //cout << "gamma_elbo before = " << gamma_elbo << endl;
                 UpdateGamma(*d, gamma, z, N, K, alpha);
                 gamma_elbo = ElboGamma(*d, gamma, z, N, K, alpha);
                 elbo += gamma_elbo;
-                cout << "gamma_elbo after = " << gamma_elbo << endl;
-                cout << "=================================================" << endl;
+                //cout << "gamma_elbo after = " << gamma_elbo << endl;
+                //cout << "=================================================" << endl;
             }
-            cout << gamma.row(0) << endl;
-            cout << "#################################################" << endl;
+            //cout << gamma.row(0) << endl;
+            //cout << "#################################################" << endl;
 
             // Update lambda
             for (int k = 0; k < K; k++) {
@@ -110,9 +115,9 @@ int main() {
                 elbo += lambda_elbo;
             }
 
+            cout << elbo << endl;
             cout << "iteration finished" << endl;
             if (abs(prev_elbo - elbo) / abs(prev_elbo) < EPS) { /* Converge */ break; }
-            return 0;
         }
 
         // M-Step: Update model parameters

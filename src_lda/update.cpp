@@ -1,14 +1,30 @@
 double ElboZ(set<int>& idx_set, vector<int>& N, vector<mat>& z, mat& gamma, mat& lambda, vector< vector<string> >& W, map<string, int>& word2idx, int K, int V) {
-    double elbo = 0;
+    double total = 0.0;
     for (set<int>::iterator iter = idx_set.begin(); iter != idx_set.end(); iter++) {
         int d = *iter;
         for (int n = 0; n < N[d]; n++) {
             for (int k = 0; k < K; k++) {
-                elbo += z[d](n, k) * (digamma(lambda(k, word2idx[W[d][n]])) - digamma(sum(lambda.row(k))) + digamma(gamma(d, k)) - digamma(sum(gamma.row(d))) - log(z[d](n, k)));
+                double elbo = 0;
+                //elbo += z[d](n, k) * (digamma(lambda(k, word2idx[W[d][n]])) - digamma(sum(lambda.row(k)))
+                //        + digamma(gamma(d, k)) - digamma(sum(gamma.row(d))) - log(z[d](n, k)));
+                elbo += digamma(lambda(k, word2idx[W[d][n]]));
+                elbo -= digamma(sum(lambda.row(k)));
+                elbo += digamma(gamma(d, k));
+                elbo -= digamma(sum(gamma.row(d)));
+                elbo -= log(z[d](n, k));
+                elbo *= z[d](n, k);
+                total += elbo;
+                /*
+                if (std::isnan(elbo)) {
+                    cout << "nan elbo " << d << " " << n << " " << k << " " << z[d](n, k) << endl;
+                }
+                */
             }
+            //cout << "======================== d = " << d << " =========================" << endl;
+            //cout << "======================== " << total << " =========================" << endl;
         }
     }
-    return elbo;
+    return total;
 }
 
 /* update z_dn */
@@ -35,6 +51,7 @@ double UpdateZ(set<int>& idx_set, vector<int>& N, vector<mat>& z, mat& gamma, ma
             }
             z[d].row(n) -= max_z;
             z[d].row(n) = exp(z[d].row(n));
+            z[d].row(n) += std::exp(-200.0); // adding smoothness
             z[d].row(n) = normalise(z[d].row(n), 1);
         }
     }
@@ -73,9 +90,9 @@ double ElboLambda(int k, mat& lambda, vector<mat>& z, vector<vector<string> >& W
     }
     for(int w = 0; w < V; w++){
         elbo += (beta(w) - lambda(k, w) + tmp(w)) * (digamma(lambda(k, w)) - digamma(sum(lambda.row(k))));
-        elbo += log(gamma(lambda(k, w)));
+        elbo += log(tgamma(lambda(k, w)));
     }
-    elbo -= log(gamma(sum(lambda.row(k))));
+    elbo -= log(tgamma(sum(lambda.row(k))));
     return elbo;
 }
 
