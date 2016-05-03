@@ -109,6 +109,10 @@ void UpdateAlpha(vec& alpha, mat& gamma, int K, int D) {
     double g [K] = { };
     double h [K] = { };
     double update [K] = { };
+
+    double elbo_old = 0.0;
+    double elbo_new = 0.0;
+
     double sum_alpha = sum(alpha);
     double sum_gamma [D] = { };
 
@@ -135,10 +139,28 @@ void UpdateAlpha(vec& alpha, mat& gamma, int K, int D) {
     }
     c = tmp2 / ((1 / z) + tmp3);
 
+    for (int d = 0; d < D; d++){
+        double tmp4 = 0.0;
+        for (int k = 1; k < K; k++){
+            tmp4 = - lgamma(alpha(k)) + (alpha(k) - 1) * (digamma(gamma(d, k)) - digamma(sum_gamma[d]));
+        }
+        elbo_old += lgamma(sum_alpha) + tmp4;
+    }
+    cout << "elbo before alpha update: " << elbo_old << endl;
+
     for (int i = 0; i < K; i++){
         update[i] = (g[i] - c) / h[i];
         alpha(i) -= update[i];
     }
+
+    for (int d = 0; d < D; d++){
+        double tmp5 = 0.0;
+        for (int k = 1; k < K; k++){
+            tmp5 = - lgamma(alpha(k)) + (alpha(k) - 1) * (digamma(gamma(d, k)) - digamma(sum_gamma[d]));
+        }
+        elbo_new += lgamma(sum_alpha) + tmp5;
+    }    
+    cout << "elbo after alpha update: " << elbo_new << endl;
 
     return;
 }
