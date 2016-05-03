@@ -109,11 +109,10 @@ int main() {
     }
 
     // TODO: Evaluate
-    cout << lambda << endl;
     for(int k = 0; k < K; k++){
         uvec indx = sort_index(lambda.row(k).t(), "descend");
         cout << "topic " << k << endl;
-        for(int i = 0; i < 5; i++){
+        for(int i = 0; i < 10; i++){
             cout << idx2word[indx(i)] << ' ' << lambda(k, indx(i)) << endl;
         }
         cout << endl;
