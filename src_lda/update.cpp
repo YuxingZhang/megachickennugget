@@ -107,6 +107,7 @@ void UpdateAlpha(vec& alpha, mat& gamma, int K, int D) {
     double NEWTON_THRESH = 0.00001;
     int MAX_ITER = 1000;
     double gamma = 0.001;
+    double max_df = 0.0;
 
     double c = 0.0;
     double z = 0.0;
@@ -125,7 +126,7 @@ void UpdateAlpha(vec& alpha, mat& gamma, int K, int D) {
         double elbo_old = 0.0;
         double elbo_new = 0.0;
         double sum_alpha = sum(alpha);
-        double max_df = 0.0;
+        max_df = 0.0;
 
         for (int i = 0; i < K; i++){
             double tmp = 0.0;
@@ -171,7 +172,7 @@ void UpdateAlpha(vec& alpha, mat& gamma, int K, int D) {
             elbo_new += lgamma(sum_alpha) + tmp5;
         }    
         cout << "elbo after alpha update: " << elbo_new << endl;
-        
+
     } while (iter < MAX_ITER && max_df > NEWTON_THRESH);
 
     return;
