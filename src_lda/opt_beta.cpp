@@ -21,16 +21,12 @@ void UpdateBeta(vec& beta, mat& lambda, int V, int K){
 			}
 			g(w) = K * (digamma_beta - digamma(beta(w))) + temp - digamma_theta;
 		}
-		cout << "this is g" << endl;
-		cout << g.t() << endl;
 		// compute the Hessian
 		double trigamma_beta = trigamma(sum(beta));
 		for(int w = 0; w < V; w++){
 			h(w) = K * trigamma(beta(w));
 		}
 
-	cout << "this is h" << endl;
-	cout << h.t() << endl;
 		// compute constant terms needed for gradient
 		double c = sum(g / h) / (- 1 / trigamma_beta + sum(1 / h));
 
@@ -40,8 +36,6 @@ void UpdateBeta(vec& beta, mat& lambda, int V, int K){
 		
 		beta -= gamma * df;
 		iter++;
-		cout << "iteration: " << iter << endl;
-		cout << beta.t() << endl;
 	} while(iter < MAX_ITER && max(abs(df)) > NEWTON_THRESH);
 
 	return;

@@ -26,8 +26,18 @@ double UpdateZ(set<int>& idx_set, vector<int>& N, vector<mat>& z, mat& gamma, ma
     return 0.0;
 }
 
+double ElboGamma(int d, mat& gamma, vector<mat>& z, vector<int>& N, int K, mat& alpha) {
+    double elbo = 0.0;
+    for (int k = 0; k < K; k++) {
+        elbo += (alpha(k) - gamma(d, k) + sum(z[d].col(k))) * (digamma(gamma(d, k)) - digamma(sum(gamma.row(d))));
+        elbo += log(digamma(gamma(d, k)));
+    }
+    elbo -= log(digamma(sum(gamma.row(d))));
+    return elbo;
+}
+
 /* update Gamma */
-double UpdateGamma(int d, mat& gamma, vector<mat>& z, vector<int>& N, int K, mat& alpha){
+void UpdateGamma(int d, mat& gamma, vector<mat>& z, vector<int>& N, int K, mat& alpha){
     for(int k = 0; k < K; k++) {
         double temp = 0.0;
         for(int n = 0; n < N[d]; n++) {
@@ -35,7 +45,7 @@ double UpdateGamma(int d, mat& gamma, vector<mat>& z, vector<int>& N, int K, mat
         }
         gamma(d, k) = alpha(k) + temp;
     }
-    return 0.0;
+    return;
 }
 
 /* update Lambda */

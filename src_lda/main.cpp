@@ -87,16 +87,27 @@ int main() {
             }
 
             // update Z
-            elbo += UpdateZ(idx_set, N, z, gamma, lambda, W, word2idx, K, V);
+            double z_elbo = UpdateZ(idx_set, N, z, gamma, lambda, W, word2idx, K, V);
+            elbo += z_elbo;
 
             // update_Gamma            
+            cout << gamma.row(0) << endl;
             for (set<int>::iterator d = idx_set.begin(); d != idx_set.end(); d++) {
-                elbo += UpdateGamma(*d, gamma, z, N, K, alpha);
+                double gamma_elbo = ElboGamma(*d, gamma, z, N, K, alpha);
+                cout << "gamma_elbo before = " << gamma_elbo << endl;
+                UpdateGamma(*d, gamma, z, N, K, alpha);
+                gamma_elbo = ElboGamma(*d, gamma, z, N, K, alpha);
+                elbo += gamma_elbo;
+                cout << "gamma_elbo after = " << gamma_elbo << endl;
+                cout << "=================================================" << endl;
             }
+            cout << gamma.row(0) << endl;
+            cout << "#################################################" << endl;
 
             // Update lambda
             for (int k = 0; k < K; k++) {
-                elbo += UpdateLambda(k, lambda, z, W, word2idx, beta, D, N, V);
+                double lambda_elbo = UpdateLambda(k, lambda, z, W, word2idx, beta, D, N, V);
+                elbo += lambda_elbo;
             }
 
             cout << "iteration finished" << endl;
