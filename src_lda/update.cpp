@@ -32,9 +32,9 @@ double ElboGamma(int d, mat& gamma, vector<mat>& z, vector<int>& N, int K, mat& 
     double elbo = 0.0;
     for (int k = 0; k < K; k++) {
         elbo += (alpha(k) - gamma(d, k) + sum(z[d].col(k))) * (digamma(gamma(d, k)) - digamma(sum(gamma.row(d))));
-        elbo += log(digamma(gamma(d, k)));
+        elbo += log(tgamma(gamma(d, k)));
     }
-    elbo -= log(digamma(sum(gamma.row(d))));
+    elbo -= log(tgamma(sum(gamma.row(d))));
     return elbo;
 }
 
