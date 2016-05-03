@@ -52,7 +52,7 @@ int main() {
         random_index.push_back(i);
     }
     random_shuffle(random_index.begin(), random_index.end());
-    const int BATCH_SIZE = 87;
+    const int BATCH_SIZE = 100;
     const double EPS = 0.1;
     int num_of_batch = (int)((random_index.size() + BATCH_SIZE - 1) / BATCH_SIZE);
     int cur_batch = num_of_batch;
@@ -112,6 +112,7 @@ int main() {
 
             cout << "iteration finished" << endl;
             if (abs(prev_elbo - elbo) / abs(prev_elbo) < EPS) { /* Converge */ break; }
+            return 0;
         }
 
         // M-Step: Update model parameters
