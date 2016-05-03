@@ -1,3 +1,16 @@
+double ElboZ(set<int>& idx_set, vector<int>& N, vector<mat>& z, mat& gamma, mat& lambda, vector< vector<string> >& W, map<string, int>& word2idx, int K, int V) {
+    double elbo = 0;
+    for (set<int>::iterator iter = idx_set.begin(); iter != idx_set.end(); iter++) {
+        int d = *iter;
+        for (int n = 0; n < N[d]; n++) {
+            for (int k = 0; k < K; k++) {
+                elbo += z[d](n, k) * (digamma(lambda(k, word2idx[W[d][n]])) - digamma(sum(lambda.row(k))) + digamma(gamma(d, k)) - digamma(sum(gamma.row(d))) - log(z[d](n, k)));
+            }
+        }
+    }
+    return elbo;
+}
+
 /* update z_dn */
 double UpdateZ(set<int>& idx_set, vector<int>& N, vector<mat>& z, mat& gamma, mat& lambda, vector< vector<string> >& W, map<string, int>& word2idx, int K, int V) {
     for (set<int>::iterator iter = idx_set.begin(); iter != idx_set.end(); iter++) {
@@ -48,6 +61,22 @@ void UpdateGamma(int d, mat& gamma, vector<mat>& z, vector<int>& N, int K, mat& 
         gamma(d, k) = alpha(k) + temp;
     }
     return;
+}
+
+double ElboLambda(int k, mat& lambda, vector<mat>& z, vector<vector<string> >& W, map<string, int>& word2idx, vec& beta, int D, vector<int>& N, int V){
+    double elbo = 0;
+    vec tmp(V, fill::zeros);
+    for(int d = 0; d < D; d++){
+        for(int n  = 0; n < N[d]; n++){
+            tmp(word2idx[W[d][n]]) += z[d](n, k);
+        }
+    }
+    for(int w = 0; w < V; w++){
+        elbo += (beta(w) - lambda(k, w) + tmp(w)) * (digamma(lambda(k, w)) - digamma(sum(lambda.row(k))));
+        elbo += log(gamma(lambda(k, w)));
+    }
+    elbo -= log(gamma(sum(lambda.row(k))));
+    return elbo;
 }
 
 /* update Lambda */
