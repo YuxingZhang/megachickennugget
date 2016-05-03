@@ -217,7 +217,7 @@ void UpdateBeta(vec& beta, mat& lambda, int V, int K){
             df(w) = (g(w) - c) / h(w);
         }
         
-        beta -= gamma * df;
+        beta -= df;
         iter++;
     } while(iter < MAX_ITER && max(abs(df)) > NEWTON_THRESH);
 
