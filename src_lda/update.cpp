@@ -118,7 +118,8 @@ void UpdateAlpha(vec& alpha, mat& gamma, int K, int D) {
     double update[K];
     memset(update, 0, sizeof(update));
     
-    double sum_gamma [D] = { };
+    double sum_gamma[D];
+    memset(sum_gamma, 0, sizeof(sum_gamma));
     for (int d = 0; d < D; d++){
         sum_gamma [d] = sum(gamma.row(d));
     }
