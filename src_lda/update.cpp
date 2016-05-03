@@ -103,6 +103,42 @@ void UpdateBeta() {
     return;
 }
 
-void UpdateAlpha() {
+void UpdateAlpha(vec& alpha, mat& gamma, int K, int D) {
+    double c = 0.0;
+    double z = 0.0;
+    double g [K] = { };
+    double h [K] = { };
+    double update [K] = { };
+    double sum_alpha = sum(alpha);
+    double sum_gamma [D] = { };
+
+    for (int d = 0; d < D; d++){
+        sum_gamma [d] = sum(gamma.row(d));
+    }
+
+    for (int i = 0; i < K; i++){
+        double tmp = 0.0;
+        for (int d = 0; d < D; d++){
+            tmp += digamma(gamma(d, i)) - digamma(sum_gamma[d]);
+        }
+        g [i] = D * (digamma(sum_alpha) - digamma(alpha(i))) + tmp;
+        h [i] = D * trigamma(alpha(i));
+    }
+
+    z = - trigamma(sum_alpha);
+
+    double tmp2 = 0.0;
+    double tmp3 = 0.0;
+    for (int i = 0; i < K; i++){
+        tmp2 += g[i] / h[i];
+        tmp3 += 1 / h[i];
+    }
+    c = tmp2 / ((1 / z) + tmp3);
+
+    for (int i = 0; i < K; i++){
+        update[i] = (g[i] - c) / h[i];
+        alpha(i) -= update[i];
+    }
+
     return;
 }
