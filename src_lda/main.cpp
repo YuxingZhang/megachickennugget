@@ -32,17 +32,9 @@ int main() {
     const int V = idx2word.size(); // vocabulary size
     const int D = W.size(); // number of documents
     const int K = 5; // number of topics
-    // const int WORD_DIM = 20; // dimension of word embedding
-    // const int DOC_DIM = 10;// dimension of document embedding
 
-    // model parameters, changed in the M step
-    // double c = 1.0;
-    // double kappa = 1.0;
-    // double gamma = 1.0;
-    vec beta(V, fill::zeros);
-    vec alpha(K, fill:zeros);
-    beta += 1;
-    alpha += 1;
+    vec beta(V, fill::ones);
+    vec alpha(K, fill:ones);
 
     // initialization
     vector<mat> z; // each element is a n_d * K matrix 
@@ -51,17 +43,8 @@ int main() {
         tmp = normalise(tmp, 1, 1);
         z.push_back(tmp);
     }
-
-    mat eta_m(D, K, fill::randu); // mean of eta
-    // mat eta_s(D, K, fill::randu); // sigma of eta
-
-    // mat a_m(D, DOC_DIM, fill::randu);
-    // mat a_s = diagmat(vec(DOC_DIM, fill::randu)); // all a_d share the same matrix
-
-    mat rho_m(K, V, fill::randu); // mean of rho
-
-    // mat u_m(K, DOC_DIM, fill::randu); // mean of u
-    // mat u_s = diagmat(vec(DOC_DIM, fill::randu)); // sigma of u, shared
+    mat gamma(D, K, fill::randu); 
+    mat lambda(K, V, fill::randu); 
 
     // train for each batch
     vector<int> random_index;
@@ -79,7 +62,6 @@ int main() {
     int iteration = 0;
     int MAX_ITER = 10;
     int aux_iter = 10;
-    cout << eta_m.row(0) << endl;
     double elbo, prev_elbo;
 
     while (iteration < MAX_ITER) {
@@ -105,37 +87,16 @@ int main() {
             }
 
             // update Z
-            elbo += UpdateZ(idx_set, N, z, eta_m, rho_m, W, word2idx, K);
-            // if (!UpdateZ(idx_set, N, z, eta_m, rho_m, W, word2idx, K, EPS)) { 
-            //     has_converge = false; 
-            //     //cout << "Z -------------> NOT CONVERGE" << endl;
-            // }
+            elbo += UpdateZ(idx_set, N, z, gamma, lambda, W, word2idx, K);
 
-            // update_Eta            
+            // update_Gamma            
             for (set<int>::iterator d = idx_set.begin(); d != idx_set.end(); d++) {
-                elbo += UpdateEta(*d, eta_m, z, gamma, alpha, N, K);
-                //cout << "upday A" << endl;
-                // if (!UpdateA(*d, a_m, a_s, u_m, u_s, eta_m, c, gamma, DOC_DIM, K, EPS)) {
-                //     has_converge = false;
-                    //cout << "A -------------> NOT CONVERGE" << endl;
-                // }
+                elbo += UpdateGamma(*d, gamma, z, N, K);
             }
-            //cout << eta_m.row(0) << endl;
 
-            // Update rho
+            // Update lambda
             for (int k = 0; k < K; k++) {
-                elbo += UpdateRho(k, rho_m, z, W, word2idx, beta, D, N, V);
-
-                // //cout << "upday Rho" << endl;
-                // if (!UpdateRho(k, rho_m, z, W, word2idx, beta, D, N, V, EPS)) {
-                //     has_converge = false; 
-                //     //cout << "撸 -------------> NOT CONVERGE" << endl;
-                // }
-                // //cout << "upday U" << endl;
-                // if (!UpdateU(k, u_m, u_s, a_m, a_s, eta_m, kappa, gamma, DOC_DIM, D, EPS)) {
-                //     has_converge = false; 
-                //     //cout << "U -------------> NOT CONVERGE" << endl;
-                // }
+                elbo += UpdateLambda(k, lambda, z, W, word2idx, beta, D, N, V);
             }
 
             cout << "iteration finished" << endl;
@@ -145,15 +106,11 @@ int main() {
         // M-Step: Update model parameters
         UpdateBeta();
         UpdateAlpha();
-        // kappa = UpdateKappa(u_m, u_s, DOC_DIM, K);
-        // c = UpdateC(a_m, a_s, DOC_DIM, D);
     }
 
     // TODO: Evaluate
-    cout << "eta_m =" << eta_m << endl;
     for(int k = 0; k < K; k++){
-        //cout << rho_m.row(k) << endl;
-        uvec indx = sort_index(rho_m.row(k).t(), "descend");
+        uvec indx = sort_index(lambda.row(k).t(), "descend");
         cout << "topic " << k << endl;
         for(int i = 0; i < 5; i++){
             cout << idx2word[indx(i)] << endl;
