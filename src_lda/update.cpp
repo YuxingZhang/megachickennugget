@@ -125,6 +125,7 @@ void UpdateAlpha_gradient(vec& alpha, mat& gamma, int K, int D){
             g(i) = D * (digamma(sum_alpha) - digamma(alpha(i))) + tmp;
         }
         alpha -= g * step_size;
+        iter++;
     } while(iter < MAX_ITER && max(g) > NEWTON_THRESH)
 
     return;
