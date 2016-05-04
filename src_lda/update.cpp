@@ -107,7 +107,27 @@ void UpdateAlpha_gradient(vec& alpha, mat& gamma, int K, int D){
     double NEWTON_THREASH = 0.00001;
     int MAX_ITER = 1000;
     double step_size = 0.01;
-    double max_df = 0.0;
+    
+    vec g(K, fill::zeros);
+    vec gamma_s(D, fill::zeros);
+    double sum_alpha;
+    for (int d = 0; d < D; d++){
+        gamma_s(d) = sum(gamma.row(d));
+    }
+
+    do{
+        sum_alpha = sum(alpha);
+        for (int i = 0; i < K; i++){
+            double tmp = 0.0;
+            for (int d = 0; d < D; d++){
+                tmp += digamma(gamma(d, i)) - digamma(gamma_s(d));
+            }
+            g(i) = D * (digamma(sum_alpha) - digamma(alpha(i))) + tmp;
+        }
+        alpha -= g * step_size;
+    } while(iter < MAX_ITER && max(g) > NEWTON_THRESH)
+
+    return;
 }
 
 
