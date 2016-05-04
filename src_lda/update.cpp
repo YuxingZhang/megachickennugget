@@ -115,6 +115,8 @@ void UpdateAlpha_gradient(vec& alpha, mat& gamma, int K, int D){
         gamma_s(d) = sum(gamma.row(d));
     }
 
+    int iter = 0;
+
     do{
         sum_alpha = sum(alpha);
         for (int i = 0; i < K; i++){
