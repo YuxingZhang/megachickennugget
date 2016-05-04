@@ -96,32 +96,22 @@ int main() {
                 idx_set.insert(random_index[i]);
             }
 
-            //cout << "upday Z" << endl;
             if (!UpdateZ(idx_set, N, z, eta_m, rho_m, W, word2idx, K, EPS)) { 
                 has_converge = false; 
-                //cout << "Z -------------> NOT CONVERGE" << endl;
             }
             for (set<int>::iterator d = idx_set.begin(); d != idx_set.end(); d++) {
-                //cout << "sample Eta" << endl;
                 SampleEta(*d, eta_m, u_m, a_m, z, gamma, N, K);
-                //cout << "upday A" << endl;
                 if (!UpdateA(*d, a_m, a_s, u_m, u_s, eta_m, c, gamma, DOC_DIM, K, EPS)) {
                     has_converge = false;
-                    //cout << "A -------------> NOT CONVERGE" << endl;
                 }
             }
-            //cout << eta_m.row(0) << endl;
 
             for (int k = 0; k < K; k++) {
-                //cout << "upday Rho" << endl;
                 if (!UpdateRho(k, rho_m, z, W, word2idx, beta, D, N, V, EPS)) {
                     has_converge = false; 
-                    //cout << "撸 -------------> NOT CONVERGE" << endl;
                 }
-                //cout << "upday U" << endl;
                 if (!UpdateU(k, u_m, u_s, a_m, a_s, eta_m, kappa, gamma, DOC_DIM, D, EPS)) {
                     has_converge = false; 
-                    //cout << "U -------------> NOT CONVERGE" << endl;
                 }
             }
             cout << "iteration finished" << endl;
