@@ -19,8 +19,8 @@ void load_files(string embedding, string corpus, map<string, int>& word2idx, map
 
 int main() {
     // Reading input files, including the corpus and the embedding
-    string emb_file = "../abs_vectors.txt";
-    string corpus_file = "../abs_corpus.txt";
+    string emb_file = "../vectors_bloomberg.txt";
+    string corpus_file = "../corpus_bloomberg.txt";
     //arma_rng::set_seed_random();
     map<string, int> word2idx;  // V
     map<int, string> idx2word;  // V
@@ -36,9 +36,9 @@ int main() {
     const int DOC_DIM = 10;// dimension of document embedding
 
     // model parameters, changed in the M step
-    double c = 1.0;
-    double kappa = 1.0;
-    double gamma = 1.0;
+    double c = 1;
+    double kappa = 1;
+    double gamma = 1;
     vec beta(V, fill::zeros);
     beta += 1;
 
@@ -53,13 +53,13 @@ int main() {
     mat eta_m(D, K, fill::randu); // mean of eta
     mat eta_s(D, K, fill::randu); // sigma of eta
 
-    mat a_m(D, DOC_DIM, fill::randu);
-    mat a_s = diagmat(vec(DOC_DIM, fill::randu)); // all a_d share the same matrix
+    mat a_m(D, DOC_DIM, fill::zeros);
+    mat a_s = diagmat(vec(DOC_DIM, fill::ones)); // all a_d share the same matrix
 
     mat rho_m(K, V, fill::randu); // mean of rho
 
-    mat u_m(K, DOC_DIM, fill::randu); // mean of u
-    mat u_s = diagmat(vec(DOC_DIM, fill::randu)); // sigma of u, shared
+    mat u_m(K, DOC_DIM, fill::zeros); // mean of u
+    mat u_s = diagmat(vec(DOC_DIM, fill::ones)); // sigma of u, shared
 
     // train for each batch
     vector<int> random_index;
@@ -67,7 +67,7 @@ int main() {
         random_index.push_back(i);
     }
     random_shuffle(random_index.begin(), random_index.end());
-    const int BATCH_SIZE = 87;
+    const int BATCH_SIZE = 10;
     const double EPS = 0.1;
     int num_of_batch = (int)((random_index.size() + BATCH_SIZE - 1) / BATCH_SIZE);
     int cur_batch = num_of_batch;
@@ -75,9 +75,8 @@ int main() {
     cout << "vocabulary size = " << V << endl;
 
     int iteration = 0;
-    int MAX_ITER = 5;
+    int MAX_ITER = 10;
     int aux_iter = 10;
-    cout << eta_m.row(0) << endl;
     while (iteration < MAX_ITER) {
         iteration++;
 
@@ -106,10 +105,10 @@ int main() {
                 //cout << "sample Eta" << endl;
                 SampleEta(*d, eta_m, u_m, a_m, z, gamma, N, K);
                 //cout << "upday A" << endl;
-                if (!UpdateA(*d, a_m, a_s, u_m, u_s, eta_m, c, gamma, DOC_DIM, K, EPS)) {
-                    has_converge = false;
+                //if (!UpdateA(*d, a_m, a_s, u_m, u_s, eta_m, c, gamma, DOC_DIM, K, EPS)) {
+                  //  has_converge = false;
                     //cout << "A -------------> NOT CONVERGE" << endl;
-                }
+                //}
             }
             //cout << eta_m.row(0) << endl;
 
@@ -120,33 +119,28 @@ int main() {
                     //cout << "撸 -------------> NOT CONVERGE" << endl;
                 }
                 //cout << "upday U" << endl;
-                if (!UpdateU(k, u_m, u_s, a_m, a_s, eta_m, kappa, gamma, DOC_DIM, D, EPS)) {
-                    has_converge = false; 
+                //if (!UpdateU(k, u_m, u_s, a_m, a_s, eta_m, kappa, gamma, DOC_DIM, D, EPS)) {
+                  //  has_converge = false; 
                     //cout << "U -------------> NOT CONVERGE" << endl;
-                }
+                //}
             }
             cout << "iteration finished" << endl;
             if (has_converge) { break; }
         }
 
-        kappa = UpdateKappa(u_m, u_s, DOC_DIM, K);
-        c = UpdateC(a_m, a_s, DOC_DIM, D);
+        //kappa = UpdateKappa(u_m, u_s, DOC_DIM, K);
+        //c = UpdateC(a_m, a_s, DOC_DIM, D);
     }
-
+	cout << z[0] << endl;
+	/*for(int d = 0; d < D; d++){
+		cout << eta_m.row(d) << endl;
+	}*/
     // TODO: Evaluate
-    cout << "z_0n = " << endl;
-    cout << z[0] << endl;
-    cout << "z_1n = " << endl;
-    cout << z[1] << endl;
-    cout << "z_2n = " << endl;
-    cout << z[2] << endl;
-    cout << "z_3n = " << endl;
-    cout << z[3] << endl;
     for(int k = 0; k < K; k++){
-        //cout << rho_m.row(k) << endl;
+	//cout << rho_m.row(k) << endl;
         uvec indx = sort_index(rho_m.row(k).t(), "descend");
         cout << "topic " << k << endl;
-        for(int i = 0; i < 5; i++){
+        for(int i = 0; i < 10; i++){
             cout << idx2word[indx(i)] << endl;
         }
         cout << endl;
