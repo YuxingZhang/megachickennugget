@@ -104,7 +104,7 @@ void UpdateBeta() {
 }
 
 void UpdateAlpha_gradient(vec& alpha, mat& gamma, int K, int D){
-    double NEWTON_THREASH = 0.00001;
+    double NEWTON_THRESH = 0.00001;
     int MAX_ITER = 1000;
     double step_size = 0.01;
     
@@ -128,7 +128,7 @@ void UpdateAlpha_gradient(vec& alpha, mat& gamma, int K, int D){
         }
         alpha -= g * step_size;
         iter++;
-    } while(iter < MAX_ITER && max(g) > NEWTON_THRESH)
+    } while(iter < MAX_ITER && max(abs(g)) > NEWTON_THRESH);
 
     return;
 }
@@ -263,9 +263,7 @@ void upBeta(vec& beta, mat& lambda, int V, int K){
     int MAX_ITER = 1000;
     double step_size = 0.01;
     
-    vec df(V, fill::zeros);
     vec g(V, fill::zeros);
-    vec h(V, fill::zeros);
     int iter = 0;
     do{
         // compute the first derivative
@@ -284,7 +282,7 @@ void upBeta(vec& beta, mat& lambda, int V, int K){
         
         beta -= g * step_size;
         iter++;
-    } while(iter < MAX_ITER && max(abs(df)) > NEWTON_THRESH);
+    } while(iter < MAX_ITER && max(abs(g)) > NEWTON_THRESH);
 
     return;
 }
