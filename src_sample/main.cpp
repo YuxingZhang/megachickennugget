@@ -19,8 +19,8 @@ void load_files(string embedding, string corpus, map<string, int>& word2idx, map
 
 int main() {
     // Reading input files, including the corpus and the embedding
-    string emb_file = "../vectors_bloomberg.txt";
-    string corpus_file = "../corpus_bloomberg.txt";
+    string emb_file = "../abs_vectors.txt";
+    string corpus_file = "../abs_corpus.txt";
     //arma_rng::set_seed_random();
     map<string, int> word2idx;  // V
     map<int, string> idx2word;  // V
@@ -105,10 +105,10 @@ int main() {
                 //cout << "sample Eta" << endl;
                 SampleEta(*d, eta_m, u_m, a_m, z, gamma, N, K);
                 //cout << "upday A" << endl;
-                //if (!UpdateA(*d, a_m, a_s, u_m, u_s, eta_m, c, gamma, DOC_DIM, K, EPS)) {
-                  //  has_converge = false;
+                if (!UpdateA(*d, a_m, a_s, u_m, u_s, eta_m, c, gamma, DOC_DIM, K, EPS)) {
+                    has_converge = false;
                     //cout << "A -------------> NOT CONVERGE" << endl;
-                //}
+                }
             }
             //cout << eta_m.row(0) << endl;
 
@@ -119,10 +119,10 @@ int main() {
                     //cout << "撸 -------------> NOT CONVERGE" << endl;
                 }
                 //cout << "upday U" << endl;
-                //if (!UpdateU(k, u_m, u_s, a_m, a_s, eta_m, kappa, gamma, DOC_DIM, D, EPS)) {
-                  //  has_converge = false; 
+                if (!UpdateU(k, u_m, u_s, a_m, a_s, eta_m, kappa, gamma, DOC_DIM, D, EPS)) {
+                    has_converge = false; 
                     //cout << "U -------------> NOT CONVERGE" << endl;
-                //}
+                }
             }
             cout << "iteration finished" << endl;
             if (has_converge) { break; }
@@ -131,13 +131,13 @@ int main() {
         //kappa = UpdateKappa(u_m, u_s, DOC_DIM, K);
         //c = UpdateC(a_m, a_s, DOC_DIM, D);
     }
-	cout << z[0] << endl;
-	/*for(int d = 0; d < D; d++){
-		cout << eta_m.row(d) << endl;
-	}*/
+    cout << z[0] << endl;
+    /*for(int d = 0; d < D; d++){
+      cout << eta_m.row(d) << endl;
+      }*/
     // TODO: Evaluate
     for(int k = 0; k < K; k++){
-	//cout << rho_m.row(k) << endl;
+        //cout << rho_m.row(k) << endl;
         uvec indx = sort_index(rho_m.row(k).t(), "descend");
         cout << "topic " << k << endl;
         for(int i = 0; i < 10; i++){
