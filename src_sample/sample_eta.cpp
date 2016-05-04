@@ -12,7 +12,7 @@ void SampleEta(int d, mat& eta_m, mat& u_m, mat& a_m, vector<mat>& z, double gam
 	int block_num = ceil(N[d] / block_size);
 	int batch = 0;
 	int num_batch = 5;
-	for(int n = 0; n < num_batch; n++){
+	for(int m = 0; m < num_batch; m++){
 		while (batch < block_num){		
 		    // proposal distribution
 		    double proposal_mu[K];
