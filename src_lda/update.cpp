@@ -104,7 +104,7 @@ void UpdateBeta() {
 }
 
 void UpdateAlpha_gradient(vec& alpha, mat& gamma, int K, int D){
-    double NEWTON_THREASH = 0.00001;
+    double NEWTON_THRESH = 0.00001;
     int MAX_ITER = 1000;
     double step_size = 0.01;
     
@@ -128,7 +128,7 @@ void UpdateAlpha_gradient(vec& alpha, mat& gamma, int K, int D){
         }
         alpha -= g * step_size;
         iter++;
-    } while(iter < MAX_ITER && max(g) > NEWTON_THRESH)
+    } while(iter < MAX_ITER && max(g) > NEWTON_THRESH);
 
     return;
 }
