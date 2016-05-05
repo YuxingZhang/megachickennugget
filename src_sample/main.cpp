@@ -19,8 +19,8 @@ void load_files(string embedding, string corpus, map<string, int>& word2idx, map
 
 int main() {
     // Reading input files, including the corpus and the embedding
-    string emb_file = "../mini_abs_vectors.txt";
-    string corpus_file = "../mini_abs_corpus.txt";
+    string emb_file = "../news_vectors.txt";
+    string corpus_file = "../news_corpus.txt";
     //arma_rng::set_seed_random();
     map<string, int> word2idx;  // V
     map<int, string> idx2word;  // V
@@ -31,7 +31,7 @@ int main() {
     // some parameters
     const int V = idx2word.size(); // vocabulary size
     const int D = W.size(); // number of documents
-    const int K = 10; // number of topics
+    const int K = 20; // number of topics
     const int WORD_DIM = 20; // dimension of word embedding
     const int DOC_DIM = 3;// dimension of document embedding
 
