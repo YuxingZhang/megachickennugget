@@ -31,9 +31,9 @@ int main() {
     // some parameters
     const int V = idx2word.size(); // vocabulary size
     const int D = W.size(); // number of documents
-    const int K = 5; // number of topics
+    const int K = 10; // number of topics
     const int WORD_DIM = 20; // dimension of word embedding
-    const int DOC_DIM = 10;// dimension of document embedding
+    const int DOC_DIM = 3;// dimension of document embedding
 
     // model parameters, changed in the M step
     double c = 1;
@@ -122,17 +122,34 @@ int main() {
         //c = UpdateC(a_m, a_s, DOC_DIM, D);
     }
 
+    ofstream fout;
+    fout.open ("u_m.txt");
+    fout << u_m << endl;
+    fout.close();
 	
+    fout.open ("a_m.txt");
+    fout << a_m << endl;
+    fout.close();
+    
+    fout.open ("eta_m.txt");
+    fout << eta_m << endl;
+    fout.close();
+
+    fout.open ("rho_m.txt");
+    fout << rho_m << endl;
+    fout.close();
+        
+    fout.open("topic.txt");
     // TODO: Evaluate
     for(int k = 0; k < K; k++){
         //cout << rho_m.row(k) << endl;
         uvec indx = sort_index(rho_m.row(k).t(), "descend");
-        cout << "topic " << k << endl;
-        for(int i = 0; i < 10; i++){
-            cout << idx2word[indx(i)] << endl;
+        fout << "topic " << k << endl;
+        for(int i = 0; i < 20; i++){
+            fout << idx2word[indx(i)] << endl;
         }
-        cout << endl;
+        fout << endl;
     }
-
+    fout.close();
     return 0;
 }
