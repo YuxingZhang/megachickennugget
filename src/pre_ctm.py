@@ -6,10 +6,10 @@ if __name__ == '__main__':
 	remove = set(['the', 'will', 'a', 'this', 'that', 'of', 'an', 'to', 'as', 'is', 'are', 'was', \
 		'for', 'where', 'with', 'which', 'in', 'and', 'by', 'we', 'be', 'can', 'on', 'at', 'from',\
 		'some', 'too', 'it', 'not', 'or', 'were', 'one', 'then', 'if', 'all', 'when', 'there', 'must',\
-		'how', 'no', 'since', 'very', 'however', 'any', 'just', 'only', 'also'])
+		'how', 'no', 'since', 'very', 'however', 'any', 'just', 'only', 'also', 're', 'subject'])
 
-	path = '/Users/Lidan/Documents/CMU Yr1 Sem2/10-708/Project/nipsdata/'
-	input_file = 'a_result/abstracts.txt'
+	path = '/Users/Lidan/Documents/CMU Yr1 Sem2/10-708/Project/newsdata/'
+	input_file = 'a_result/corpus.txt'
 	# new_corpus_file gives the processed corpus file without 'remove' words
 	new_corpus_file = 'a_result/new_corpus.txt'
 	output_file = 'a_result/wordcount.dat'
@@ -27,19 +27,20 @@ if __name__ == '__main__':
 	for l in f.readlines():
 		l = l[:-1]
 		words = l.split(' ')
-		for w in words:
-			if (len(w) > 1) and (not w in remove):
-				if not vocab_hm.has_key(w): 
-					vocab.append(w)
-					vocab_hm[w] = 1
-				else:
-					vocab_hm[w] += 1
+		if len(words) < 200:
+			for w in words:
+				if (len(w) > 1) and (not w in remove):
+					if not vocab_hm.has_key(w): 
+						vocab.append(w)
+						vocab_hm[w] = 1
+					else:
+						vocab_hm[w] += 1
 	f.close()
 
 	# remove words that appear fewer than 50 times and output the vocab.dat file
 	for i in range(len(vocab)):
 		w = vocab[i]
-		if vocab_hm[w] < 5:
+		if vocab_hm[w] < 50:
 			vocab_hm.pop(w)
 
 	# make a new list of vocab after removing the words
@@ -57,22 +58,24 @@ if __name__ == '__main__':
 		d = dict()
 		l = l[:-1]
 		words = l.split(' ')
-		for w in words:
-			if vocab_hm.has_key(w):
-				if len(d) > 0:
-					fout_corpus.write(' ');
-				fout_corpus.write(w)
-				if d.has_key(w):
-					d[w] += 1
-				else:
-					d[w] = 1
-		f_out.write(str(len(d)))
-		for i in range(len(vocab)):
-			if d.has_key(vocab[i]):
-				f_out.write(' ' + str(i) + ':' + str(d[vocab[i]]))
-		if len(d) > 0:
-			f_out.write('\n')
-			fout_corpus.write('\n')
+		# only keep records with fewer than 2000 words
+		if len(words) < 200:
+			for w in words:
+				if vocab_hm.has_key(w):
+					if len(d) > 0:
+						fout_corpus.write(' ');
+					fout_corpus.write(w)
+					if d.has_key(w):
+						d[w] += 1
+					else:
+						d[w] = 1
+			f_out.write(str(len(d)))
+			for i in range(len(vocab)):
+				if d.has_key(vocab[i]):
+					f_out.write(' ' + str(i) + ':' + str(d[vocab[i]]))
+			if len(d) > 0:
+				f_out.write('\n')
+				fout_corpus.write('\n')
 	f.close()
 	f_out.close()
 	fout_corpus.close()
