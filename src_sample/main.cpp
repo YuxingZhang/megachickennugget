@@ -19,8 +19,8 @@ void load_files(string embedding, string corpus, map<string, int>& word2idx, map
 
 int main() {
     // Reading input files, including the corpus and the embedding
-    string emb_file = "../abs_vectors.txt";
-    string corpus_file = "../abs_corpus.txt";
+    string emb_file = "../mini_abs_vectors.txt";
+    string corpus_file = "../mini_abs_corpus.txt";
     //arma_rng::set_seed_random();
     map<string, int> word2idx;  // V
     map<int, string> idx2word;  // V
@@ -38,7 +38,7 @@ int main() {
     // model parameters, changed in the M step
     double c = 1;
     double kappa = 1;
-    double gamma = 1;
+    double gamma = 0.1;
     vec beta(V, fill::zeros);
     beta += 1;
 
@@ -53,13 +53,13 @@ int main() {
     mat eta_m(D, K, fill::randu); // mean of eta
     mat eta_s(D, K, fill::randu); // sigma of eta
 
-    mat a_m(D, DOC_DIM, fill::zeros);
-    mat a_s = diagmat(vec(DOC_DIM, fill::ones)); // all a_d share the same matrix
+    mat a_m(D, DOC_DIM, fill::randu);
+    mat a_s = diagmat(vec(DOC_DIM, fill::randu)); // all a_d share the same matrix
 
     mat rho_m(K, V, fill::randu); // mean of rho
 
-    mat u_m(K, DOC_DIM, fill::zeros); // mean of u
-    mat u_s = diagmat(vec(DOC_DIM, fill::ones)); // sigma of u, shared
+    mat u_m(K, DOC_DIM, fill::randu); // mean of u
+    mat u_s = diagmat(vec(DOC_DIM, fill::randu)); // sigma of u, shared
 
     // train for each batch
     vector<int> random_index;
@@ -67,7 +67,7 @@ int main() {
         random_index.push_back(i);
     }
     random_shuffle(random_index.begin(), random_index.end());
-    const int BATCH_SIZE = 10;
+    const int BATCH_SIZE = 1000;
     const double EPS = 0.1;
     int num_of_batch = (int)((random_index.size() + BATCH_SIZE - 1) / BATCH_SIZE);
     int cur_batch = num_of_batch;
@@ -121,10 +121,8 @@ int main() {
         //kappa = UpdateKappa(u_m, u_s, DOC_DIM, K);
         //c = UpdateC(a_m, a_s, DOC_DIM, D);
     }
-    cout << z[0] << endl;
-    /*for(int d = 0; d < D; d++){
-      cout << eta_m.row(d) << endl;
-      }*/
+
+	
     // TODO: Evaluate
     for(int k = 0; k < K; k++){
         //cout << rho_m.row(k) << endl;

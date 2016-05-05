@@ -5,25 +5,25 @@ void SampleEta(int d, mat& eta_m, mat& u_m, mat& a_m, vector<mat>& z, double gam
     vec eta_sample_sum(K, fill::zeros);
     double new_eta, sum_eta, accept, C;
     std::default_random_engine generator;
-    int iterations = 1000;
+    int iterations = 5000;
     int num_sample = 100;
 
-	int block_size = 20;
-	int block_num = ceil(N[d] / block_size);
-	for(int m = 0; m < 5; m++){
-		int batch = 0;
-		while (batch < block_num){		
+	//int block_size = 20;
+	//int block_num = ceil(N[d] / block_size);
+	//for(int m = 0; m < 5; m++){
+	//	int batch = 0;
+	//	while (batch < block_num){		
 		    // proposal distribution
 			double proposal_mu[K];
-			int upsize = min(N[d], (batch + 1) * block_size);
-			int losize = batch * block_size;
-			int block_length = upsize - losize;
+	//		int upsize = min(N[d], (batch + 1) * block_size);
+	//		int losize = batch * block_size;
+	//		int block_length = upsize - losize;
 		    for (int k = 0; k < K; k++) {
 				double tmp = 0.0;
-				for (int n = losize; n < upsize; n++) {
+				for (int n = 0; n < N[d]; n++) {
 				    tmp += z[d](n, k); 
 				}
-				proposal_mu[k] = dot(u_m.row(k), a_m.row(d)) + tmp / gamma - block_length / (gamma * K);
+				proposal_mu[k] = dot(u_m.row(k), a_m.row(d)) + tmp / gamma - N[d] / (gamma * K);
 				//cout << "dot, tmp / gamma = " << dot(u_m.row(k), a_m.row(d)) << " " << tmp / gamma << endl;
 				//cout << proposal_mu[k] << " ";
 		    }
@@ -41,7 +41,7 @@ void SampleEta(int d, mat& eta_m, mat& u_m, mat& a_m, vector<mat>& z, double gam
 				    new_eta = n_distribution(generator);
 				    // compute the rejection criteria
 				    //accept = min(pow((C + exp(prev_eta(k))) / (C + exp(new_eta)), N[d]), 1.0);
-					accept = min(1.0, exp(block_length * (log(C + exp(prev_eta(k))) - log(C + exp(new_eta)) + new_eta / K - prev_eta(k) / K)));	
+					accept = min(1.0, exp(N[d] * (log(C + exp(prev_eta(k))) - log(C + exp(new_eta)) + new_eta / K - prev_eta(k) / K)));	
 					//cout << accept << endl;	
 					//cout << log(C + exp(prev_eta(k))) << " " << log(C + exp(new_eta)) << " " << new_eta << " " << prev_eta(k) << endl;
 				    // get the new sample
@@ -58,12 +58,12 @@ void SampleEta(int d, mat& eta_m, mat& u_m, mat& a_m, vector<mat>& z, double gam
 				    prev_eta(k) = new_eta;
 				}
 		    }
-			batch++;
-		}
-	}
+			//batch++;
+		//}
+	//}
     //cout << "before" << endl;
     //cout << eta_m.row(d);
-    eta_m.row(d) = eta_sample_sum.t() / (block_num * num_sample * 5);
+    eta_m.row(d) = eta_sample_sum.t() / num_sample;
     //cout << "after" << endl;
     //cout << eta_m.row(d);
 
