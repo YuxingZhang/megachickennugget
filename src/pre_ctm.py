@@ -6,7 +6,10 @@ if __name__ == '__main__':
 	remove = set(['the', 'will', 'a', 'this', 'that', 'of', 'an', 'to', 'as', 'is', 'are', 'was', \
 		'for', 'where', 'with', 'which', 'in', 'and', 'by', 'we', 'be', 'can', 'on', 'at', 'from',\
 		'some', 'too', 'it', 'not', 'or', 'were', 'one', 'then', 'if', 'all', 'when', 'there', 'must',\
-		'how', 'no', 'since', 'very', 'however', 'any', 'just', 'only', 'also', 're', 'subject'])
+		'how', 'no', 'since', 'very', 'however', 'any', 'just', 'only', 'also', 're', 'subject', 'have',\
+		'my', 'but', 'so', 'has', 'does', 'do', 'what', 'you', 'would', 'about', 'me', 'dont', 'am',\
+		 'get', 'know', 'please', 'thanks', 'out', 'they', 'who', 'anyone', 'need', 'someone', 'he', 'his',\
+		 'them', 'your', 'writes', 'write', 'why'])
 
 	path = '/Users/Lidan/Documents/CMU Yr1 Sem2/10-708/Project/newsdata/'
 	input_file = 'a_result/corpus.txt'
@@ -17,6 +20,7 @@ if __name__ == '__main__':
 
 	vocab = list()
 	vocab_hm = dict()
+	max_len = 1000
 
 	f = open(path + input_file, 'r')
 	f_out = open(path + output_file, 'w')
@@ -27,7 +31,7 @@ if __name__ == '__main__':
 	for l in f.readlines():
 		l = l[:-1]
 		words = l.split(' ')
-		if len(words) < 200:
+		if len(words) < max_len:
 			for w in words:
 				if (len(w) > 1) and (not w in remove):
 					if not vocab_hm.has_key(w): 
@@ -59,7 +63,7 @@ if __name__ == '__main__':
 		l = l[:-1]
 		words = l.split(' ')
 		# only keep records with fewer than 2000 words
-		if len(words) < 200:
+		if len(words) < max_len:
 			for w in words:
 				if vocab_hm.has_key(w):
 					if len(d) > 0:
